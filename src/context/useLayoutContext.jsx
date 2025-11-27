@@ -108,6 +108,7 @@ const LayoutProvider = ({
       showBackdrop: !offcanvasStates.showBackdrop
     });
   }, [offcanvasStates.showBackdrop]);
+
   useEffect(() => {
     toggleDocumentAttribute('data-bs-theme', settings.theme);
     toggleDocumentAttribute('data-topbar-color', settings.topbarTheme);
@@ -136,7 +137,7 @@ const LayoutProvider = ({
     resetSettings
   }), [settings, offcanvasStates])}>
       {children}
-      {offcanvasStates.showBackdrop && <div className="offcanvas-backdrop fade show" onClick={toggleBackdrop} />}
+      {offcanvasStates.showBackdrop && <div className="offcanvas-backdrop fade" onClick={toggleBackdrop} />}
     </ThemeContext.Provider>;
 };
 export { LayoutProvider, useLayoutContext };

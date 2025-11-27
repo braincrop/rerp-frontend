@@ -2,6 +2,7 @@ import { MENU_ITEMS } from '@/assets/data/menu-items';
 export const getMenuItems = () => {
   return MENU_ITEMS;
 };
+
 export const findAllParent = (menuItems, menuItem) => {
   let parents = [];
   const parent = findMenuItem(menuItems, menuItem.parentKey);

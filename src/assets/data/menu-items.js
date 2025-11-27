@@ -12,70 +12,187 @@ export const MENU_ITEMS = [{
     variant: 'primary'
   }
 },
-// ====================Authentication===============
 
-{
-  key: 'auth',
-  label: 'Authentication',
-  icon: 'solar:user-circle-outline',
-  children: [{
-    key: 'sign-in',
-    label: 'Sign In',
-    url: '/auth/sign-in',
-    parentKey: 'auth'
-  }, {
-    key: 'sign-up',
-    label: 'Sign Up',
-    url: '/auth/sign-up',
-    parentKey: 'auth'
-  }, {
-    key: 'reset-password',
-    label: 'Reset Password',
-    url: '/auth/reset-password',
-    parentKey: 'auth'
-  }, {
-    key: 'lock-screen',
-    label: 'Lock Screen',
-    url: '/auth/lock-screen',
-    parentKey: 'auth'
-  }]
-},
-{
-key:"category",
-label:"Category",
-icon:"solar:category-outline",
-children:[{
-  key:"add",
-  label:"Add",
-  url:"/category/add",
-  parentKey:"category"
-},
-{
-  key:"list",
-  label:"List",
-  url:"/category/list",
-  parentKey:"category"
-}]
+// =================================
 
-},
+  {
+    key: "categories",
+    label: "Categories",
+    icon: "solar:category-2-linear",
+    url: "/categories/Category"
+  },
+  {
+    key: "products",
+    label: "Products",
+    icon: "solar:box-linear",
+    url: "/products"
+  },
+  {
+    key: "assigned-items",
+    label: "Assigned Items",
+    icon: "solar:checklist-linear",
+    url: "/assigned-items"
+  },
+  {
+    key: "employees",
+    label: "Employees",
+    icon: "solar:users-group-two-rounded-linear",
+    url: "/employees"
+  },
+  {
+    key: "reservation",
+    label: "Reservation",
+    icon: "solar:calendar-linear",
+    url: "/reservation"
+  },
+  {
+    key: "coupons",
+    label: "Coupons",
+    icon: "solar:ticket-sale-linear",
+    url: "/coupons"
+  },
+  {
+    key: "vendi-splash-screen",
+    label: "Vendi Splash Screen",
+    icon: "solar:monitor-linear",
+    url: "/vendi-splash-screen"
+  },
+  {
+    key: "app-subscriber",
+    label: "App Subscriber",
+    icon: "solar:users-group-rounded-linear",
+    url: "/app-subscriber"
+  },
+  {
+    key: "sms-service",
+    label: "SMS Service",
+    icon: "solar:chat-round-linear",
+    url: "/sms-service"
+  },
+  {
+    key: "mobile-notification",
+    label: "Mobile Notification",
+    icon: "solar:bell-linear",
+    url: "/mobile-notification"
+  },
+  {
+    key: "logs",
+    label: "Logs",
+    icon: "solar:document-text-linear",
+    url: "/logs"
+  },
+  {
+    key: "sales-logs",
+    label: "Sales Logs",
+    icon: "solar:graph-up-linear",
+    url: "/sales-logs"
+  },
+  {
+    key: "app-build",
+    label: "App Build",
+    icon: "solar:settings-line-duotone",
+    url: "/app-build"
+  },
+  {
+    key: "devices",
+    label: "Device",
+    icon: "solar:server-square-linear",
+    url: "/device",
+    children: [
+      {
+        key: "vendi-device",
+        label: "Vendi Device",
+        url: "/device/vendi-device",
+        parentKey: "devices"
+      },
+      {
+        key: "send-message",
+        label: "Send Message",
+        url: "/device/send-message",
+        parentKey: "devices"
+      },
+      {
+        key: "commands",
+        label: "Commands",
+        url: "/device/commands",
+        parentKey: "devices"
+      }
+    ]
+  },
+  {
+    key: "language",
+    label: "Language",
+    icon: "solar:translate-linear",
+    url: "/language",
+    children: [
+      {
+        key: "add-language",
+        label: "Add Translation",
+        url: "/language/add-translation",
+        parentKey: "language"
+      }
+    ]
+  },
+  {
+    key: "user-management",
+    label: "User Management",
+    icon: "solar:user-circle-linear",
+    url: "/user-management",
+    children: [
+      {
+        key: "roles",
+        label: "Roles",
+        url: "/user-management/roles",
+        parentKey: "user-management"
+      },
+      {
+        key: "user",
+        label: "Users",
+        url: "/user-management/users",
+        parentKey: "user-management"
+      }
+    ]
+  },
+  {
+    key: "email-management",
+    label: "Email Management",
+    icon: "solar:letter-opened-linear",
+    url: "/email-management",
+    children: [
+      {
+        key: "types",
+        label: "Types",
+        url: "/email-management/types",
+        parentKey: "email-management"
+      },
+      {
+        key: "receipt",
+        label: "Receipts",
+        url: "/email-management/receipts",
+        parentKey: "email-management"
+      }
+    ]
+  }
+
+
 // ====================error===============
 
-{
-  key: 'error-pages',
-  label: 'Error Pages',
-  icon: 'solar:danger-outline',
-  children: [{
-    key: '404-error',
-    label: '404 Error',
-    url: '/error-pages/pages-404',
-    parentKey: 'error'
-  }, {
-    key: '404-error(alt)',
-    label: '404 Error (alt)',
-    url: '/pages-404-alt',
-    parentKey: 'error'
-  }]
-},
+// {
+//   key: 'error-pages',
+//   label: 'Error Pages',
+//   icon: 'solar:danger-outline',
+//   children: [{
+//     key: '404-error',
+//     label: '404 Error',
+//     url: '/error-pages/pages-404',
+//     parentKey: 'error'
+//   }, {
+//     key: '404-error(alt)',
+//     label: '404 Error (alt)',
+//     url: '/pages-404-alt',
+//     parentKey: 'error'
+//   }]
+// },
 // ====================base-ui===============
 // {
 //   key: 'ui-kit',
