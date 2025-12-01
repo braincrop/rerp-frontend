@@ -2,9 +2,7 @@ import AllPagination from './components/AllPagination';
 import Link from 'next/link';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import { Col, Row } from 'react-bootstrap';
-export const metadata = {
-  title: 'Pagination '
-};
+
 const Pagination = () => {
   return <>
       <Row>
