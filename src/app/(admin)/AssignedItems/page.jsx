@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useMemo } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
-import { Icon } from '@iconify/react'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap';
+import { Icon } from '@iconify/react';
 
 const initialProducts = [
   {
@@ -178,6 +178,11 @@ const Page = () => {
 
   return (
     <Container className="mt-5">
+      <Row className="mb-2">
+        <Col md="6">
+          <Input type="text" placeholder="Search branch..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        </Col>
+      </Row>
       <Row className="mb-4">
         <Col md="2">
           <Input type="text" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -310,4 +315,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default Page;

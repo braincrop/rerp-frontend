@@ -24,6 +24,12 @@ export const MENU_ITEMS = [{
     icon: "solar:box-linear",
     url: "/products"
   },
+   {
+    key: "branch",
+    label: "Branch",
+    icon: "solar:buildings-linear",
+    url: "/Branch"
+  },
   {
     key: "assigned-items",
     label: "Assigned Items",
