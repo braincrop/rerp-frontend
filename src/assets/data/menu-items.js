@@ -12,13 +12,10 @@ export const MENU_ITEMS = [{
     variant: 'primary'
   }
 },
-
-// =================================
-
   {
     key: "categories",
     label: "Categories",
-    icon: "solar:category-2-linear",
+    icon: "iconamoon:category-thin",
     url: "/categories/Category"
   },
   {
@@ -27,11 +24,17 @@ export const MENU_ITEMS = [{
     icon: "solar:box-linear",
     url: "/products"
   },
+   {
+    key: "branch",
+    label: "Branch",
+    icon: "solar:buildings-linear",
+    url: "/Branch"
+  },
   {
     key: "assigned-items",
     label: "Assigned Items",
     icon: "solar:checklist-linear",
-    url: "/assigned-items"
+    url: "/AssignedItems"
   },
   {
     key: "employees",
@@ -122,7 +125,7 @@ export const MENU_ITEMS = [{
   {
     key: "language",
     label: "Language",
-    icon: "solar:translate-linear",
+    icon: "ion:language-sharp",
     url: "/language",
     children: [
       {

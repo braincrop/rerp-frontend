@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label } from 'reactstrap'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label } from 'reactstrap';
 import { Icon } from '@iconify/react'
-const page = () => {
+const Page = () => {
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('') // 'create' | 'edit'
+  const [modalType, setModalType] = useState('') ;
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [categoryInput, setCategoryInput] = useState('')
   const [categories, setCategories] = useState([
@@ -118,4 +118,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
