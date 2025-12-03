@@ -6,100 +6,112 @@ import { Icon } from '@iconify/react'
 const initialProducts = [
   {
     id: 1,
-    name: 'IB 10 - The One at University City',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
+    branch: "IB 39 - Starwood Capital Group",
+    eeid: "001795",
+    name: "Alcide, Edley",
+    email: "Ealcide@LnrPartners.com",
+    workphone: "+13056955541",
+    employed: "true",
   },
   {
     id: 2,
-    name: 'IB 11 - Alluvion Las Olas',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'false',
+    branch: "IB 0 - Test Machine",
+    eeid: "001234",
+    name: "Khan, Ahmed",
+    email: "m.ahmed@braincrop.net",
+    workphone: "+17864714000",
+    employed: "false",
   },
   {
     id: 3,
-    name: 'IB 16 - Memorial Healthcare System Corporate Office',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'false',
+    branch: "IB 21 - GreenStone Finance",
+    eeid: "002156",
+    name: "Smith, John",
+    email: "john.smith@greenstone.com",
+    workphone: "+14051234567",
+    employed: "true",
   },
   {
     id: 4,
-    name: 'IB 17 - UM School of Law',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
+    branch: "IB 12 - NovaTech Solutions",
+    eeid: "003478",
+    name: "Brown, Alice",
+    email: "alice.brown@novatech.com",
+    workphone: "+18134566789",
+    employed: "true",
   },
   {
     id: 5,
-    name: 'IB 15 - UHealth at Plantation',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
+    branch: "IB 89 - SilverLake Advisors",
+    eeid: "004789",
+    name: "Lee, Michael",
+    email: "michael.lee@silverlake.com",
+    workphone: "+15025557788",
+    employed: "false",
   },
   {
     id: 6,
-    name: 'IB 23 - Baptist Hospital',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
+    branch: "IB 44 - Alpha Holdings",
+    eeid: "005321",
+    name: "Garcia, Maria",
+    email: "maria.garcia@alpha.com",
+    workphone: "+12068990011",
+    employed: "true",
   },
   {
     id: 7,
-    name: 'IB 30 - UM Stanford Residential Hall',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
+    branch: "IB 17 - Global Equity Corp",
+    eeid: "006432",
+    name: "Wilson, David",
+    email: "david.wilson@gecorp.com",
+    workphone: "+16034567899",
+    employed: "true",
   },
   {
     id: 8,
-    name: 'IB 31 - Broward Health Coral Springs',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
+    branch: "IB 5 - Horizon Investments",
+    eeid: "007543",
+    name: "Taylor, Emma",
+    email: "emma.taylor@horizon.com",
+    workphone: "+17045556677",
+    employed: "false",
   },
   {
     id: 9,
-    name: 'IB 35 - UM School of Architecture',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
+    branch: "IB 33 - BluePeak Partners",
+    eeid: "008654",
+    name: "Johnson, Robert",
+    email: "robert.j@bluepeak.com",
+    workphone: "+19056667788",
+    employed: "true",
   },
   {
     id: 10,
-    name: 'IB 33 - Memorial Regional Hospital South',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
+    branch: "IB 61 - Apex Dynamics",
+    eeid: "009765",
+    name: "Martinez, Sofia",
+    email: "sofia.m@apexdynamics.com",
+    workphone: "+13046665544",
+    employed: "false",
   },
-]
+];
+
 
 const Page = () => {
   const [products, setProducts] = useState(initialProducts)
   const [search, setSearch] = useState('')
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useState(5)
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('');
+  const [modalType, setModalType] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [productInput, setProductInput] = useState({
+    branch: '',
+    eeid: '',
     name: '',
-    revenueCenter: '',
-    ui: '',
-    accessibility: '',
-    mobileOrdering: '',
+    email: '',
+    workphone: '',
+    employed: '',
   })
   const openModal = (type, index = null) => {
     setModalType(type)
@@ -108,11 +120,12 @@ const Page = () => {
       setProductInput(products[index])
     } else {
       setProductInput({
+        branch: '',
+        eeid: '',
         name: '',
-        revenueCenter: '',
-        ui: '',
-        accessibility: '',
-        mobileOrdering: '',
+        email: '',
+        workphone: '',
+        employed: '',
       })
     }
     setModalOpen(true)
@@ -158,7 +171,6 @@ const Page = () => {
         <Col md="2">
           <Input type="text" placeholder="Search branch..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </Col>
-
         <Col md="2">
           <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
             <option value={5}>5</option>
@@ -166,8 +178,11 @@ const Page = () => {
             <option value={20}>20</option>
           </Input>
         </Col>
-
         <Col md="8" className="text-end">
+          <Button color="primary" onClick={() => openModal('create')} className='me-1'>
+            <Icon icon="mdi:file-upload-outline" width={18}  className='me-2'/>
+            Upload File
+          </Button>
           <Button color="primary" onClick={() => openModal('create')}>
             <Icon icon="mdi:plus" width={18} className="me-2" />
             Create New
@@ -178,11 +193,12 @@ const Page = () => {
         <thead className="table-light">
           <tr>
             <th>#</th>
+            <th>Branch</th>
+            <th>EEID</th>
             <th>Name</th>
-            <th>Revenue Center</th>
-            <th>UI</th>
-            <th>Accessibility</th>
-            <th>Mobile Ordering</th>
+            <th>Email</th>
+            <th>Workphone</th>
+            <th>Employed</th>   
             <th className="text-center">Actions</th>
           </tr>
         </thead>
@@ -191,16 +207,16 @@ const Page = () => {
             paginated.map((prod, index) => (
               <tr key={prod.id}>
                 <td>{index + 1}</td>
+                <td>{prod.branch}</td>
+                <td>{prod.eeid}</td>
                 <td>{prod.name}</td>
-                <td>{prod.revenueCenter}</td>
-                <td>{prod.ui}</td>
-                <td>{prod.accessibility}</td>
-                <td>{prod.mobileOrdering}</td>
+                <td>{prod.email}</td>
+                <td>{prod.workphone}</td>
+                <td>{prod.employed}</td>
                 <td className="text-center">
                   <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', index)}>
                     <Icon icon="mdi:pencil" width={16} />
                   </Button>
-
                   <Button color="danger" size="sm" onClick={() => openDeleteModal(index)}>
                     <Icon icon="mdi:delete" width={16} />
                   </Button>
@@ -220,24 +236,28 @@ const Page = () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Branch' : 'Edit Branch'}</ModalHeader>
         <ModalBody>
           <FormGroup>
+            <Label>Branch</Label>
+            <Input name="branch" value={productInput.branch} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label>EE ID</Label>
+            <Input name="eeid" value={productInput.eeid} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
             <Label>Name</Label>
             <Input name="name" value={productInput.name} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Revenue Center</Label>
-            <Input name="revenueCenter" value={productInput.revenueCenter} onChange={handleInputChange} />
+            <Label>Email</Label>
+            <Input name="email" value={productInput.email} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>UI</Label>
-            <Input name="ui" value={productInput.ui} onChange={handleInputChange} />
+            <Label>Work Phone</Label>
+            <Input name="workphone" value={productInput.workphone} onChange={handleInputChange} />
           </FormGroup>
-          <FormGroup>
-            <Label>Accessibility</Label>
-            <Input name="accessibility" value={productInput.accessibility} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Mobile Ordering</Label>
-            <Input name="mobileOrdering" value={productInput.mobileOrdering} onChange={handleInputChange} />
+           <FormGroup>
+            <Label>Employed</Label>
+            <Input name="employed" value={productInput.employed} onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
@@ -250,9 +270,8 @@ const Page = () => {
         </ModalFooter>
       </Modal>
       <Modal isOpen={deleteModal} centered>
-        <ModalHeader>Delete Branch</ModalHeader>
-        <ModalBody>Are you sure you want to delete this Branch?</ModalBody>
-
+        <ModalHeader>Delete Employee</ModalHeader>
+        <ModalBody>Are you sure you want to delete this Employee?</ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setDeleteModal(false)}>
             Cancel

@@ -34,7 +34,13 @@ yarn-error.log*
 
 # vercel
 .vercel
+# netlify
+
+.netlify
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Netlify folder
+.netlify
