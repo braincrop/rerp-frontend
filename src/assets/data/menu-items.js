@@ -40,7 +40,7 @@ export const MENU_ITEMS = [{
     key: "employees",
     label: "Employees",
     icon: "solar:users-group-two-rounded-linear",
-    url: "/employees"
+    url: "/Employees"
   },
   {
     key: "reservation",
