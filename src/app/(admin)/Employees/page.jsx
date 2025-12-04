@@ -226,7 +226,7 @@ const Page = () => {
           ) : (
             <tr>
               <td colSpan="7" className="text-center text-muted py-4">
-                No Branch Found
+                No Employees Found
               </td>
             </tr>
           )}

@@ -46,13 +46,13 @@ export const MENU_ITEMS = [{
     key: "reservation",
     label: "Reservation",
     icon: "solar:calendar-linear",
-    url: "/reservation"
+    url: "/Reservation"
   },
   {
     key: "coupons",
     label: "Coupons",
     icon: "solar:ticket-sale-linear",
-    url: "/coupons"
+    url: "/Coupons"
   },
   {
     key: "vendi-splash-screen",
