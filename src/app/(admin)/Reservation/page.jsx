@@ -168,7 +168,7 @@ const Page = () => {
             <th>Branch</th>
             <th>Username</th>
             <th>Code</th>
-            <th>Product</th>
+            {/* <th>Product</th> */}
             <th>Reserved Date</th>
             <th>Vented Date</th>
             <th>Vended</th>
