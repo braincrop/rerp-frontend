@@ -184,7 +184,7 @@ const Page = () => {
                 <td>{prod.branch}</td>
                 <td>{prod.username}</td>
                 <td>{prod.code}</td>
-                <td>''</td>
+                {/* <td>{prod.product}</td> */}
                 <td>{prod.ReservedDate}</td>
                 <td>{prod.ventedDate}</td>
                 <td>{prod.vended}</td>
