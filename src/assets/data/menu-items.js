@@ -58,13 +58,13 @@ export const MENU_ITEMS = [{
     key: "vendi-splash-screen",
     label: "Vendi Splash Screen",
     icon: "solar:monitor-linear",
-    url: "/vendi-splash-screen"
+    url: "/VendiSplashScreen"
   },
   {
     key: "app-subscriber",
     label: "App Subscriber",
     icon: "solar:users-group-rounded-linear",
-    url: "/app-subscriber"
+    url: "/AppSubscriber"
   },
   {
     key: "sms-service",
