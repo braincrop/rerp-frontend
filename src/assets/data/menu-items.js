@@ -46,25 +46,25 @@ export const MENU_ITEMS = [{
     key: "reservation",
     label: "Reservation",
     icon: "solar:calendar-linear",
-    url: "/reservation"
+    url: "/Reservation"
   },
   {
     key: "coupons",
     label: "Coupons",
     icon: "solar:ticket-sale-linear",
-    url: "/coupons"
+    url: "/Coupons"
   },
   {
     key: "vendi-splash-screen",
     label: "Vendi Splash Screen",
     icon: "solar:monitor-linear",
-    url: "/vendi-splash-screen"
+    url: "/VendiSplashScreen"
   },
   {
     key: "app-subscriber",
     label: "App Subscriber",
     icon: "solar:users-group-rounded-linear",
-    url: "/app-subscriber"
+    url: "/AppSubscriber"
   },
   {
     key: "sms-service",

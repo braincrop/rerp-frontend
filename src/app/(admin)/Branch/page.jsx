@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useMemo } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, 
+  Input, FormGroup, Label, Row, Col } from 'reactstrap';
 import { Icon } from '@iconify/react'
 
 const initialProducts = [
@@ -87,13 +88,13 @@ const initialProducts = [
 ]
 
 const Page = () => {
-  const [products, setProducts] = useState(initialProducts)
-  const [search, setSearch] = useState('')
+  const [products, setProducts] = useState(initialProducts);
+  const [search, setSearch] = useState('');
   const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(null)
-  const [deleteModal, setDeleteModal] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [productInput, setProductInput] = useState({
     name: '',
     revenueCenter: '',
@@ -266,4 +267,4 @@ const Page = () => {
   )
 }
 
-export default Page
+export default Page;
