@@ -1,26 +1,23 @@
 'use client'
-import React, { useState } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label } from 'reactstrap';
+import React, { useEffect, useState } from 'react'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label,Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
+import { useDispatch, useSelector } from 'react-redux'
+import { allCategories, GetAllCategory, PostCategory } from '@/redux/slice/categories/CategorySlice'
+
 const Page = () => {
+  const dispatch = useDispatch()
+  const { category, loading } = useSelector(allCategories)
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('') ;
+  const [modalType, setModalType] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [categoryInput, setCategoryInput] = useState('')
-  const [categories, setCategories] = useState([
-    'Breakfast',
-    'Combos',
-    'Desserts',
-    'Drinks',
-    'Heat and Eat',
-    'Salads and Bowls',
-    'Sandwiches and Wraps',
-    'Snacks and Proteins',
-    'Diet Meal',
-    'Electronics',
-    'Other',
-  ])
 
+  useEffect(() => {
+    dispatch(GetAllCategory())
+  }, [])
+
+  console.log('category', category)
   const openModal = (type, index = null) => {
     setModalType(type)
     setSelectedIndex(index)
@@ -29,18 +26,16 @@ const Page = () => {
     setModalOpen(true)
   }
 
-  // Handlers for CRUD - currently local state
   const saveCategory = () => {
     if (!categoryInput.trim()) return
-
     if (modalType === 'create') {
-      setCategories([...categories, categoryInput.trim()])
-      // Future: dispatch Redux action for API create
+      console.log('categoryInput', categoryInput)
+      const category = {
+        Name: categoryInput,
+      }
+      dispatch(PostCategory(category))
     } else if (modalType === 'edit' && selectedIndex !== null) {
-      const updated = [...categories]
-      updated[selectedIndex] = categoryInput.trim()
-      setCategories(updated)
-      // Future: dispatch Redux action for API update
+      
     }
     setModalOpen(false)
   }
@@ -71,11 +66,15 @@ const Page = () => {
           </tr>
         </thead>
         <tbody>
-          {categories.length > 0 ? (
-            categories.map((cat, index) => (
+          {loading ? (
+            <td colSpan="3" className="text-center py-4">
+              <Spinner size="sm" /> Loading...
+            </td>
+          ) : category?.length > 0 ? (
+            category.map((cat, index) => (
               <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{cat}</td>
+                <td>{cat.dcid}</td>
+                <td>{cat.name}</td>
                 <td className="text-center">
                   <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', index)}>
                     <Icon icon="mdi:pencil" width="16" height="16" />
