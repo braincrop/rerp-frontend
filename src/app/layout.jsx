@@ -25,18 +25,7 @@ export default function RootLayout({ children }) {
       <body className={roboto.className}>
         <div id="__next_splash">
           <ReduxProvider>
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick={false}
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
+           <ToastContainer position="top-center" />
             <AppProvidersWrapper>{children}</AppProvidersWrapper>
           </ReduxProvider>
         </div>
