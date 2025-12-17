@@ -4,7 +4,7 @@ import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, S
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
 import CreateProduct from '../../../components/CreateProduct/createproduct'
-import { allProducts, GetAllProduct } from '@/redux/slice/Products/productSlice'
+import { allProducts, DeleteProductData, GetAllProduct } from '@/redux/slice/Products/productSlice'
 
 const Page = () => {
   const { product, loading } = useSelector(allProducts)
@@ -14,21 +14,37 @@ const Page = () => {
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+  const [modalType, setModalType] = useState('create')
 
   useEffect(() => {
     dispatch(GetAllProduct())
   }, [])
-
   const openDeleteModal = (index) => {
     setSelectedIndex(index)
     setDeleteModal(true)
   }
 
   const confirmDelete = () => {
-    const updated = product.filter((_, i) => i !== selectedIndex)
     setDeleteModal(false)
+    dispatch(DeleteProductData(selectedIndex))
   }
-
+  const openModal = (type, product = null) => {
+    console.log('product', product, type)
+    setModalType(type)
+    setSelectedProduct(product)
+    setShow(true)
+  }
+  const handleToggleShow = () => {
+    if (modalType === 'edit' || show) {
+      setShow(false)
+      setSelectedProduct(null)
+      setModalType('')
+    } else {
+      setShow(true)
+      setModalType('create')
+    }
+  }
   const filteredProducts = useMemo(() => {
     return product.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
   }, [search, product])
@@ -53,14 +69,14 @@ const Page = () => {
           </>
         ) : null}
         <Col md={show ? '12' : '8'} className="text-end">
-          <Button color="primary" onClick={() => setShow(!show)}>
+          <Button color="primary" onClick={handleToggleShow}>
             <Icon icon="mdi:plus" width={18} className="me-1" />
-            {show ? 'View List' : 'Add Product'}
+            {modalType === 'edit' || show ? 'View List' : 'Add Product'}
           </Button>
         </Col>
       </Row>
       {show ? (
-        <CreateProduct />
+        <CreateProduct setShow={setShow} selectedProduct={selectedProduct} modalType={modalType} />
       ) : (
         <Table bordered hover responsive className="shadow-sm rounded">
           <thead className="table-light align-middle">
@@ -114,7 +130,7 @@ const Page = () => {
                   <td>{prod.basePrice}</td>
                   <td>{prod.sellPrice}</td>
                   <td className="text-center">
-                    <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', prod.dpid)}>
+                    <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', prod)}>
                       <Icon icon="mdi:pencil" width={16} />
                     </Button>
                     <Button color="danger" size="sm" onClick={() => openDeleteModal(prod.dpid)}>
