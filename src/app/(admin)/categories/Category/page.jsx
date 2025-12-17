@@ -1,56 +1,67 @@
 'use client'
-import React, { useState } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label } from 'reactstrap';
+import React, { useEffect, useState } from 'react'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
+import { useDispatch, useSelector } from 'react-redux'
+import { allCategories, DeleteCategoryData, GetAllCategory, PostCategory, UpdatedCategory } from '@/redux/slice/categories/CategorySlice'
+
 const Page = () => {
+  const dispatch = useDispatch()
+  const { category, loading } = useSelector(allCategories)
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('') ;
+  const [modalType, setModalType] = useState('')
+  const [deleteid, setDeleteid] = useState('')
+  const [deleteModal, setDeleteModal] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [categoryInput, setCategoryInput] = useState('')
-  const [categories, setCategories] = useState([
-    'Breakfast',
-    'Combos',
-    'Desserts',
-    'Drinks',
-    'Heat and Eat',
-    'Salads and Bowls',
-    'Sandwiches and Wraps',
-    'Snacks and Proteins',
-    'Diet Meal',
-    'Electronics',
-    'Other',
-  ])
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null)
 
-  const openModal = (type, index = null) => {
-    setModalType(type)
-    setSelectedIndex(index)
-    if (type === 'edit' && index !== null) setCategoryInput(categories[index])
-    else setCategoryInput('')
-    setModalOpen(true)
+  useEffect(() => {
+    dispatch(GetAllCategory())
+  }, [])
+
+  const openModal = (type, id = null) => {
+  setModalType(type)
+  setSelectedCategoryId(id)
+  if (type === 'edit' && id !== null) {
+    const selectedCategory = category.find((cat) => cat.dcid === id)
+    setCategoryInput(selectedCategory?.name || '')
+  } else {
+    setCategoryInput('')
   }
 
-  // Handlers for CRUD - currently local state
-  const saveCategory = () => {
-    if (!categoryInput.trim()) return
+  setModalOpen(true)
+}
 
-    if (modalType === 'create') {
-      setCategories([...categories, categoryInput.trim()])
-      // Future: dispatch Redux action for API create
-    } else if (modalType === 'edit' && selectedIndex !== null) {
-      const updated = [...categories]
-      updated[selectedIndex] = categoryInput.trim()
-      setCategories(updated)
-      // Future: dispatch Redux action for API update
-    }
-    setModalOpen(false)
+const saveCategory = () => {
+  if (!categoryInput.trim()) return
+  if (modalType === 'create') {
+    dispatch(
+      PostCategory({
+        Name: categoryInput,
+      })
+    )
   }
-
-  const deleteCategory = (index) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      const updated = categories.filter((_, i) => i !== index)
-      setCategories(updated)
-      // Future: dispatch Redux action for API delete
+  if (modalType === 'edit' && selectedCategoryId !== null) {
+    let data = {
+      dcid: selectedCategoryId,
+      name: categoryInput
     }
+    dispatch(
+      UpdatedCategory(data)
+    )
+  }
+  setModalOpen(false)
+}
+
+
+  const opendeleteModal = (index) => {
+    setDeleteid(index)
+    setDeleteModal(true)
+  }
+  const deleteCategory = () => {
+    dispatch(DeleteCategoryData(deleteid))
+    setDeleteModal(false)
   }
   return (
     <Container className="mt-5">
@@ -71,17 +82,23 @@ const Page = () => {
           </tr>
         </thead>
         <tbody>
-          {categories.length > 0 ? (
-            categories.map((cat, index) => (
-              <tr key={index}>
-                <td>{index + 1}</td>
-                <td>{cat}</td>
+          {loading ? (
+            <tr>
+              <td colSpan="3" className="text-center py-4">
+                <Spinner size="sm" /> Loading...
+              </td>
+            </tr>
+          ) : category?.length > 0 ? (
+            category.map((cat) => (
+              <tr key={cat.dcid}>
+                <td>{cat.dcid}</td>
+                <td>{cat.name}</td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', index)}>
-                    <Icon icon="mdi:pencil" width="16" height="16" />
+                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', cat.dcid)}>
+                    <Icon icon="mdi:pencil" width="16" />
                   </Button>
-                  <Button color="danger" size="sm" onClick={() => deleteCategory(index)}>
-                    <Icon icon="mdi:delete" width="16" height="16" />
+                  <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.dcid)}>
+                    <Icon icon="mdi:delete" width="16" />
                   </Button>
                 </td>
               </tr>
@@ -111,6 +128,21 @@ const Page = () => {
           </Button>
           <Button color="primary" onClick={saveCategory}>
             {modalType === 'create' ? 'Create' : 'Save'}
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={deleteModal} toggle={() => setDeleteModal(!deleteModal)} centered>
+        <ModalHeader toggle={() => setDeleteModal(!deleteModal)}>Delete Category</ModalHeader>
+        <ModalBody>
+          <p>Are you sure you want to delete this category?</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={() => setDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button color="danger" onClick={deleteCategory}>
+            Delete
           </Button>
         </ModalFooter>
       </Modal>
