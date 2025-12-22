@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Spinner, Input, FormGroup, Label, Row, Col } from 'reactstrap'
 import { Icon } from '@iconify/react'
@@ -7,10 +7,10 @@ import CreateProduct from '../../../components/CreateProduct/createproduct'
 import { allProducts, DeleteProductData, GetAllProduct } from '@/redux/slice/Products/productSlice'
 
 const Page = () => {
-  const { product, loading } = useSelector(allProducts)
-  const dispatch = useDispatch()
-  const [search, setSearch] = useState('')
-  const [show, setShow] = useState(false)
+  const { product, loading } = useSelector(allProducts);
+  const dispatch = useDispatch();
+  const [search, setSearch] = useState('');
+  const [show, setShow] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
@@ -30,7 +30,6 @@ const Page = () => {
     dispatch(DeleteProductData(selectedIndex))
   }
   const openModal = (type, product = null) => {
-    console.log('product', product, type)
     setModalType(type)
     setSelectedProduct(product)
     setShow(true)
@@ -48,7 +47,6 @@ const Page = () => {
   const filteredProducts = useMemo(() => {
     return product.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
   }, [search, product])
-
   const paginated = filteredProducts.slice(0, itemsPerPage)
 
   return (

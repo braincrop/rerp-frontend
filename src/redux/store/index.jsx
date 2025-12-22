@@ -2,6 +2,7 @@ import { configureStore} from "@reduxjs/toolkit";
 import allDevices  from "../slice/devicesSlice";
 import allCategories from "../slice/categories/CategorySlice";
 import allProducts from "../slice/Products/productSlice";
+import allBranch from "../slice/Branch/branchSlice";
 
 
 export function makeStore() {
@@ -9,7 +10,8 @@ export function makeStore() {
     reducer: {
         allDevices: allDevices,
         allCategories:allCategories,
-        allProducts:allProducts
+        allProducts:allProducts,
+        allBranch:allBranch
     },
   });
 }

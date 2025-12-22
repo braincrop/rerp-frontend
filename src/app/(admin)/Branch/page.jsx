@@ -1,134 +1,78 @@
 'use client'
-import React, { useState, useMemo } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, 
-  Input, FormGroup, Label, Row, Col } from 'reactstrap';
+import React, { useState, useMemo, useEffect } from 'react'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
 import { Icon } from '@iconify/react'
-
-const initialProducts = [
-  {
-    id: 1,
-    name: 'IB 10 - The One at University City',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 2,
-    name: 'IB 11 - Alluvion Las Olas',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'false',
-  },
-  {
-    id: 3,
-    name: 'IB 16 - Memorial Healthcare System Corporate Office',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'false',
-  },
-  {
-    id: 4,
-    name: 'IB 17 - UM School of Law',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 5,
-    name: 'IB 15 - UHealth at Plantation',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 6,
-    name: 'IB 23 - Baptist Hospital',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'public',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 7,
-    name: 'IB 30 - UM Stanford Residential Hall',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 8,
-    name: 'IB 31 - Broward Health Coral Springs',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 9,
-    name: 'IB 35 - UM School of Architecture',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
-  },
-  {
-    id: 10,
-    name: 'IB 33 - Memorial Regional Hospital South',
-    revenueCenter: 'Vending Machine',
-    ui: 'Vendron',
-    accessibility: 'private',
-    mobileOrdering: 'true',
-  },
-]
+import { useDispatch, useSelector } from 'react-redux'
+import { allBranch, DeleteBranchData, GetAllBranch, PostBranchData, UpdatedBranch } from '@/redux/slice/Branch/branchSlice'
+import { Spinner } from 'react-bootstrap'
 
 const Page = () => {
-  const [products, setProducts] = useState(initialProducts);
-  const [search, setSearch] = useState('');
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [deleteModal, setDeleteModal] = useState(false);
-  const [productInput, setProductInput] = useState({
+  const { branch, loading } = useSelector(allBranch)
+  const dispatch = useDispatch()
+  const [search, setSearch] = useState('')
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [selectedIndex, setSelectedIndex] = useState(null)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [BranchInput, setBranchInput] = useState({
     name: '',
-    revenueCenter: '',
-    ui: '',
-    accessibility: '',
-    mobileOrdering: '',
+    memo: '',
+    companyId: '',
+    outletAddress: '',
   })
-  const openModal = (type, index = null) => {
+
+  useEffect(() => {
+    dispatch(GetAllBranch())
+  }, [])
+
+  console.log('branchInput', BranchInput)
+
+  const openModal = (type, branch = null) => {
     setModalType(type)
-    setSelectedIndex(index)
-    if (type === 'edit' && index !== null) {
-      setProductInput(products[index])
+    if (type === 'edit' && branch) {
+      setBranchInput({
+        name: branch.name || '',
+        memo: branch.memo || '',
+        companyId: branch.companyId || '',
+        outletAddress: branch.outletAddress || '',
+        branchId: branch.branchId,
+      })
     } else {
-      setProductInput({
+      setBranchInput({
         name: '',
-        revenueCenter: '',
-        ui: '',
-        accessibility: '',
-        mobileOrdering: '',
+        memo: '',
+        companyId: '',
+        outletAddress: '',
       })
     }
     setModalOpen(true)
   }
 
   const saveProduct = () => {
-    if (!productInput.name.trim()) return
+    if (!BranchInput.name.trim()) return
     if (modalType === 'create') {
-      setProducts([...products, { ...productInput, id: Date.now() }])
+      dispatch(
+        PostBranchData({
+          name: BranchInput.name,
+          memo: BranchInput.memo,
+          outletAddress: BranchInput.outletAddress,
+        }),
+      )
     }
-    if (modalType === 'edit' && selectedIndex !== null) {
-      const updated = [...products]
-      updated[selectedIndex] = { ...productInput }
-      setProducts(updated)
+    if (modalType === 'edit') {
+      dispatch(
+        UpdatedBranch({
+          branchId: BranchInput.branchId,
+          updatedData: {
+            name: BranchInput.name,
+            memo: BranchInput.memo,
+            outletAddress: BranchInput.outletAddress,
+          },
+        }),
+      )
     }
+
     setModalOpen(false)
   }
 
@@ -137,29 +81,27 @@ const Page = () => {
     setDeleteModal(true)
   }
 
-  // Confirm Delete
   const confirmDelete = () => {
-    const updated = products.filter((_, i) => i !== selectedIndex)
-    setProducts(updated)
+    dispatch(DeleteBranchData(selectedIndex))
     setDeleteModal(false)
   }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setProductInput((prev) => ({ ...prev, [name]: value }))
+    setBranchInput((prev) => ({ ...prev, [name]: value }))
   }
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-  }, [search, products])
+    return branch.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+  }, [search, branch])
   const paginated = filteredProducts.slice(0, itemsPerPage)
 
+  console.log('branch', branch)
   return (
     <Container className="mt-5">
       <Row className="mb-4">
         <Col md="2">
           <Input type="text" placeholder="Search branch..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </Col>
-
         <Col md="2">
           <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
             <option value={5}>5</option>
@@ -167,7 +109,6 @@ const Page = () => {
             <option value={20}>20</option>
           </Input>
         </Col>
-
         <Col md="8" className="text-end">
           <Button color="primary" onClick={() => openModal('create')}>
             <Icon icon="mdi:plus" width={18} className="me-2" />
@@ -176,33 +117,39 @@ const Page = () => {
         </Col>
       </Row>
       <Table bordered hover responsive className="shadow-sm rounded">
-        <thead className="table-light">
+        <thead className="table-light align-middle">
           <tr>
             <th>#</th>
-            <th>Name</th>
-            <th>Revenue Center</th>
-            <th>UI</th>
-            <th>Accessibility</th>
+            <th>Branch Name</th>
+            <th>Address</th>
+            <th>Memo</th>
             <th>Mobile Ordering</th>
+            <th>Revenue Center</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {paginated.length > 0 ? (
-            paginated.map((prod, index) => (
-              <tr key={prod.id}>
+          {loading ? (
+            <tr>
+              <td colSpan="7" className="text-center py-4">
+                <Spinner size="sm" className="me-2" />
+                Loading branches...
+              </td>
+            </tr>
+          ) : branch?.length > 0 ? (
+            branch.map((branch, index) => (
+              <tr key={branch.branchId}>
                 <td>{index + 1}</td>
-                <td>{prod.name}</td>
-                <td>{prod.revenueCenter}</td>
-                <td>{prod.ui}</td>
-                <td>{prod.accessibility}</td>
-                <td>{prod.mobileOrdering}</td>
+                <td>{branch.name}</td>
+                <td>{branch.outletAddress || '-'}</td>
+                <td>{branch.memo || '-'}</td>
+                <td>{branch.mobileOrdering === null ? '-' : branch.mobileOrdering ? 'Yes' : 'No'}</td>
+                <td>{branch.revenueCenterId || '-'}</td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', index)}>
+                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', branch)}>
                     <Icon icon="mdi:pencil" width={16} />
                   </Button>
-
-                  <Button color="danger" size="sm" onClick={() => openDeleteModal(index)}>
+                  <Button color="danger" size="sm" onClick={() => openDeleteModal(branch.branchId)}>
                     <Icon icon="mdi:delete" width={16} />
                   </Button>
                 </td>
@@ -217,28 +164,25 @@ const Page = () => {
           )}
         </tbody>
       </Table>
+
       <Modal isOpen={modalOpen} centered>
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Branch' : 'Edit Branch'}</ModalHeader>
         <ModalBody>
           <FormGroup>
             <Label>Name</Label>
-            <Input name="name" value={productInput.name} onChange={handleInputChange} />
+            <Input name="name" value={BranchInput?.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Revenue Center</Label>
-            <Input name="revenueCenter" value={productInput.revenueCenter} onChange={handleInputChange} />
+            <Label>Memo</Label>
+            <Input name="memo" value={BranchInput?.memo || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>UI</Label>
-            <Input name="ui" value={productInput.ui} onChange={handleInputChange} />
+            <Label>CompanyId</Label>
+            <Input name="companyId" type="number" value={BranchInput?.companyId || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Accessibility</Label>
-            <Input name="accessibility" value={productInput.accessibility} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Mobile Ordering</Label>
-            <Input name="mobileOrdering" value={productInput.mobileOrdering} onChange={handleInputChange} />
+            <Label>OutletAddress</Label>
+            <Input name="outletAddress" value={BranchInput?.outletAddress || ''} onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
@@ -253,7 +197,6 @@ const Page = () => {
       <Modal isOpen={deleteModal} centered>
         <ModalHeader>Delete Branch</ModalHeader>
         <ModalBody>Are you sure you want to delete this Branch?</ModalBody>
-
         <ModalFooter>
           <Button color="secondary" onClick={() => setDeleteModal(false)}>
             Cancel
@@ -267,4 +210,4 @@ const Page = () => {
   )
 }
 
-export default Page;
+export default Page
