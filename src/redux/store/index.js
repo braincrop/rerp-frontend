@@ -1,5 +1,5 @@
 import { configureStore} from "@reduxjs/toolkit";
-import allDevices  from "../slice/devicesSlice";
+import allDevices  from "../slice/devicesSlice/DevicesSlice";
 import allCategories from "../slice/categories/CategorySlice";
 import allProducts from "../slice/Products/productSlice";
 import allBranch from "../slice/Branch/branchSlice";

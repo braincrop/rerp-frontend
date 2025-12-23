@@ -3,62 +3,94 @@ import React, { useEffect, useState } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { allCategories, DeleteCategoryData, GetAllCategory, PostCategory, UpdatedCategory } from '@/redux/slice/categories/CategorySlice'
+import { allDevices, DeleteDeviceData, GetAllDevices, PostDevice, UpdatedDevice } from '@/redux/slice/devicesSlice/DevicesSlice'
 
 const Page = () => {
   const dispatch = useDispatch()
-  const [modalOpen, setModalOpen] = useState(false)
-  const [modalType, setModalType] = useState('')
-  const [deleteid, setDeleteid] = useState('')
+  const { devices, loading } = useSelector(allDevices);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [deleteid, setDeleteid] = useState('');
   const [deleteModal, setDeleteModal] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(null)
-  const [categoryInput, setCategoryInput] = useState('')
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null)
+  const [DeviceInput, setDeviceInput] = useState({
+    name: '',
+    deviceName: '',
+    ip: '',
+  })
 
-//   useEffect(() => {
-//     dispatch(GetAllCategory())
-//   }, [])
+  useEffect(() => {
+    dispatch(GetAllDevices())
+  }, [])
 
-  const openModal = (type, id = null) => {
-  setModalType(type)
-  setSelectedCategoryId(id)
-  if (type === 'edit' && id !== null) {
-    const selectedCategory = category.find((cat) => cat.dcid === id)
-    setCategoryInput(selectedCategory?.name || '')
-  } else {
-    setCategoryInput('')
-  }
-  setModalOpen(true)
-}
-
-const saveCategory = () => {
-  if (!categoryInput.trim()) return
-  if (modalType === 'create') {
-    dispatch(
-      PostCategory({
-        Name: categoryInput,
+  const openModal = (type, device = null) => {
+    setModalType(type)
+    if (type === 'edit' && device) {
+      setDeviceInput({
+        name: device.name || '',
+        deviceName: device.deviceName || '',
+        ip: device.ip || '',
+        id: device.id,
       })
-    )
-  }
-  if (modalType === 'edit' && selectedCategoryId !== null) {
-    let data = {
-      dcid: selectedCategoryId,
-      name: categoryInput
+    } else {
+      setDeviceInput({
+        name: '',
+        deviceName: '',
+        ip: '',
+      })
     }
-    dispatch(
-      UpdatedCategory(data)
-    )
+    setModalOpen(true)
   }
-  setModalOpen(false)
+
+const saveDevice = async () => {
+  if (!DeviceInput.name?.trim()) {
+    Notify('error', 'Device name is required')
+    return
+  }
+  try {
+    let resultAction
+    if (modalType === 'create') {
+      resultAction = await dispatch(PostDevice(DeviceInput))
+      if (PostDevice.fulfilled.match(resultAction)) {
+        await dispatch(GetAllDevices())
+        setModalOpen(false)
+      } else {
+        Notify('error', resultAction.payload || 'Failed to create device')
+      }
+    } else if (modalType === 'edit') {
+      resultAction = await dispatch(
+        UpdatedDevice({
+          id: DeviceInput.id,
+          updatedData: {
+            name: DeviceInput.name,
+            deviceName: DeviceInput.deviceName,
+            ip: DeviceInput.ip,
+          },
+        })
+      )
+      if (UpdatedDevice.fulfilled.match(resultAction)) {
+        await dispatch(GetAllDevices())
+        setModalOpen(false)
+      } else {
+        Notify('error', resultAction.payload || 'Failed to update device')
+      }
+    }
+  } catch (error) {
+    console.error(error)
+    Notify('error', 'Something went wrong')
+  }
 }
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setDeviceInput((prev) => ({ ...prev, [name]: value }))
+  }
 
   const opendeleteModal = (index) => {
     setDeleteid(index)
     setDeleteModal(true)
   }
   const deleteCategory = () => {
-    dispatch(DeleteCategoryData(deleteid))
+    dispatch(DeleteDeviceData(deleteid))
     setDeleteModal(false)
   }
   return (
@@ -70,64 +102,74 @@ const saveCategory = () => {
           Create New
         </Button>
       </div>
-
       <Table bordered hover responsive className="shadow-sm rounded">
-        <thead className="table-light">
+        <thead className="table-light align-middle">
           <tr>
             <th>#</th>
-            <th>IP</th>
+            <th>Name</th>
             <th>Device Name</th>
-            <th>Splash Sreen</th>
-            <th>Is Connected</th>
-            <th>Created ON</th>
-            <th>Last Updated</th>
+            <th>IP Address</th>
+            <th>Status</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
-        {/* <tbody>
+
+        <tbody>
           {loading ? (
             <tr>
-              <td colSpan="3" className="text-center py-4">
-                <Spinner size="sm" /> Loading...
+              <td colSpan="6" className="text-center py-4">
+                <Spinner size="sm" className="me-2" />
+                Loading devices...
               </td>
             </tr>
-          ) : category?.length > 0 ? (
-            category.map((cat) => (
-              <tr key={cat.dcid}>
-                <td>{cat.dcid}</td>
-                <td>{cat.name}</td>
+          ) : devices?.length > 0 ? (
+            devices.map((device, index) => (
+              <tr key={device.id}>
+                <td>{index + 1}</td>
+                <td>{device.name}</td>
+                <td>{device.deviceName}</td>
+                <td>{device.ip}</td>
+                <td>{device.isActive ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}</td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', cat.dcid)}>
-                    <Icon icon="mdi:pencil" width="16" />
+                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', device)}>
+                    <Icon icon="mdi:pencil" width={16} />
                   </Button>
-                  <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.dcid)}>
-                    <Icon icon="mdi:delete" width="16" />
+                  <Button color="danger" size="sm" onClick={() => opendeleteModal(device.id)}>
+                    <Icon icon="mdi:delete" width={16} />
                   </Button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="3" className="text-center text-muted py-4">
-                No Device found
+              <td colSpan="6" className="text-center text-muted py-4">
+                No Device Found
               </td>
             </tr>
           )}
-        </tbody> */}
+        </tbody>
       </Table>
-      <Modal isOpen={modalOpen} toggle={() => setModalOpen(!modalOpen)} centered>
-        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create New Category' : 'Edit Category'}</ModalHeader>
+      <Modal isOpen={modalOpen} centered>
+        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Device' : 'Edit Device'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Category Name</Label>
-            <Input type="text" value={categoryInput} onChange={(e) => setCategoryInput(e.target.value)} />
+            <Label>Name</Label>
+            <Input name="name" value={DeviceInput?.name || ''} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label>Device Name</Label>
+            <Input name="deviceName" value={DeviceInput?.deviceName || ''} onChange={handleInputChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label>Ip</Label>
+            <Input name="ip" type="number" value={DeviceInput?.ip || ''} onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveCategory}>
+          <Button color="primary" onClick={saveDevice}>
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

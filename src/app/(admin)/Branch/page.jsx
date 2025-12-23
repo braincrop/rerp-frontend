@@ -26,7 +26,6 @@ const Page = () => {
     dispatch(GetAllBranch())
   }, [])
 
-  console.log('branchInput', BranchInput)
 
   const openModal = (type, branch = null) => {
     setModalType(type)
@@ -49,19 +48,29 @@ const Page = () => {
     setModalOpen(true)
   }
 
-  const saveProduct = () => {
-    if (!BranchInput.name.trim()) return
+  const saveProduct = async () => {
+  if (!BranchInput.name?.trim()) {
+    Notify('error', 'Branch name is required')
+    return
+  }
+  try {
+    let resultAction
     if (modalType === 'create') {
-      dispatch(
+      resultAction = await dispatch(
         PostBranchData({
           name: BranchInput.name,
           memo: BranchInput.memo,
           outletAddress: BranchInput.outletAddress,
-        }),
+        })
       )
+      if (PostBranchData.fulfilled.match(resultAction)) {
+        setModalOpen(false)
+      } else {
+        Notify('error', resultAction.payload || 'Failed to create branch')
+      }
     }
     if (modalType === 'edit') {
-      dispatch(
+      resultAction = await dispatch(
         UpdatedBranch({
           branchId: BranchInput.branchId,
           updatedData: {
@@ -69,13 +78,19 @@ const Page = () => {
             memo: BranchInput.memo,
             outletAddress: BranchInput.outletAddress,
           },
-        }),
+        })
       )
+      if (UpdatedBranch.fulfilled.match(resultAction)) {
+        setModalOpen(false)
+      } else {
+        Notify('error', resultAction.payload || 'Failed to update branch')
+      }
     }
-
-    setModalOpen(false)
+  } catch (error) {
+    console.error(error)
+    Notify('error', 'Something went wrong')
   }
-
+}
   const openDeleteModal = (index) => {
     setSelectedIndex(index)
     setDeleteModal(true)
@@ -194,6 +209,7 @@ const Page = () => {
           </Button>
         </ModalFooter>
       </Modal>
+
       <Modal isOpen={deleteModal} centered>
         <ModalHeader>Delete Branch</ModalHeader>
         <ModalBody>Are you sure you want to delete this Branch?</ModalBody>
