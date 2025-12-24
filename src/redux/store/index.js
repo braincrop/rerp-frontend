@@ -3,6 +3,7 @@ import allDevices  from "../slice/devicesSlice/DevicesSlice";
 import allCategories from "../slice/categories/CategorySlice";
 import allProducts from "../slice/Products/productSlice";
 import allBranch from "../slice/Branch/branchSlice";
+import allVendiSplashMachine from "../slice/VendingSplashMachine/VendingSplashMachine";
 
 
 export function makeStore() {
@@ -11,7 +12,8 @@ export function makeStore() {
         allDevices: allDevices,
         allCategories:allCategories,
         allProducts:allProducts,
-        allBranch:allBranch
+        allBranch:allBranch,
+        allVendiSplashMachine:allVendiSplashMachine
     },
   });
 }
