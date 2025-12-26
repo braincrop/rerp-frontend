@@ -3,17 +3,56 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { allBranch, DeleteBranchData, GetAllBranch, PostBranchData, UpdatedBranch } from '@/redux/slice/Branch/branchSlice'
-import { Spinner } from 'react-bootstrap'
+import { allBranch, DeleteBranchData, GetAllBranch, PostAssignItemCategory, PostBranchData, PostItemCategoryBulk, UpdatedBranch } from '@/redux/slice/Branch/branchSlice'
+import { Spinner } from 'react-bootstrap';
+import Select from 'react-select'
+import { allCategories, GetAllCategory } from '@/redux/slice/categories/CategorySlice'
+import Notify from '@/components/Notify'
+
+const customSelectStyles = {
+  control: (base) => ({
+    ...base,
+    backgroundColor: '#000',
+    borderColor: '#444',
+    color: '#fff',
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: '#000',
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? '#333' : '#000',
+    color: '#fff',
+  }),
+  multiValue: (base) => ({
+    ...base,
+    backgroundColor: '#333',
+  }),
+  multiValueLabel: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+}
+
 
 const Page = () => {
   const { branch, loading } = useSelector(allBranch)
+  const { category } = useSelector(allCategories)
   const dispatch = useDispatch()
   const [search, setSearch] = useState('')
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState('')
+  const [itemCategoryBulkModal, setItemCategoryBulkModal] = useState(false)
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null)
+  const [selectedCategories, setSelectedCategories] = useState([])
   const [selectedIndex, setSelectedIndex] = useState(null)
+  const [assginBranchesModal, setAssignBranchesModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [BranchInput, setBranchInput] = useState({
     name: '',
@@ -24,8 +63,19 @@ const Page = () => {
 
   useEffect(() => {
     dispatch(GetAllBranch())
+    dispatch(GetAllCategory())
   }, [])
 
+  const openItemCategoryBulkModal = (deviceId) => {
+    setSelectedDeviceId(deviceId)
+    setSelectedCategories([]) // reset
+    setItemCategoryBulkModal(true)
+  }
+  console.log(category, 'category')
+  const categoryOptions = category?.map((cat) => ({
+    value: cat.dcid,
+    label: cat.name,
+  }))
 
   const openModal = (type, branch = null) => {
     setModalType(type)
@@ -49,62 +99,95 @@ const Page = () => {
   }
 
   const saveProduct = async () => {
-  if (!BranchInput.name?.trim()) {
-    Notify('error', 'Branch name is required')
-    return
-  }
-  try {
-    let resultAction
-    if (modalType === 'create') {
-      resultAction = await dispatch(
-        PostBranchData({
-          name: BranchInput.name,
-          memo: BranchInput.memo,
-          outletAddress: BranchInput.outletAddress,
-        })
-      )
-      if (PostBranchData.fulfilled.match(resultAction)) {
-        setModalOpen(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to create branch')
-      }
+    if (!BranchInput.name?.trim()) {
+      Notify('error', 'Branch name is required')
+      return
     }
-    if (modalType === 'edit') {
-      resultAction = await dispatch(
-        UpdatedBranch({
-          branchId: BranchInput.branchId,
-          updatedData: {
+    try {
+      let resultAction
+      if (modalType === 'create') {
+        resultAction = await dispatch(
+          PostBranchData({
             name: BranchInput.name,
             memo: BranchInput.memo,
             outletAddress: BranchInput.outletAddress,
-          },
-        })
-      )
-      if (UpdatedBranch.fulfilled.match(resultAction)) {
-        setModalOpen(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to update branch')
+          }),
+        )
+        if (PostBranchData.fulfilled.match(resultAction)) {
+          setModalOpen(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to create branch')
+        }
       }
+      if (modalType === 'edit') {
+        resultAction = await dispatch(
+          UpdatedBranch({
+            branchId: BranchInput.branchId,
+            updatedData: {
+              name: BranchInput.name,
+              memo: BranchInput.memo,
+              outletAddress: BranchInput.outletAddress,
+            },
+          }),
+        )
+        if (UpdatedBranch.fulfilled.match(resultAction)) {
+          setModalOpen(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to update branch')
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      Notify('error', 'Something went wrong')
     }
-  } catch (error) {
-    console.error(error)
-    Notify('error', 'Something went wrong')
   }
-}
   const openDeleteModal = (index) => {
     setSelectedIndex(index)
     setDeleteModal(true)
   }
 
+  const openAssignBranchesModal = (index) => {
+    setSelectedIndex(index)
+    setAssignBranchesModal(true)
+  }
   const confirmDelete = () => {
     dispatch(DeleteBranchData(selectedIndex))
     setDeleteModal(false)
+  }
+
+  const AssignBranches = () => {
+    dispatch(PostAssignItemCategory(selectedIndex)).unwrap()
+    setAssignBranchesModal(false)
   }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setBranchInput((prev) => ({ ...prev, [name]: value }))
   }
+
+  const submitItemCategoryBulk = async () => {
+  if (!selectedCategories.length) {
+    Notify('error', 'Please select at least one category')
+    return
+  }
+  const payload = {
+    branchId: selectedDeviceId,
+    distinctCategoryIds: selectedCategories.map((item) => item.value),
+  }
+  console.log('payload', payload  )
+  try {
+    const result = await dispatch(PostItemCategoryBulk(payload))
+    if (PostItemCategoryBulk.fulfilled.match(result)) {
+      setItemCategoryBulkModal(false)
+    } else {
+      Notify('error', 'Assignment failed')
+    }
+  } catch (err) {
+    Notify('error', 'Something went wrong')
+  }
+}
+
+
   const filteredProducts = useMemo(() => {
     return branch.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
   }, [search, branch])
@@ -160,8 +243,15 @@ const Page = () => {
                 <td>{branch.memo || '-'}</td>
                 <td>{branch.mobileOrdering === null ? '-' : branch.mobileOrdering ? 'Yes' : 'No'}</td>
                 <td>{branch.revenueCenterId || '-'}</td>
+               
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', branch)}>
+                   <Button color="info" size="sm"  className="me-1" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
+                  <Icon icon="mdi:playlist-edit" width={16} />
+                </Button>
+                  <Button color="danger" size="sm" className="me-1" onClick={() => openAssignBranchesModal(branch.branchId)}>
+                    <Icon icon="mdi:source-branch" width={16} />
+                  </Button>
+                  <Button color="warning" size="sm" className="me-1 text-white" onClick={() => openModal('edit', branch)}>
                     <Icon icon="mdi:pencil" width={16} />
                   </Button>
                   <Button color="danger" size="sm" onClick={() => openDeleteModal(branch.branchId)}>
@@ -219,6 +309,60 @@ const Page = () => {
           </Button>
           <Button color="danger" onClick={confirmDelete}>
             Delete
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={assginBranchesModal} centered toggle={() => setAssignBranchesModal(false)}>
+        <ModalHeader toggle={() => setAssignBranchesModal(false)}>
+          <Icon icon="mdi:source-branch" className="me-2" />
+          Assign Branch
+        </ModalHeader>
+        <ModalBody className="text-center">
+          <Icon icon="mdi:office-building-marker" width={48} className="mb-3 text-primary" />
+          <h5 className="mb-2">Confirm Branch Assignment</h5>
+          <p className="text-muted mb-0">Are you sure you want to assign this branch to the selected item?</p>
+        </ModalBody>
+        <ModalFooter className="justify-content-end">
+          <Button color="secondary" outline onClick={() => setAssignBranchesModal(false)}>
+            Cancel
+          </Button>
+          <Button color="primary" onClick={AssignBranches}>
+            <Icon icon="mdi:check-circle-outline" className="me-1" />
+            Assign
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={itemCategoryBulkModal} centered toggle={() => setItemCategoryBulkModal(false)}>
+        <ModalHeader toggle={() => setItemCategoryBulkModal(false)}>
+          <Icon icon="mdi:playlist-edit" className="me-2" />
+          Assign Item Categories (Bulk)
+        </ModalHeader>
+        <ModalBody>
+          <FormGroup>
+            <Label>Device ID</Label>
+            <Input value={selectedDeviceId || ''} disabled />
+          </FormGroup>
+          <FormGroup>
+            <Label>Item Categories</Label>
+            <Select
+              isMulti
+              options={categoryOptions}
+              value={selectedCategories}
+              onChange={setSelectedCategories}
+              styles={customSelectStyles}
+              placeholder="Select categories..."
+            />
+          </FormGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="secondary" outline onClick={() => setItemCategoryBulkModal(false)}>
+            Cancel
+          </Button>
+          <Button color="primary" onClick={submitItemCategoryBulk}>
+            <Icon icon="mdi:check-circle-outline" className="me-1" />
+            Assign
           </Button>
         </ModalFooter>
       </Modal>

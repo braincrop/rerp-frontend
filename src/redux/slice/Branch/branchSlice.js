@@ -1,7 +1,7 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
-import { AllBranch, PostBranch, UpdateBranch,DeleteBranch } from '../../../api/branch/branchHelperApi';
+import { AllBranch, PostBranch, UpdateBranch,DeleteBranch, PostAssignBranch, ItemCategoryBulk } from '../../../api/branch/branchHelperApi';
 
 export const GetAllBranch = createAsyncThunk('Branch/AllBranch', async () => {
   try {
@@ -28,6 +28,34 @@ export const PostBranchData = createAsyncThunk('Branch/postBranch', async (data)
     throw Error('Failed to post Branch')
   }
 })
+
+export const PostAssignItemCategory = createAsyncThunk('Branch/AssignBranch', async (data) => {
+  try {
+    const response = await PostAssignBranch(data)
+    const _response = {
+      data: response.data,
+      status: response.status,
+    }
+    return _response
+  } catch (error) {
+    throw Error('Failed to post Branch')
+  }
+})
+
+export const PostItemCategoryBulk = createAsyncThunk('Branch/ItemCategory', async (data) => {
+  try {
+    const response = await ItemCategoryBulk(data)
+    const _response = {
+      data: response.data,
+      status: response.status,
+    }
+    return _response
+  } catch (error) {
+    throw Error('Failed to post Branch')
+  }
+})
+
+
 
 export const UpdatedBranch = createAsyncThunk('Branch/UpdateBranch', async (data) => {
   try {
@@ -82,6 +110,39 @@ export const BranchSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+      builder
+      .addCase(PostAssignItemCategory.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(PostAssignItemCategory.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload?.status === 200) {
+          state.error = null
+          Notify('success', 'ItemCategory created successfully')
+        }
+      })
+      .addCase(PostAssignItemCategory.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+
+        builder
+      .addCase(PostItemCategoryBulk.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(PostItemCategoryBulk.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload?.status === 200) {
+          state.error = null
+          Notify('success', 'Categories assigned successfully')
+        }
+      })
+      .addCase(PostItemCategoryBulk.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+
+
     builder
       .addCase(UpdatedBranch.pending, (state) => {
         state.loading = true

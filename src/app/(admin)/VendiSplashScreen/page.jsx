@@ -107,14 +107,14 @@ const Page = () => {
     setModalOpen(true)
   }
 
-  const saveProduct = () => {
+  const saveProduct = async() => {
     if (!VendiSplashMachine.name.trim()) return
     if (modalType === 'create') {
       dispatch(PostVendiMachine(VendiSplashMachine)).unwrap()
       setModalOpen(false)
     }
     if (modalType === 'edit') {
-       dispatch(UpdatedVendiMachine({
+      await dispatch(UpdatedVendiMachine({
         id: VendiSplashMachine.id,
         updatedData: {
           name: VendiSplashMachine.name,
@@ -125,6 +125,7 @@ const Page = () => {
           vendronDeviceInfoIds: VendiSplashMachine.vendronDeviceInfoIds,
         },
       })).unwrap()
+      await dispatch(GetAllVendiMachine())
       setModalOpen(false)
     }
   }

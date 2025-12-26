@@ -18,6 +18,25 @@ export const PostBranch = async (data) => {
   }
 }
 
+export const PostAssignBranch = async (data) => {
+  try {
+    const response = await axiosInstance.post(`branches/create-by-branch/${data}`)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+export const ItemCategoryBulk = async (data) => {
+  try {
+    const response = await axiosInstance.post(`item-subcategories/bulk`,data)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const UpdateBranch = async (data) => {
   const { branchId, updatedData } = data
 
