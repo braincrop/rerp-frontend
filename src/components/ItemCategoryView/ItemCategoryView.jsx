@@ -219,7 +219,7 @@ const ItemCategoryView = ({ data, onBack }) => {
             Cancel
           </Button>
           <Button color="primary" onClick={saveItem}>
-            Create
+             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>
       </Modal>
