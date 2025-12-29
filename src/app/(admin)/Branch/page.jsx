@@ -71,7 +71,7 @@ const Page = () => {
     setSelectedCategories([]) // reset
     setItemCategoryBulkModal(true)
   }
-  console.log(category, 'category')
+
   const categoryOptions = category?.map((cat) => ({
     value: cat.dcid,
     label: cat.name,
