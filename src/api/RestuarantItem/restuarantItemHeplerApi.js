@@ -21,10 +21,11 @@ export const PostRestuarantItem = async (data) => {
 }
 
 export const UpdateRestuarant = async (data) => {
-  const { dpid, updatedData } = data
+  console.log('data', data)
+  const { restaurantItemID, updatedData } = data
 
   try {
-    const response = await axiosInstance.put(`restaurant-items/${data.dpid}`, {
+    const response = await axiosInstance.put(`restaurant-items/${restaurantItemID}`, {
       ...updatedData,
     })
     return response

@@ -3,8 +3,16 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { allBranch, DeleteBranchData, GetAllBranch, PostAssignItemCategory, PostBranchData, PostItemCategoryBulk, UpdatedBranch } from '@/redux/slice/Branch/branchSlice'
-import { Spinner } from 'react-bootstrap';
+import {
+  allBranch,
+  DeleteBranchData,
+  GetAllBranch,
+  PostAssignItemCategory,
+  PostBranchData,
+  PostItemCategoryBulk,
+  UpdatedBranch,
+} from '@/redux/slice/Branch/branchSlice'
+import { Spinner } from 'react-bootstrap'
 import Select from 'react-select'
 import { allCategories, GetAllCategory } from '@/redux/slice/categories/CategorySlice'
 import Notify from '@/components/Notify'
@@ -38,7 +46,6 @@ const customSelectStyles = {
     color: '#fff',
   }),
 }
-
 
 const Page = () => {
   const { branch, loading } = useSelector(allBranch)
@@ -166,27 +173,26 @@ const Page = () => {
   }
 
   const submitItemCategoryBulk = async () => {
-  if (!selectedCategories.length) {
-    Notify('error', 'Please select at least one category')
-    return
-  }
-  const payload = {
-    branchId: selectedDeviceId,
-    distinctCategoryIds: selectedCategories.map((item) => item.value),
-  }
-  console.log('payload', payload  )
-  try {
-    const result = await dispatch(PostItemCategoryBulk(payload))
-    if (PostItemCategoryBulk.fulfilled.match(result)) {
-      setItemCategoryBulkModal(false)
-    } else {
-      Notify('error', 'Assignment failed')
+    if (!selectedCategories.length) {
+      Notify('error', 'Please select at least one category')
+      return
     }
-  } catch (err) {
-    Notify('error', 'Something went wrong')
+    const payload = {
+      branchId: selectedDeviceId,
+      distinctCategoryIds: selectedCategories.map((item) => item.value),
+    }
+    console.log('payload', payload)
+    try {
+      const result = await dispatch(PostItemCategoryBulk(payload))
+      if (PostItemCategoryBulk.fulfilled.match(result)) {
+        setItemCategoryBulkModal(false)
+      } else {
+        Notify('error', 'Assignment failed')
+      }
+    } catch (err) {
+      Notify('error', 'Something went wrong')
+    }
   }
-}
-
 
   const filteredProducts = useMemo(() => {
     return branch.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
@@ -196,24 +202,27 @@ const Page = () => {
   console.log('branch', branch)
   return (
     <Container className="mt-5">
-      <Row className="mb-4">
-        <Col md="2">
+      <Row className="mb-4 align-items-center g-2">
+        <Col xs="12" sm="6" md="3" lg="2">
           <Input type="text" placeholder="Search branch..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </Col>
-        <Col md="2">
+        <Col xs="12" sm="6" md="3" lg="2">
           <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={20}>20</option>
           </Input>
         </Col>
-        <Col md="8" className="text-end">
-          <Button color="primary" onClick={() => openModal('create')}>
+        <Col lg="6"></Col>
+        <Col xs="12" md="6" lg="2" className="self-end">
+          <Button color="primary" className="w-100 w-md-auto" onClick={() => openModal('create')}>
             <Icon icon="mdi:plus" width={18} className="me-2" />
             Create New
           </Button>
         </Col>
+        
       </Row>
+
       <Table bordered hover responsive className="shadow-sm rounded">
         <thead className="table-light align-middle">
           <tr>
@@ -243,20 +252,22 @@ const Page = () => {
                 <td>{branch.memo || '-'}</td>
                 <td>{branch.mobileOrdering === null ? '-' : branch.mobileOrdering ? 'Yes' : 'No'}</td>
                 <td>{branch.revenueCenterId || '-'}</td>
-               
+
                 <td className="text-center">
-                   <Button color="info" size="sm"  className="me-1" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
-                  <Icon icon="mdi:playlist-edit" width={16} />
-                </Button>
-                  <Button color="danger" size="sm" className="me-1" onClick={() => openAssignBranchesModal(branch.branchId)}>
-                    <Icon icon="mdi:source-branch" width={16} />
-                  </Button>
-                  <Button color="warning" size="sm" className="me-1 text-white" onClick={() => openModal('edit', branch)}>
-                    <Icon icon="mdi:pencil" width={16} />
-                  </Button>
-                  <Button color="danger" size="sm" onClick={() => openDeleteModal(branch.branchId)}>
-                    <Icon icon="mdi:delete" width={16} />
-                  </Button>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <Button color="info" size="sm" className="me-1 w-sm-auto" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
+                      <Icon icon="mdi:playlist-edit" width={16} />
+                    </Button>
+                    <Button color="danger" size="sm" className="me-1 w-sm-auto" onClick={() => openAssignBranchesModal(branch.branchId)}>
+                      <Icon icon="mdi:source-branch" width={16} />
+                    </Button>
+                    <Button color="warning" size="sm" className="me-1 w-sm-auto" onClick={() => openModal('edit', branch)}>
+                      <Icon icon="mdi:pencil" width={16} />
+                    </Button>
+                    <Button color="danger" size="sm" className="me-1 w-sm-auto" onClick={() => openDeleteModal(branch.branchId)}>
+                      <Icon icon="mdi:delete" width={16} />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))

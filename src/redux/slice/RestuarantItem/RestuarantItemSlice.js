@@ -90,7 +90,7 @@ export const RestuarantItemSlice = createSlice({
         if (action.payload?.status === 200) {
           state.error = null
           state.restuarantItem.unshift(action.payload.data)
-          Notify('success', 'RestuarantItem added successfully')
+          Notify('success', 'Restuarant Item added successfully')
         }
       })
       .addCase(PostRestuarantItemData.rejected, (state, action) => {
@@ -104,8 +104,8 @@ export const RestuarantItemSlice = createSlice({
       .addCase(UpdateRestuarantItem.fulfilled, (state, action) => {
         state.loading = false
         if (action.payload?.status === 200) {
-          state.restuarantItem = state.product.map((item) => (item.dpid === action.payload.data.dpid ? action.payload.data : item))
-          Notify('success', 'RestuarantItem updated successfully')
+          state.restuarantItem = state.restuarantItem.map((item) => (item.restaurantItemID === action.payload.data.restaurantItemID ? action.payload.data : item))
+          Notify('success', 'Restuarant Item updated successfully')
         }
       })
       .addCase(UpdateRestuarantItem.rejected, (state, action) => {
@@ -121,8 +121,8 @@ export const RestuarantItemSlice = createSlice({
         if (action.payload?.status === 200) {
           state.error = null
           const deletedId = action.meta.arg
-          state.restuarantItem = state.restuarantItem.filter((item) => item.dpid !== deletedId)
-          Notify('success', 'RestuarantItem deleted successfully')
+          state.restuarantItem = state.restuarantItem.filter((item) => item.restaurantItemID !== deletedId)
+          Notify('success', 'Restuarant Item deleted successfully')
         }
       })
       .addCase(DeleteRestuarantItemData.rejected, (state, action) => {

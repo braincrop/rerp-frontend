@@ -1,4 +1,4 @@
-'use client';
+'use client'
 import React, { useState, useMemo, useEffect } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Spinner, Input, FormGroup, Label, Row, Col } from 'reactstrap'
 import { Icon } from '@iconify/react'
@@ -7,10 +7,10 @@ import CreateProduct from '../../../components/CreateProduct/createproduct'
 import { allProducts, DeleteProductData, GetAllProduct } from '@/redux/slice/Products/productSlice'
 
 const Page = () => {
-  const { product, loading } = useSelector(allProducts);
-  const dispatch = useDispatch();
-  const [search, setSearch] = useState('');
-  const [show, setShow] = useState(false);
+  const { product, loading } = useSelector(allProducts)
+  const dispatch = useDispatch()
+  const [search, setSearch] = useState('')
+  const [show, setShow] = useState(false)
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
@@ -51,28 +51,30 @@ const Page = () => {
 
   return (
     <Container className="mt-5">
-      <Row className="mb-4">
-        {!show ? (
-          <>
-            <Col md="2">
+      <Row className="mb-4 align-items-center">
+        {!show && (
+          <Col xs="12" md="6" className="mb-2 mb-md-0">
+            <div className="d-flex flex-column flex-sm-row gap-2">
               <Input type="text" placeholder="Search products..." value={search} onChange={(e) => setSearch(e.target.value)} />
-            </Col>
-            <Col md="2">
               <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
               </Input>
-            </Col>
-          </>
-        ) : null}
-        <Col md={show ? '12' : '8'} className="text-end">
-          <Button color="primary" onClick={handleToggleShow}>
-            <Icon icon="mdi:plus" width={18} className="me-1" />
-            {modalType === 'edit' || show ? 'View List' : 'Add Product'}
-          </Button>
+            </div>
+          </Col>
+        )}
+
+        <Col xs="12" md={show ? '12' : '6'}>
+          <div className="d-flex flex-column flex-sm-row justify-content-center justify-content-md-end gap-2">
+            <Button color="primary" onClick={handleToggleShow}>
+              <Icon icon="mdi:plus" width={18} className="me-1" />
+              {modalType === 'edit' || show ? 'View List' : 'Add Product'}
+            </Button>
+          </div>
         </Col>
       </Row>
+
       {show ? (
         <CreateProduct setShow={setShow} selectedProduct={selectedProduct} modalType={modalType} />
       ) : (
@@ -128,12 +130,14 @@ const Page = () => {
                   <td>{prod.basePrice}</td>
                   <td>{prod.sellPrice}</td>
                   <td className="text-center">
-                    <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', prod)}>
-                      <Icon icon="mdi:pencil" width={16} />
-                    </Button>
-                    <Button color="danger" size="sm" onClick={() => openDeleteModal(prod.dpid)}>
-                      <Icon icon="mdi:delete" width={16} />
-                    </Button>
+                    <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                      <Button color="warning" size="sm" className="text-white w-md-auto" onClick={() => openModal('edit', prod)}>
+                        <Icon icon="mdi:pencil" width={16} />
+                      </Button>
+                      <Button color="danger" size="sm" className="text-white w-md-auto" onClick={() => openDeleteModal(prod.dpid)}>
+                        <Icon icon="mdi:delete" width={16} />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))

@@ -107,24 +107,26 @@ const Page = () => {
     setModalOpen(true)
   }
 
-  const saveProduct = async() => {
+  const saveProduct = async () => {
     if (!VendiSplashMachine.name.trim()) return
     if (modalType === 'create') {
       dispatch(PostVendiMachine(VendiSplashMachine)).unwrap()
       setModalOpen(false)
     }
     if (modalType === 'edit') {
-      await dispatch(UpdatedVendiMachine({
-        id: VendiSplashMachine.id,
-        updatedData: {
-          name: VendiSplashMachine.name,
-          path: VendiSplashMachine.path,
-          memo: VendiSplashMachine.memo,
-          startTime: VendiSplashMachine.starttime,
-          endTime: VendiSplashMachine.endtime,
-          vendronDeviceInfoIds: VendiSplashMachine.vendronDeviceInfoIds,
-        },
-      })).unwrap()
+      await dispatch(
+        UpdatedVendiMachine({
+          id: VendiSplashMachine.id,
+          updatedData: {
+            name: VendiSplashMachine.name,
+            path: VendiSplashMachine.path,
+            memo: VendiSplashMachine.memo,
+            startTime: VendiSplashMachine.starttime,
+            endTime: VendiSplashMachine.endtime,
+            vendronDeviceInfoIds: VendiSplashMachine.vendronDeviceInfoIds,
+          },
+        }),
+      ).unwrap()
       await dispatch(GetAllVendiMachine())
       setModalOpen(false)
     }
@@ -180,22 +182,24 @@ const Page = () => {
 
   return (
     <Container className="mt-5">
-      <Row className="mb-4">
-        <Col md="2">
-          <Input type="text" placeholder="Search Machine..." value={search} onChange={(e) => setSearch(e.target.value)} />
+      <Row className="mb-4 align-items-center">
+        <Col xs="12" md="6" className="mb-2 mb-md-0">
+          <div className="d-flex flex-column flex-sm-row gap-2">
+            <Input type="text" placeholder="Search Machine..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </Input>
+          </div>
         </Col>
-        <Col md="2">
-          <Input type="select" value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </Input>
-        </Col>
-        <Col md="8" className="text-end">
-          <Button color="primary" onClick={() => openModal('create')}>
-            <Icon icon="mdi:plus" width={18} className="me-2" />
-            Create New
-          </Button>
+        <Col xs="12" md="6">
+          <div className="d-flex flex-column flex-sm-row justify-content-center justify-content-md-end gap-2">
+            <Button color="primary" onClick={() => openModal('create')}>
+              <Icon icon="mdi:plus" width={18} className="me-2" />
+              Create New
+            </Button>
+          </div>
         </Col>
       </Row>
       <Table bordered hover responsive className="shadow-sm rounded">
@@ -239,12 +243,14 @@ const Page = () => {
                   )}
                 </td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', item)}>
-                    <Icon icon="mdi:pencil" width={16} />
-                  </Button>
-                  <Button color="danger" size="sm" onClick={() => openDeleteModal(item.vmSplashId)}>
-                    <Icon icon="mdi:delete" width={16} />
-                  </Button>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <Button color="warning" size="sm" className=" text-white w-md-auto" onClick={() => openModal('edit', item)}>
+                      <Icon icon="mdi:pencil" width={16} />
+                    </Button>
+                    <Button color="danger" size="sm" className=" text-white w-md-auto" onClick={() => openDeleteModal(item.vmSplashId)}>
+                      <Icon icon="mdi:delete" width={16} />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))

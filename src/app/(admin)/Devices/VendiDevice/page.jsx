@@ -131,12 +131,14 @@ const saveDevice = async () => {
                 <td>{device.ip}</td>
                 <td>{device.isActive ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}</td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', device)}>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                  <Button color="warning" size="sm" className="text-white w-md-auto" onClick={() => openModal('edit', device)}>
                     <Icon icon="mdi:pencil" width={16} />
                   </Button>
-                  <Button color="danger" size="sm" onClick={() => opendeleteModal(device.id)}>
+                  <Button color="danger" size="sm" className="text-white w-md-auto" onClick={() => opendeleteModal(device.id)}>
                     <Icon icon="mdi:delete" width={16} />
                   </Button>
+                  </div>
                 </td>
               </tr>
             ))

@@ -1,5 +1,11 @@
 'use client'
-import { allRestuarantItem, GetRestuarantItem, PostRestuarantItemData } from '@/redux/slice/RestuarantItem/RestuarantItemSlice'
+import {
+  allRestuarantItem,
+  DeleteRestuarantItemData,
+  GetRestuarantItem,
+  PostRestuarantItemData,
+  UpdateRestuarantItem,
+} from '@/redux/slice/RestuarantItem/RestuarantItemSlice'
 import { useEffect, useState } from 'react'
 import { Container, Spinner, FormGroup } from 'react-bootstrap'
 import { Icon } from '@iconify/react'
@@ -11,7 +17,9 @@ import Notify from '../Notify'
 
 const ItemCategoryView = ({ data, onBack }) => {
   const dispatch = useDispatch()
-  const {product} = useSelector(allProducts);
+  const { product } = useSelector(allProducts)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(null)
   const { restuarantItem, loading } = useSelector(allRestuarantItem)
   const [modalType, setModalType] = useState('create')
   const [itemInput, setItemInput] = useState({
@@ -32,23 +40,24 @@ const ItemCategoryView = ({ data, onBack }) => {
     }
     dispatch(GetAllProduct())
   }, [])
-  console.log('input-data', [data?.itemSubCategoryID])
 
- const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setItemInput((prev) => ({
-    ...prev,
-    [name]: name === 'distinctProductId' ? Number(value) : value,
-  }));
-};
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setItemInput((prev) => ({
+      ...prev,
+      [name]: name === 'distinctProductId' ? Number(value) : value,
+    }))
+  }
   const openModal = (type, item = null) => {
+    console.log('edit-data', item)
     setModalType(type)
     if (type === 'edit' && item) {
       setItemInput({
+        restaurantItemID: item.restaurantItemID || 0,
         barcode: item.barcode || '',
         name: item.name || '',
         buyPrice: item.buyPrice || 0,
-        sellprice: item.sellPrice || 0,
+        sellPrice: item.sellPrice || 0,
         distinctProductId: item.distinctProductId || 0,
         imagePath: item.imagePath || '',
         itemSubCategoryIds: item.itemSubCategoryID || data?.itemSubCategoryID,
@@ -85,41 +94,59 @@ const ItemCategoryView = ({ data, onBack }) => {
     }
   }
   const saveItem = async () => {
-    if (!itemInput.name.trim()) return Notify('error', 'Item name is required')
-    try {
-       const payload = {
-      ...itemInput,
-      buyPrice: Number(itemInput.buyPrice),
-      sellPrice: Number(itemInput.sellPrice),
-      itemSubCategoryIds: Array.isArray(itemInput.itemSubCategoryIds)
-        ? itemInput.itemSubCategoryIds.map(Number)
-        : [Number(itemInput.itemSubCategoryIds)]
+    if (!itemInput.name.trim()) {
+      return Notify('error', 'Item name is required')
     }
-      const result = await dispatch(PostRestuarantItemData(payload)).unwrap()
-      if (PostRestuarantItemData.fulfilled.match(result)){
-        setModalOpen(false)
+    try {
+      const payload = {
+        ...itemInput,
+        itemSubCategoryIds: Array.isArray(itemInput.itemSubCategoryIds)
+          ? itemInput.itemSubCategoryIds.map(Number)
+          : [Number(itemInput.itemSubCategoryIds)],
       }
+      const data = {
+        restaurantItemID: itemInput.restaurantItemID,
+        updatedData: payload,
+      }
+      if (modalType === 'edit') {
+        await dispatch(UpdateRestuarantItem(data)).unwrap()
+        // Notify('success', 'Item updated successfully')
+      } else {
+        await dispatch(PostRestuarantItemData(payload)).unwrap()
+        // Notify('success', 'Item created successfully')
+      }
+      setModalOpen(false)
     } catch (error) {
       console.error(error)
-      Notify('error', 'Failed to create item')
+      Notify('error', 'Failed to save item')
     }
   }
-
-  console.log('restuarantItem', restuarantItem)
+  const openDeleteModal = (index) => {
+    setSelectedIndex(index)
+    setDeleteModal(true)
+  }
+  const confirmDelete = () => {
+    dispatch(DeleteRestuarantItemData(selectedIndex)).unwrap()
+    setDeleteModal(false)
+  }
 
   return (
     <Container>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">Restuarant Item</h2>
-        <div>
-          <Button color="primary" onClick={() => openModal('create')} className="me-1">
-            <Icon icon="mdi:plus" width="16" height="16" className="me-1" />
-            Create New
-          </Button>
-          <Button color="primary" onClick={() => onBack()}>
-            <Icon icon="mdi:arrow-left" width="16" height="16" className="me-1" />
-            Back to Category
-          </Button>
+      <div className="row align-items-center mb-4">
+        <div className="col-12 col-md-6 mb-3 mb-md-0">
+          <h2 className="fw-bold text-center text-md-start">Restuarant Item</h2>
+        </div>
+        <div className="col-12 col-md-6">
+          <div className="d-flex flex-column flex-sm-row justify-content-center justify-content-md-end gap-2">
+            <Button color="primary" onClick={() => openModal('create')}>
+              <Icon icon="mdi:plus" width="16" height="16" className="me-1" />
+              Create New
+            </Button>
+            <Button color="primary" onClick={() => onBack()}>
+              <Icon icon="mdi:arrow-left" width="16" height="16" className="me-1" />
+              Back to Category
+            </Button>
+          </div>
         </div>
       </div>
       <Table bordered hover responsive className="shadow-sm rounded">
@@ -146,7 +173,7 @@ const ItemCategoryView = ({ data, onBack }) => {
             </tr>
           ) : restuarantItem?.length > 0 ? (
             restuarantItem.map((item, index) => (
-              <tr key={item.restaurantItemID}>
+              <tr key={`${item.restaurantItemID}-${index}`}>
                 <td>{index + 1}</td>
                 <td>{item.name}</td>
                 <td>{item.barcode}</td>
@@ -157,12 +184,14 @@ const ItemCategoryView = ({ data, onBack }) => {
                 <td>{item.taxCategoryId ?? '-'}</td>
                 <td>{item.imagePath ? <img src={item.imagePath} alt={item.name} width={50} height={50} className="rounded" /> : '-'}</td>
                 <td>
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', item)}>
-                    <Icon icon="mdi:pencil" width="16" />
-                  </Button>
-                  <Button color="danger" size="sm">
-                    <Icon icon="mdi:delete" width="16" />
-                  </Button>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <Button color="warning" size="sm" className="w-sm-auto" onClick={() => openModal('edit', item)}>
+                      <Icon icon="mdi:pencil" width="16" />
+                    </Button>
+                    <Button color="danger" size="sm" className="w-sm-auto" onClick={() => openDeleteModal(item.restaurantItemID)}>
+                      <Icon icon="mdi:delete" width="16" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))
@@ -219,7 +248,19 @@ const ItemCategoryView = ({ data, onBack }) => {
             Cancel
           </Button>
           <Button color="primary" onClick={saveItem}>
-             {modalType === 'create' ? 'Create' : 'Save'}
+            {modalType === 'create' ? 'Create' : 'Save'}
+          </Button>
+        </ModalFooter>
+      </Modal>
+      <Modal isOpen={deleteModal} centered>
+        <ModalHeader>Delete Item</ModalHeader>
+        <ModalBody>Are you sure you want to delete this Restuarant Item?</ModalBody>
+        <ModalFooter>
+          <Button color="secondary" onClick={() => setDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button color="danger" onClick={confirmDelete}>
+            Delete
           </Button>
         </ModalFooter>
       </Modal>
@@ -227,4 +268,4 @@ const ItemCategoryView = ({ data, onBack }) => {
   )
 }
 
-export default ItemCategoryView
+export default ItemCategoryView;
