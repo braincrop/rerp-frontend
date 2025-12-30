@@ -105,7 +105,7 @@ export const MENU_ITEMS = [{
       {
         key: "vendi-device",
         label: "Vendi Device",
-        url: "/device/vendi-device",
+        url: "/Devices/VendiDevice",
         parentKey: "devices"
       },
       {

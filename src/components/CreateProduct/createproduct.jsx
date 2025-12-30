@@ -23,15 +23,28 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     categoryIds: '',
   })
 
-  // console.log('Product Input:', productInput)
   useEffect(() => {
-    if (modalType === 'edit' && selectedProduct) {
-      setProductInput({
-        ...selectedProduct,
-        categoryIds: selectedProduct.categoryIds?.join(',') || '',
-      })
-    }
-  }, [selectedProduct, modalType])
+  if (modalType === 'edit' && selectedProduct) {
+    setProductInput({
+      name: selectedProduct.name ?? '',
+      memo: selectedProduct.memo ?? '',
+      imagePath: selectedProduct.imagePath ?? '',
+      imagePathNf: selectedProduct.imagePathNf ?? '',
+      productDescription: selectedProduct.productDescription ?? '',
+      ingredients: selectedProduct.ingredients ?? '',
+      productContains: selectedProduct.productContains ?? '',
+      shelfLife: selectedProduct.shelfLife ?? '',
+      basePrice: selectedProduct.basePrice ?? '',
+      sellPrice: selectedProduct.sellPrice ?? '',
+      barcode: selectedProduct.barcode ?? '',
+      taxApplied: selectedProduct.taxApplied ?? '',
+      categoryIds: selectedProduct.categoryIds
+        ? selectedProduct.categoryIds.join(',')
+        : '',
+    })
+  }
+}, [selectedProduct, modalType])
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setProductInput({ ...productInput, [name]: value })
@@ -57,35 +70,35 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     }
   }
   const validateForm = () => {
-    if (!productInput.name.trim()) {
+    if (!productInput.name?.trim()) {
       Notify('error', 'Product name is required')
       return false
     }
-    if (!productInput.memo.trim()) {
+    if (!productInput.memo?.trim()) {
       Notify('error', 'Memo is required')
       return false
     }
-    if (!productInput.imagePath) {
+    if (!productInput?.imagePath) {
       Notify('error', 'Product image is required')
       return false
     }
-    if (!productInput.imagePathNf) {
+    if (!productInput?.imagePathNf) {
       Notify('error', 'Product NF image is required')
       return false
     }
-    if (!productInput.ingredients.trim()) {
+    if (!productInput.ingredients?.trim()) {
       Notify('error', 'Ingredients are required')
       return false
     }
-    if (!productInput.productContains.trim()) {
+    if (!productInput.productContains?.trim()) {
       Notify('error', 'Product contains is required')
       return false
     }
-    if (!productInput.shelfLife.trim()) {
+    if (!productInput.shelfLife?.trim()) {
       Notify('error', 'Shelf life is required')
       return false
     }
-    if (!productInput.basePrice) {
+    if (!productInput?.basePrice) {
       Notify('error', 'Base price is required')
       return false
     }
@@ -93,7 +106,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       Notify('error', 'Sell price is required')
       return false
     }
-    if (!productInput.barcode.trim()) {
+    if (!productInput.barcode?.trim()) {
       Notify('error', 'Barcode is required')
       return false
     }
@@ -102,12 +115,12 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       return false
     }
 
-    if (!productInput.categoryIds.trim()) {
+    if (!productInput.categoryIds?.trim()) {
       Notify('error', 'Category IDs are required')
       return false
     }
 
-    if (!productInput.productDescription.trim()) {
+    if (!productInput.productDescription?.trim()) {
       Notify('error', 'Description is required')
       return false
     }

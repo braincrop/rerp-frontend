@@ -42,7 +42,7 @@
     "react-jvectormap": "^0.0.16",
     "react-quill": "^2.0.0",
     "react-redux": "^9.2.0",
-    "react-select": "^5.8.0",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "reactstrap": "^9.2.3",
     "sass": "^1.81.0",
