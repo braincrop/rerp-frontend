@@ -208,6 +208,19 @@ const ItemCategoryView = ({ data, onBack }) => {
       <Modal isOpen={modalOpen} centered>
         <ModalHeader toggle={() => setModalOpen(false)}>{modalType === 'create' ? 'Create Item' : 'Edit Item'}</ModalHeader>
         <ModalBody>
+           <FormGroup>
+            <Label>Distinct Product</Label>
+            <Input type="select" name="distinctProductId" value={itemInput.distinctProductId || ''} onChange={handleInputChange}>
+              <option value="" disabled hidden>
+                Select Product--
+              </option>
+              {product?.map((product) => (
+                <option key={product.dpid} value={product.dpid}>
+                  {product.name}
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
           <FormGroup>
             <Label>Barcode</Label>
             <Input name="barcode" value={itemInput.barcode} onChange={handleInputChange} />
@@ -225,19 +238,6 @@ const ItemCategoryView = ({ data, onBack }) => {
             <Input name="sellPrice" type="number" value={itemInput.sellPrice} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Distinct Product</Label>
-            <Input type="select" name="distinctProductId" value={itemInput.distinctProductId || ''} onChange={handleInputChange}>
-              <option value="" disabled hidden>
-                Select Product--
-              </option>
-              {product?.map((product) => (
-                <option key={product.dpid} value={product.dpid}>
-                  {product.name}
-                </option>
-              ))}
-            </Input>
-          </FormGroup>
-          <FormGroup>
             <Label>Image</Label>
             <Input type="file" onChange={handleImageUpload} />
             {uploading && <Spinner size="sm" className="ms-2" />}
@@ -253,6 +253,7 @@ const ItemCategoryView = ({ data, onBack }) => {
           </Button>
         </ModalFooter>
       </Modal>
+      
       <Modal isOpen={deleteModal} centered>
         <ModalHeader>Delete Item</ModalHeader>
         <ModalBody>Are you sure you want to delete this Restuarant Item?</ModalBody>
