@@ -1,7 +1,6 @@
 import { axiosInstance } from '../axiosConfig'
 
 export const RestuarantItem = async (data) => {
-    console.log('data', data)
   try {
     const response = await axiosInstance.get(`restaurant-items/by-subcategory/${data}`)
     return response
@@ -21,7 +20,6 @@ export const PostRestuarantItem = async (data) => {
 }
 
 export const UpdateRestuarant = async (data) => {
-  console.log('data', data)
   const { restaurantItemID, updatedData } = data
 
   try {

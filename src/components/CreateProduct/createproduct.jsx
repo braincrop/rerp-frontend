@@ -24,26 +24,24 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
   })
 
   useEffect(() => {
-  if (modalType === 'edit' && selectedProduct) {
-    setProductInput({
-      name: selectedProduct.name ?? '',
-      memo: selectedProduct.memo ?? '',
-      imagePath: selectedProduct.imagePath ?? '',
-      imagePathNf: selectedProduct.imagePathNf ?? '',
-      productDescription: selectedProduct.productDescription ?? '',
-      ingredients: selectedProduct.ingredients ?? '',
-      productContains: selectedProduct.productContains ?? '',
-      shelfLife: selectedProduct.shelfLife ?? '',
-      basePrice: selectedProduct.basePrice ?? '',
-      sellPrice: selectedProduct.sellPrice ?? '',
-      barcode: selectedProduct.barcode ?? '',
-      taxApplied: selectedProduct.taxApplied ?? '',
-      categoryIds: selectedProduct.categoryIds
-        ? selectedProduct.categoryIds.join(',')
-        : '',
-    })
-  }
-}, [selectedProduct, modalType])
+    if (modalType === 'edit' && selectedProduct) {
+      setProductInput({
+        name: selectedProduct.name ?? '',
+        memo: selectedProduct.memo ?? '',
+        imagePath: selectedProduct.imagePath ?? '',
+        imagePathNf: selectedProduct.imagePathNf ?? '',
+        productDescription: selectedProduct.productDescription ?? '',
+        ingredients: selectedProduct.ingredients ?? '',
+        productContains: selectedProduct.productContains ?? '',
+        shelfLife: selectedProduct.shelfLife ?? '',
+        basePrice: selectedProduct.basePrice ?? '',
+        sellPrice: selectedProduct.sellPrice ?? '',
+        barcode: selectedProduct.barcode ?? '',
+        taxApplied: selectedProduct.taxApplied ?? '',
+        categoryIds: selectedProduct.categoryIds ? selectedProduct.categoryIds.join(',') : '',
+      })
+    }
+  }, [selectedProduct, modalType])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -56,7 +54,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       const res = await postImage(formData)
       setProductInput((prev) => ({
         ...prev,
-        [fieldName]: res?.url,
+        [fieldName]: res?.data.url,
       }))
     } catch (err) {
       console.error(err)
@@ -138,31 +136,31 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       categoryIds: productInput.categoryIds.split(',').map((id) => Number(id.trim())),
     }
     try {
-    if (modalType === 'create') {
-      const resultAction = await dispatch(PostProduct(payload))
-      if (PostProduct.fulfilled.match(resultAction)) {
-        setShow(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to create product')
+      if (modalType === 'create') {
+        const resultAction = await dispatch(PostProduct(payload))
+        if (PostProduct.fulfilled.match(resultAction)) {
+          setShow(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to create product')
+        }
+      } else if (modalType === 'edit') {
+        const updatedData = { ...payload }
+        const productId = selectedProduct.dpid
+        const data = {
+          dpid: productId,
+          updatedData: updatedData,
+        }
+        const resultAction = await dispatch(UpdatedProduct(data))
+        if (UpdatedProduct.fulfilled.match(resultAction)) {
+          setShow(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to update product')
+        }
       }
-    } else if (modalType === 'edit') {
-      const updatedData = { ...payload }
-      const productId = selectedProduct.dpid
-      const data = {
-        dpid: productId,
-        updatedData: updatedData,
-      }
-      const resultAction = await dispatch(UpdatedProduct(data))
-      if (UpdatedProduct.fulfilled.match(resultAction)) {
-        setShow(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to update product')
-      }
+    } catch (error) {
+      console.error('Product operation failed:', error)
+      Notify('error', 'Something went wrong')
     }
-  } catch (error) {
-    console.error('Product operation failed:', error)
-    Notify('error', 'Something went wrong')
-  }
   }
 
   return (
@@ -255,7 +253,12 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         <Col md={3}>
           <FormGroup>
             <Label>Product Description</Label>
-            <Input type="textarea" name="productDescription" value={productInput.productDescription} onChange={handleChange} />
+            <Input
+              type="textarea"
+              name="productDescription"
+              value={productInput.productDescription}
+              onChange={handleChange}
+            />
           </FormGroup>
         </Col>
 

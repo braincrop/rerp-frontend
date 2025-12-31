@@ -6,11 +6,7 @@ import { AllItemSubCategories } from '../../../api/AssignedItems/assignedItemHep
 export const GetItemCategory = createAsyncThunk('ItemCategory/AllItem', async (data) => {
   try {
     const response = await AllItemSubCategories(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
     throw Error('Failed to fetch item-category')
   }
@@ -34,9 +30,10 @@ export const ItemCategorySlice = createSlice({
       })
       .addCase(GetItemCategory.fulfilled, (state, action) => {
         state.loading = false
+        console.log('action.payload', action.payload)
         if (action.payload) {
           state.error = null
-          state.itemCat = action.payload?.data?.items
+          state.itemCat = action.payload?.data
         }
       })
       .addCase(GetItemCategory.rejected, (state, action) => {

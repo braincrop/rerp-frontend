@@ -16,42 +16,30 @@ export const GetAllProduct = createAsyncThunk('Product/AllProduct', async () => 
   }
 })
 
-export const PostProduct = createAsyncThunk('Product/postProduct', async (data) => {
+export const PostProduct = createAsyncThunk('Product/postProduct', async (data,{ rejectWithValue }) => {
   try {
     const response = await PostProducts(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post Product')
+    return rejectWithValue('Failed to post product')
   }
 })
 
-export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (data) => {
+export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (data,{ rejectWithValue }) => {
   try {
     const response = await UpdateProducts(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update Product')
+    return rejectWithValue('Failed to update Product')
   }
 })
 
-export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async (data) => {
+export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async (data,{ rejectWithValue }) => {
   try {
     const response = await DeleteProduct(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete Product')
+    return rejectWithValue('Failed to delete product')
   }
 })
 
@@ -72,15 +60,15 @@ export const ProductSlice = createSlice({
       })
       .addCase(PostProduct.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 201) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
           state.product.unshift(action.payload.data)
-          Notify('success', 'product added successfully')
+         Notify('success', action.payload.message)
         }
       })
       .addCase(PostProduct.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+       state.error = action.payload || action.error.message
       })
     builder
       .addCase(UpdatedProduct.pending, (state) => {
@@ -88,14 +76,14 @@ export const ProductSlice = createSlice({
       })
       .addCase(UpdatedProduct.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '200') {
           state.product = state.product.map((item) => (item.dpid === action.payload.data.dpid ? action.payload.data : item))
-          Notify('success', 'product updated successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(UpdatedProduct.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
 
     builder
@@ -105,7 +93,7 @@ export const ProductSlice = createSlice({
       .addCase(GetAllProduct.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        state.product = action.payload?.data
+        state.product = action.payload?.data.data
       })
       .addCase(GetAllProduct.rejected, (state, action) => {
         state.loading = false
@@ -117,11 +105,11 @@ export const ProductSlice = createSlice({
       })
       .addCase(DeleteProductData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.product = state.product.filter((item) => item.dpid !== deletedId)
-          Notify('success', 'product deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteProductData.rejected, (state, action) => {
