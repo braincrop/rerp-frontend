@@ -16,42 +16,30 @@ export const GetAllDevices = createAsyncThunk('Devices/AllDevices', async () => 
   }
 })
 
-export const PostDevice = createAsyncThunk('Device/postDevice', async (data) => {
+export const PostDevice = createAsyncThunk('Device/postDevice', async (data, { rejectWithValue }) => {
   try {
     const response = await PostDevices(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post Device')
+    return rejectWithValue('Failed to post Device')
   }
 })
 
-export const UpdatedDevice = createAsyncThunk('Device/UpdateDevice', async (data) => {
+export const UpdatedDevice = createAsyncThunk('Device/UpdateDevice', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateDevices(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update Device')
+    return rejectWithValue('Failed to update Device')
   }
 })
 
-export const DeleteDeviceData = createAsyncThunk('Device/DeleteDevice', async (data) => {
+export const DeleteDeviceData = createAsyncThunk('Device/DeleteDevice', async (data, { rejectWithValue }) => {
   try {
     const response = await DeleteDevices(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete Device')
+    return rejectWithValue('Failed to delete Device')
   }
 })
 
@@ -74,7 +62,7 @@ export const DeviceSlice = createSlice({
         state.loading = false
         if (action.payload) {
           state.error = null
-          state.devices = action.payload?.data
+          state.devices = action.payload?.data.data
         }
       })
       .addCase(GetAllDevices.rejected, (state, action) => {
@@ -88,21 +76,14 @@ export const DeviceSlice = createSlice({
       })
       .addCase(PostDevice.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 201) {
-          const createdDevice = action.payload.data
-          state.devices.unshift({
-            id: createdDevice.id,
-            name: createdDevice.name,
-            deviceName: createdDevice.deviceName || '',
-            ip: createdDevice.ip || '',
-            isActive: createdDevice.isActive ?? false,
-          })
-          Notify('success', 'Device added successfully')
+        if (action.payload?.statusCode === '201') {
+          state.devices.unshift(action.payload.data)
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostDevice.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
     builder
       .addCase(UpdatedDevice.pending, (state) => {
@@ -110,22 +91,17 @@ export const DeviceSlice = createSlice({
       })
       .addCase(UpdatedDevice.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '200') {
           const updatedId = action.meta.arg.id
           const updatedDevice = action.payload.data
-          state.devices = state.devices.map((item) =>
-            item.id === updatedId
-              ? { ...item, ...updatedDevice }
-              : item,
-          )
-
-          Notify('success', 'Device updated successfully')
+          state.devices = state.devices.map((item) => (item.id === updatedId ? { ...item, ...updatedDevice } : item))
+          Notify('success', action.payload.message)
         }
       })
 
       .addCase(UpdatedDevice.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
     builder
       .addCase(DeleteDeviceData.pending, (state) => {
@@ -133,16 +109,16 @@ export const DeviceSlice = createSlice({
       })
       .addCase(DeleteDeviceData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.devices = state.devices.filter((item) => item.id !== deletedId)
-          Notify('success', 'devices deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteDeviceData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
   },
 })

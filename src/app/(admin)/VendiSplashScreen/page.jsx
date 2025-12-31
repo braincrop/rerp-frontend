@@ -79,10 +79,7 @@ const Page = () => {
     dispatch(GetAllDevices())
   }, [])
 
-  console.log('given-input', VendiSplashMachine)
-
   const openModal = (type, item = null) => {
-    console.log('edit-data', item)
     setModalType(type)
     if (type === 'edit' && item) {
       setVendiSplashMachine({
@@ -161,7 +158,7 @@ const Page = () => {
       const res = await postVideo(formData)
       setVendiSplashMachine((prev) => ({
         ...prev,
-        [fieldName]: res?.url,
+        [fieldName]: res?.data.url,
       }))
     } catch (err) {
       console.error(err)
@@ -175,10 +172,10 @@ const Page = () => {
     }
   }
 
-  const filteredProducts = useMemo(() => {
-    return VendiMachine.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-  }, [search, VendiMachine])
-  const paginated = filteredProducts.slice(0, itemsPerPage)
+  // const filteredProducts = useMemo(() => {
+  //   return VendiMachine.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+  // }, [search, VendiMachine])
+  // const paginated = filteredProducts.slice(0, itemsPerPage)
 
   return (
     <Container className="mt-5">

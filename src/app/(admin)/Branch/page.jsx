@@ -110,6 +110,14 @@ const Page = () => {
       Notify('error', 'Branch name is required')
       return
     }
+     else if (!BranchInput.outletAddress?.trim()) {
+      Notify('error', 'outletAddress is required')
+      return
+    }
+     else if (!BranchInput.memo?.trim()) {
+      Notify('error', 'memo is required')
+      return
+    }
     try {
       let resultAction
       if (modalType === 'create') {
@@ -194,10 +202,10 @@ const Page = () => {
     }
   }
 
-  const filteredProducts = useMemo(() => {
-    return branch.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
-  }, [search, branch])
-  const paginated = filteredProducts.slice(0, itemsPerPage)
+  // const filteredProducts = useMemo(() => {
+  //   return branch.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
+  // }, [search, branch])
+  // const paginated = filteredProducts.slice(0, itemsPerPage)
 
   console.log('branch', branch)
   return (
@@ -216,13 +224,11 @@ const Page = () => {
         <Col lg="6"></Col>
         <Col xs="12" md="6" lg="2" className="self-end">
           <Button color="primary" className="w-100 w-md-auto" onClick={() => openModal('create')}>
-            <Icon icon="mdi:plus" width={18} className="me-2" />
+            <Icon icon="mdi:plus" width={18} className="me-1" />
             Create New
           </Button>
         </Col>
-        
       </Row>
-
       <Table bordered hover responsive className="shadow-sm rounded">
         <thead className="table-light align-middle">
           <tr>
@@ -255,16 +261,16 @@ const Page = () => {
 
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                    <Button color="info" size="sm" className="me-1 w-sm-auto" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
-                      <Icon icon="mdi:playlist-edit" width={16} />
+                    <Button color="info" size="sm" title="Assign-Item" className="me-1 w-sm-auto" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
+                      <Icon icon="mdi:playlist-edit" width={16}  />
                     </Button>
-                    <Button color="danger" size="sm" className="me-1 w-sm-auto" onClick={() => openAssignBranchesModal(branch.branchId)}>
+                    <Button color="danger" size="sm" title='Assign-Branch' className="me-1 w-sm-auto" onClick={() => openAssignBranchesModal(branch.branchId)}>
                       <Icon icon="mdi:source-branch" width={16} />
                     </Button>
-                    <Button color="warning" size="sm" className="me-1 w-sm-auto" onClick={() => openModal('edit', branch)}>
+                    <Button color="warning" size="sm" title="Edit" className="me-1 w-sm-auto" onClick={() => openModal('edit', branch)}>
                       <Icon icon="mdi:pencil" width={16} />
                     </Button>
-                    <Button color="danger" size="sm" className="me-1 w-sm-auto" onClick={() => openDeleteModal(branch.branchId)}>
+                    <Button color="danger" size="sm" title="Delete" className="me-1 w-sm-auto" onClick={() => openDeleteModal(branch.branchId)}>
                       <Icon icon="mdi:delete" width={16} />
                     </Button>
                   </div>

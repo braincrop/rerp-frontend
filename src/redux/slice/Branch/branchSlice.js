@@ -1,7 +1,7 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
-import { AllBranch, PostBranch, UpdateBranch,DeleteBranch, PostAssignBranch, ItemCategoryBulk } from '../../../api/branch/branchHelperApi';
+import { AllBranch, PostBranch, UpdateBranch, DeleteBranch, PostAssignBranch, ItemCategoryBulk } from '../../../api/branch/branchHelperApi'
 
 export const GetAllBranch = createAsyncThunk('Branch/AllBranch', async () => {
   try {
@@ -16,16 +16,12 @@ export const GetAllBranch = createAsyncThunk('Branch/AllBranch', async () => {
   }
 })
 
-export const PostBranchData = createAsyncThunk('Branch/postBranch', async (data) => {
+export const PostBranchData = createAsyncThunk('Branch/postBranch', async (data, { rejectWithValue }) => {
   try {
     const response = await PostBranch(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post Branch')
+    return rejectWithValue('Failed to post Branch')
   }
 })
 
@@ -42,44 +38,30 @@ export const PostAssignItemCategory = createAsyncThunk('Branch/AssignBranch', as
   }
 })
 
-export const PostItemCategoryBulk = createAsyncThunk('Branch/ItemCategory', async (data) => {
+export const PostItemCategoryBulk = createAsyncThunk('Branch/ItemCategory', async (data, { rejectWithValue }) => {
   try {
     const response = await ItemCategoryBulk(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post Branch')
+    return rejectWithValue('Failed to post Branch')
   }
 })
 
-
-
-export const UpdatedBranch = createAsyncThunk('Branch/UpdateBranch', async (data) => {
+export const UpdatedBranch = createAsyncThunk('Branch/UpdateBranch', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateBranch(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update Branch')
+    return rejectWithValue('Failed to update Branch')
   }
 })
 
-export const DeleteBranchData = createAsyncThunk('Branch/DeleteBranch', async (data) => {
+export const DeleteBranchData = createAsyncThunk('Branch/DeleteBranch', async (data, { rejectWithValue }) => {
   try {
     const response = await DeleteBranch(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete branch')
+    return rejectWithValue('Failed to delete Branch')
   }
 })
 
@@ -100,17 +82,17 @@ export const BranchSlice = createSlice({
       })
       .addCase(PostBranchData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
           state.branch.unshift(action.payload.data)
-          Notify('success', 'Branch added successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostBranchData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
-      builder
+    builder
       .addCase(PostAssignItemCategory.pending, (state) => {
         state.loading = true
       })
@@ -126,15 +108,15 @@ export const BranchSlice = createSlice({
         state.error = action.error.message
       })
 
-        builder
+    builder
       .addCase(PostItemCategoryBulk.pending, (state) => {
         state.loading = true
       })
       .addCase(PostItemCategoryBulk.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
-          Notify('success', 'Categories assigned successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostItemCategoryBulk.rejected, (state, action) => {
@@ -142,21 +124,20 @@ export const BranchSlice = createSlice({
         state.error = action.error.message
       })
 
-
     builder
       .addCase(UpdatedBranch.pending, (state) => {
         state.loading = true
       })
       .addCase(UpdatedBranch.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '200') {
           state.branch = state.branch.map((item) => (item.branchId === action.payload.data.branchId ? action.payload.data : item))
-          Notify('success', 'Branch updated successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(UpdatedBranch.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
 
     builder
@@ -166,7 +147,7 @@ export const BranchSlice = createSlice({
       .addCase(GetAllBranch.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        state.branch = action.payload?.data
+        state.branch = action.payload?.data.data
       })
       .addCase(GetAllBranch.rejected, (state, action) => {
         state.loading = false
@@ -178,22 +159,22 @@ export const BranchSlice = createSlice({
       })
       .addCase(DeleteBranchData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.branch = state.branch.filter((item) => item.branchId !== deletedId)
-          Notify('success', 'Branch deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteBranchData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
   },
 })
 
 export const {} = BranchSlice.actions
 
-export const allBranch = (state) => state.allBranch;
+export const allBranch = (state) => state.allBranch
 
 export default BranchSlice.reducer

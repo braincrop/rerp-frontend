@@ -16,42 +16,30 @@ export const GetRestuarantItem = createAsyncThunk('ItemCategory/AllItem', async 
   }
 })
 
-export const PostRestuarantItemData = createAsyncThunk('RestuarantItem/PostRestuarantItem', async (data) => {
+export const PostRestuarantItemData = createAsyncThunk('RestuarantItem/PostRestuarantItem', async (data, { rejectWithValue }) => {
   try {
     const response = await PostRestuarantItem(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post ItemCategory')
+    return rejectWithValue('Failed to post ItemCategory')
   }
 })
 
-export const UpdateRestuarantItem = createAsyncThunk('RestuarantItem/UpdateRestuarantItem', async (data) => {
+export const UpdateRestuarantItem = createAsyncThunk('RestuarantItem/UpdateRestuarantItem', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateRestuarant(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update ItemCategory')
+    return rejectWithValue('Failed to update ItemCategory')
   }
 })
 
-export const DeleteRestuarantItemData = createAsyncThunk('RestuarantItem/DeleteRestuarantItem', async (data) => {
+export const DeleteRestuarantItemData = createAsyncThunk('RestuarantItem/DeleteRestuarantItem', async (data, { rejectWithValue }) => {
   try {
     const response = await DeleteRestuarantItem(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete ItemCategory')
+    return rejectWithValue('Failed to delete ItemCategory')
   }
 })
 
@@ -74,7 +62,7 @@ export const RestuarantItemSlice = createSlice({
         state.loading = false
         if (action.payload) {
           state.error = null
-          state.restuarantItem = action.payload?.data?.items
+          state.restuarantItem = action.payload?.data.data?.items
         }
       })
       .addCase(GetRestuarantItem.rejected, (state, action) => {
@@ -87,15 +75,15 @@ export const RestuarantItemSlice = createSlice({
       })
       .addCase(PostRestuarantItemData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
           state.restuarantItem.unshift(action.payload.data)
-          Notify('success', 'Restuarant Item added successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostRestuarantItemData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
     builder
       .addCase(UpdateRestuarantItem.pending, (state) => {
@@ -103,14 +91,16 @@ export const RestuarantItemSlice = createSlice({
       })
       .addCase(UpdateRestuarantItem.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
-          state.restuarantItem = state.restuarantItem.map((item) => (item.restaurantItemID === action.payload.data.restaurantItemID ? action.payload.data : item))
-          Notify('success', 'Restuarant Item updated successfully')
+        if (action.payload?.statusCode === '200') {
+          state.restuarantItem = state.restuarantItem.map((item) =>
+            item.restaurantItemID === action.payload.data.restaurantItemID ? action.payload.data : item,
+          )
+          Notify('success', action.payload.message)
         }
       })
       .addCase(UpdateRestuarantItem.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
     builder
       .addCase(DeleteRestuarantItemData.pending, (state) => {
@@ -118,16 +108,16 @@ export const RestuarantItemSlice = createSlice({
       })
       .addCase(DeleteRestuarantItemData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.restuarantItem = state.restuarantItem.filter((item) => item.restaurantItemID !== deletedId)
-          Notify('success', 'Restuarant Item deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteRestuarantItemData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
   },
 })

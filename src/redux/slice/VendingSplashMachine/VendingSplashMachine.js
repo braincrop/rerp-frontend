@@ -1,7 +1,12 @@
 'use client'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import Notify from '../../../components/Notify';
-import { AllVendiSplashMachine,PostVendiSplashMachine,UpdateVendiSplashMachine,DeleteVendingSplashMachine } from '../../../api/VendingSplashMachine/VendingSplashHelperApi';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import Notify from '../../../components/Notify'
+import {
+  AllVendiSplashMachine,
+  PostVendiSplashMachine,
+  UpdateVendiSplashMachine,
+  DeleteVendingSplashMachine,
+} from '../../../api/VendingSplashMachine/VendingSplashHelperApi'
 
 export const GetAllVendiMachine = createAsyncThunk('VendiMachine/AllVendiMachine', async () => {
   try {
@@ -16,42 +21,30 @@ export const GetAllVendiMachine = createAsyncThunk('VendiMachine/AllVendiMachine
   }
 })
 
-export const PostVendiMachine = createAsyncThunk('VendiMachine/postVendiMachine', async (data) => {
+export const PostVendiMachine = createAsyncThunk('VendiMachine/postVendiMachine', async (data, { rejectWithValue }) => {
   try {
     const response = await PostVendiSplashMachine(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post VendiMachine')
+    return rejectWithValue('Failed to post VendiMachine')
   }
 })
 
-export const UpdatedVendiMachine = createAsyncThunk('VendiMachine/UpdateVendiMachine', async (data) => {
+export const UpdatedVendiMachine = createAsyncThunk('VendiMachine/UpdateVendiMachine', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateVendiSplashMachine(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update VendiMachine')
+    return rejectWithValue('Failed to update VendiMachine')
   }
 })
 
-export const DeleteVendiMachine = createAsyncThunk('VendiMachine/DeleteVendiMachine', async (data) => {
+export const DeleteVendiMachine = createAsyncThunk('VendiMachine/DeleteVendiMachine', async (data, { rejectWithValue }) => {
   try {
     const response = await DeleteVendingSplashMachine(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete VendiMachine')
+    return rejectWithValue('Failed to delete VendiMachine')
   }
 })
 
@@ -72,15 +65,15 @@ export const VendiSplashMachineSlice = createSlice({
       })
       .addCase(PostVendiMachine.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
           state.VendiMachine.unshift(action.payload.data)
-          Notify('success', 'Vendi Splash Machine added successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostVendiMachine.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
     builder
       .addCase(UpdatedVendiMachine.pending, (state) => {
@@ -88,14 +81,14 @@ export const VendiSplashMachineSlice = createSlice({
       })
       .addCase(UpdatedVendiMachine.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '200') {
           state.VendiMachine = state.VendiMachine.map((item) => (item.vmSplashId === action.payload.data.vmSplashId ? action.payload.data : item))
-          Notify('success', 'Vendi Splash Machine updated successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(UpdatedVendiMachine.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
 
     builder
@@ -105,7 +98,7 @@ export const VendiSplashMachineSlice = createSlice({
       .addCase(GetAllVendiMachine.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        state.VendiMachine = action.payload?.data
+        state.VendiMachine = action.payload?.data.data
       })
       .addCase(GetAllVendiMachine.rejected, (state, action) => {
         state.loading = false
@@ -117,22 +110,20 @@ export const VendiSplashMachineSlice = createSlice({
       })
       .addCase(DeleteVendiMachine.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.VendiMachine = state.VendiMachine.filter((item) => item.vmSplashId !== deletedId)
-          Notify('success', 'Vendi Splash Machine deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteVendiMachine.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
   },
 })
 
 export const {} = VendiSplashMachineSlice.actions
-
 export const allVendiSplashMachine = (state) => state.allVendiSplashMachine
-
 export default VendiSplashMachineSlice.reducer

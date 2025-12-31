@@ -30,6 +30,7 @@ const Page = () => {
     dispatch(DeleteProductData(selectedIndex))
   }
   const openModal = (type, product = null) => {
+    console.log('edit-data', product)
     setModalType(type)
     setSelectedProduct(product)
     setShow(true)

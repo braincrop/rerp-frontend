@@ -27,7 +27,7 @@ const ItemCategoryView = ({ data, onBack }) => {
     name: '',
     buyPrice: 0,
     sellPrice: 0,
-    distinctProductId: 0,
+    distinctProductId: '',
     imagePath: '',
     itemSubCategoryIds: [data?.itemSubCategoryID],
   })
@@ -40,12 +40,12 @@ const ItemCategoryView = ({ data, onBack }) => {
     }
     dispatch(GetAllProduct())
   }, [])
-
+  console.log('restuarantItem',restuarantItem)
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setItemInput((prev) => ({
       ...prev,
-      [name]: name === 'distinctProductId' ? Number(value) : value,
+      [name] : value,
     }))
   }
   const openModal = (type, item = null) => {
@@ -85,7 +85,7 @@ const ItemCategoryView = ({ data, onBack }) => {
       const formData = new FormData()
       formData.append('file', file)
       const res = await postImage(formData)
-      setItemInput((prev) => ({ ...prev, imagePath: res?.url }))
+      setItemInput((prev) => ({ ...prev, imagePath: res?.data.url }))
     } catch (error) {
       console.error(error)
       Notify('error', 'Image upload failed')
@@ -126,6 +126,7 @@ const ItemCategoryView = ({ data, onBack }) => {
     setDeleteModal(true)
   }
   const confirmDelete = () => {
+    console.log('index', selectedIndex)
     dispatch(DeleteRestuarantItemData(selectedIndex)).unwrap()
     setDeleteModal(false)
   }
@@ -172,7 +173,7 @@ const ItemCategoryView = ({ data, onBack }) => {
               </td>
             </tr>
           ) : restuarantItem?.length > 0 ? (
-            restuarantItem.map((item, index) => (
+            restuarantItem?.map((item, index) => (
               <tr key={`${item.restaurantItemID}-${index}`}>
                 <td>{index + 1}</td>
                 <td>{item.name}</td>
@@ -225,9 +226,9 @@ const ItemCategoryView = ({ data, onBack }) => {
           </FormGroup>
           <FormGroup>
             <Label>Distinct Product</Label>
-            <Input type="select" name="distinctProductId" value={itemInput.distinctProductId} onChange={handleInputChange}>
-              <option value="" disabled>
-                Select Product
+            <Input type="select" name="distinctProductId" value={itemInput.distinctProductId || ''} onChange={handleInputChange}>
+              <option value="" disabled hidden>
+                Select Product--
               </option>
               {product?.map((product) => (
                 <option key={product.dpid} value={product.dpid}>
