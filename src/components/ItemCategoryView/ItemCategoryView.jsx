@@ -40,14 +40,31 @@ const ItemCategoryView = ({ data, onBack }) => {
     }
     dispatch(GetAllProduct())
   }, [])
-  console.log('restuarantItem',restuarantItem)
+  
+  const isProductSelected = !!itemInput.distinctProductId
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setItemInput((prev) => ({
-      ...prev,
-      [name] : value,
-    }))
+    if (name === 'distinctProductId') {
+      const selectedProduct = product.find((p) => p.dpid === Number(value))
+      if (selectedProduct) {
+        setItemInput((prev) => ({
+          ...prev,
+          distinctProductId: value,
+          barcode: selectedProduct.barcode || '',
+          name: selectedProduct.name || '',
+          buyPrice: selectedProduct.basePrice || '',
+          sellPrice: selectedProduct.sellPrice || '',
+          imagePath: selectedProduct.imagePath || '',
+        }))
+      }
+    } else {
+      setItemInput((prev) => ({
+        ...prev,
+        [name]: value,
+      }))
+    }
   }
+
   const openModal = (type, item = null) => {
     console.log('edit-data', item)
     setModalType(type)
@@ -208,7 +225,7 @@ const ItemCategoryView = ({ data, onBack }) => {
       <Modal isOpen={modalOpen} centered>
         <ModalHeader toggle={() => setModalOpen(false)}>{modalType === 'create' ? 'Create Item' : 'Edit Item'}</ModalHeader>
         <ModalBody>
-           <FormGroup>
+          <FormGroup>
             <Label>Distinct Product</Label>
             <Input type="select" name="distinctProductId" value={itemInput.distinctProductId || ''} onChange={handleInputChange}>
               <option value="" disabled hidden>
@@ -221,29 +238,38 @@ const ItemCategoryView = ({ data, onBack }) => {
               ))}
             </Input>
           </FormGroup>
-          <FormGroup>
-            <Label>Barcode</Label>
-            <Input name="barcode" value={itemInput.barcode} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Name</Label>
-            <Input name="name" value={itemInput.name} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Buy Price</Label>
-            <Input name="buyPrice" type="number" value={itemInput.buyPrice} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Sell Price</Label>
-            <Input name="sellPrice" type="number" value={itemInput.sellPrice} onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Image</Label>
-            <Input type="file" onChange={handleImageUpload} />
-            {uploading && <Spinner size="sm" className="ms-2" />}
-            {itemInput.imagePath && <img src={itemInput.imagePath} alt="item" width={60} className="mt-2" />}
-          </FormGroup>
+          {isProductSelected && (
+            <>
+              <FormGroup>
+                <Label>Barcode</Label>
+                <Input name="barcode" value={itemInput.barcode} onChange={handleInputChange} />
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Name</Label>
+                <Input name="name" value={itemInput.name} onChange={handleInputChange} />
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Buy Price</Label>
+                <Input name="buyPrice" type="number" value={itemInput.buyPrice} onChange={handleInputChange} />
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Sell Price</Label>
+                <Input name="sellPrice" type="number" value={itemInput.sellPrice} onChange={handleInputChange} />
+              </FormGroup>
+
+              <FormGroup>
+                <Label>Image</Label>
+                <Input type="file" onChange={handleImageUpload} />
+                {uploading && <Spinner size="sm" className="ms-2" />}
+                {itemInput.imagePath && <img src={itemInput.imagePath} alt="item" width={60} className="mt-2" />}
+              </FormGroup>
+            </>
+          )}
         </ModalBody>
+
         <ModalFooter>
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
@@ -253,7 +279,7 @@ const ItemCategoryView = ({ data, onBack }) => {
           </Button>
         </ModalFooter>
       </Modal>
-      
+
       <Modal isOpen={deleteModal} centered>
         <ModalHeader>Delete Item</ModalHeader>
         <ModalBody>Are you sure you want to delete this Restuarant Item?</ModalBody>
@@ -270,4 +296,4 @@ const ItemCategoryView = ({ data, onBack }) => {
   )
 }
 
-export default ItemCategoryView;
+export default ItemCategoryView

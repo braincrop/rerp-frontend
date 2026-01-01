@@ -54,7 +54,8 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     taxApplied: '',
     categoryIds: [],
   })
-  console.log('selectedProduct', productInput)
+
+
   useEffect(() => {
     if (modalType === 'edit' && selectedProduct) {
       setProductInput({
@@ -74,7 +75,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       })
     }
   }, [selectedProduct, modalType])
-
+  
   useEffect(() => {
     dispatch(GetAllCategory())
   }, [])
