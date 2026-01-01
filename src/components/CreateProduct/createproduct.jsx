@@ -1,12 +1,44 @@
 import { PostProduct, UpdatedProduct } from '@/redux/slice/Products/productSlice'
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
 import { postImage } from '@/api/ImagesApi/imageHelperApi'
 import { Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap'
 import Notify from '../../components/Notify'
+import { allCategories, GetAllCategory } from '@/redux/slice/categories/CategorySlice'
 
+const customSelectStyles = {
+  control: (base) => ({
+    ...base,
+    backgroundColor: '#22282e',
+    borderColor: '#3a4551',
+    color: '#fff',
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: '#22282e',
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? '#333' : '#22282e',
+    color: '#fff',
+  }),
+  multiValue: (base) => ({
+    ...base,
+    backgroundColor: '#333',
+  }),
+  multiValueLabel: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+}
 const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
   const dispatch = useDispatch()
+  const { category } = useSelector(allCategories)
   const [productInput, setProductInput] = useState({
     name: '',
     memo: '',
@@ -20,8 +52,9 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     sellPrice: '',
     barcode: '',
     taxApplied: '',
-    categoryIds: '',
+    categoryIds: [],
   })
+
 
   useEffect(() => {
     if (modalType === 'edit' && selectedProduct) {
@@ -42,6 +75,15 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       })
     }
   }, [selectedProduct, modalType])
+  
+  useEffect(() => {
+    dispatch(GetAllCategory())
+  }, [])
+
+  const categoryOptions = category?.map((cat) => ({
+    value: cat.dcid,
+    label: cat.name,
+  }))
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -112,12 +154,10 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       Notify('error', 'Tax is required')
       return false
     }
-
-    if (!productInput.categoryIds?.trim()) {
+    if (!productInput.categoryIds) {
       Notify('error', 'Category IDs are required')
       return false
     }
-
     if (!productInput.productDescription?.trim()) {
       Notify('error', 'Description is required')
       return false
@@ -133,7 +173,6 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       basePrice: Number(productInput.basePrice),
       sellPrice: Number(productInput.sellPrice),
       taxApplied: Number(productInput.taxApplied),
-      categoryIds: productInput.categoryIds.split(',').map((id) => Number(id.trim())),
     }
     try {
       if (modalType === 'create') {
@@ -211,7 +250,14 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         <Col md={3}>
           <FormGroup>
             <Label>Category IDs</Label>
-            <Input name="categoryIds" value={productInput.categoryIds} onChange={handleChange} placeholder="1,2,3" />
+            <Select
+              isMulti
+              options={categoryOptions}
+              value={categoryOptions.filter((option) => productInput.categoryIds.includes(option.value))}
+              onChange={(selectedOptions) => setProductInput({ ...productInput, categoryIds: selectedOptions.map((option) => option.value)})}
+              styles={customSelectStyles}
+              placeholder="Select categories..."
+            />
           </FormGroup>
         </Col>
 
@@ -253,12 +299,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         <Col md={3}>
           <FormGroup>
             <Label>Product Description</Label>
-            <Input
-              type="textarea"
-              name="productDescription"
-              value={productInput.productDescription}
-              onChange={handleChange}
-            />
+            <Input type="textarea" name="productDescription" value={productInput.productDescription} onChange={handleChange} />
           </FormGroup>
         </Col>
 
