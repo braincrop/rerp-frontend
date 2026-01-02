@@ -18,6 +18,17 @@ export const PostCategories = async (data) => {
   }
 }
 
+export const GetCategoriesById = async (data) => {
+  console.log('id-data', data) 
+  try {
+    const response = await axiosInstance.get(`distinct-categories/${data}`)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const UpdateCategories = async (data) => {
   const { dcid, name } = data
   try {

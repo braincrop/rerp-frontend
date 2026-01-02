@@ -30,7 +30,6 @@ export const ItemCategorySlice = createSlice({
       })
       .addCase(GetItemCategory.fulfilled, (state, action) => {
         state.loading = false
-        console.log('action.payload', action.payload)
         if (action.payload) {
           state.error = null
           state.itemCat = action.payload?.data
