@@ -38,7 +38,9 @@ const ItemCategoryView = ({ data, onBack }) => {
 
   useEffect(() => {
     if (data.itemSubCategoryID) {
-      dispatch(GetRestuarantItem(data.itemSubCategoryID))
+      dispatch(GetRestuarantItem({
+        ItemSubCategoryId: data.itemSubCategoryID,
+      }))
     }
     dispatch(GetAllProduct())
   }, [])

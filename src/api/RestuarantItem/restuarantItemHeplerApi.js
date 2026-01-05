@@ -2,7 +2,11 @@ import { axiosInstance } from '../axiosConfig'
 
 export const RestuarantItem = async (data) => {
   try {
-    const response = await axiosInstance.get(`restaurant-items/by-subcategory/${data}`)
+    const response = await axiosInstance.get(`restaurant-items`,{
+      params: {
+        ...data,
+      },
+    })
     return response
   } catch (error) {
     throw error
@@ -10,7 +14,6 @@ export const RestuarantItem = async (data) => {
 }
 
 export const PostRestuarantItem = async (data) => {
-  console.log('data', data)
   try {
     const response = await axiosInstance.post('restaurant-items', data)
     return response
