@@ -118,7 +118,6 @@ export const CategorySlice = createSlice({
       .addCase(GetSingleCategory.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        console.log('action.payload', action.payload) 
         state.singleCat = action.payload?.data
       })
       .addCase(GetSingleCategory.rejected, (state, action) => {

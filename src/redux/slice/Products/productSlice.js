@@ -117,7 +117,6 @@ export const ProductSlice = createSlice({
       .addCase(GetSingleProduct.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        console.log('GetSingleProduct', action.payload)
         state.singleProduct = action.payload?.data
       })
       .addCase(GetSingleProduct.rejected, (state, action) => {

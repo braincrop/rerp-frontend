@@ -34,6 +34,8 @@ const ItemCategoryView = ({ data, onBack }) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
 
+  console.log('restuarantItem',restuarantItem)
+
   useEffect(() => {
     if (data.itemSubCategoryID) {
       dispatch(GetRestuarantItem(data.itemSubCategoryID))

@@ -14,13 +14,16 @@ import {
   ModalBody,
   ModalFooter,
   Spinner,
+  Form,
 } from 'reactstrap'
 import Select from 'react-select'
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { allBranch, GetAllBranch } from '@/redux/slice/Branch/branchSlice'
 import { allCategories, GetSingleCategory } from '@/redux/slice/categories/CategorySlice'
-import { allProducts, GetSingleProduct } from '@/redux/slice/Products/productSlice';
+import { allProducts, GetAllProduct, GetSingleProduct, PostProduct } from '@/redux/slice/Products/productSlice'
+import { allItemCategory, GetItemCategory } from '@/redux/slice/ItemCategory/ItemCategorySlice'
+import { PostRestuarantItemData } from '@/redux/slice/RestuarantItem/RestuarantItemSlice'
 
 const customSelectStyles = {
   control: (base) => ({
@@ -29,65 +32,140 @@ const customSelectStyles = {
     borderColor: '#3a4551',
     color: '#fff',
   }),
+
+  valueContainer: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+
+  input: (base) => ({
+    ...base,
+    color: '#fff', // 👈 typing text
+  }),
+
+  placeholder: (base) => ({
+    ...base,
+    color: '#ccc', // 👈 placeholder text
+  }),
+
   menu: (base) => ({
     ...base,
     backgroundColor: '#22282e',
   }),
+
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isFocused ? '#333' : '#22282e',
     color: '#fff',
   }),
+
   multiValue: (base) => ({
     ...base,
     backgroundColor: '#333',
   }),
+
   multiValueLabel: (base) => ({
     ...base,
     color: '#fff',
   }),
+
+  multiValueRemove: (base) => ({
+    ...base,
+    color: '#fff',
+    ':hover': {
+      backgroundColor: '#555',
+      color: '#fff',
+    },
+  }),
+
   singleValue: (base) => ({
     ...base,
     color: '#fff',
   }),
 }
 
-const CreateRestuarantItem = () => {
+const CreateRestuarantItem = ({ onBack }) => {
   const dispatch = useDispatch()
   const { branch } = useSelector(allBranch)
-  const { singleCat } = useSelector(allCategories)
-  const { singleProduct, loading } = useSelector(allProducts)
-  const [branchId, setBranchId] = useState('')
-  const [categoryId, setCategoryId] = useState('')
-  const [selectedProducts, setSelectedProducts] = useState([])
-  const [searchText, setSearchText] = useState('')
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    barcode: '',
-    buyPrice: '',
-    sellPrice: '',
+  const { itemCat } = useSelector(allItemCategory)
+  const { product, loading } = useSelector(allProducts)
+  const [formData, setFormData] = useState({
+    branchId: '',
+    categoryIds: [],
+    productId: '',
+    editProduct: { name: '', barcode: '', buyPrice: '', sellPrice: '' },
   })
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [newProduct, setNewProduct] = useState({ name: '', buyPrice: '', sellPrice: '', categoryIds: [] })
+
   useEffect(() => {
     dispatch(GetAllBranch())
+    dispatch(GetAllProduct())
   }, [])
 
-  const productOptions = [].concat(singleProduct || []).map((p) => ({
-    value: p.dpid,
-    label: p.name,
-  }))
+  const branchOptions = branch?.map((b) => ({ value: b.branchId, label: b.name }))
+  const categoryOptions = itemCat?.map((c) => ({ value: c.itemSubCategoryID, label: c.categoryName }))
+  const productOptions = product?.map((p) => ({ value: p.dpid, label: p.name }))
 
-  const handleCreateProduct = async () => {
-    const payload = {
-      name: newProduct.name,
-      barcode: newProduct.barcode,
-      buyPrice: Number(newProduct.buyPrice),
-      sellPrice: Number(newProduct.sellPrice),
-      itemSubCategoryIds: [categoryId],
+  const handleChange = (type, value) => {
+    if (type === 'branch') {
+      setFormData({
+        branchId: value,
+        categoryIds: [],
+        productId: '',
+        editProduct: { name: '', barcode: '', buyPrice: '', sellPrice: '' },
+      })
+      dispatch(GetItemCategory({ BranchId: value }))
     }
-    const res = await dispatch(PostRestuarantItemData(payload)).unwrap()
-    await dispatch(GetProductsByCategory(categoryId))
-    setSelectedProducts((prev) => [...prev, { value: res.data.restaurantItemID, label: res.data.name }])
+    if (type === 'category') {
+      const ids = value.map((c) => c.value)
+      setFormData((prev) => ({ ...prev, categoryIds: ids, productId: '', editProduct: { name: '', barcode: '', buyPrice: '', sellPrice: '' } }))
+      setNewProduct((prev) => ({ ...prev, categoryIds: ids }))
+    }
+    if (type === 'product') {
+      if (!value) {
+        setFormData((prev) => ({
+          ...prev,
+          productId: '',
+          editProduct: { name: '', barcode: '', buyPrice: '', sellPrice: '' },
+        }))
+        return
+      }
+      const full = product.find((p) => p.dpid === value.value)
+      setFormData((prev) => ({
+        ...prev,
+        productId: value.value,
+        editProduct: {
+          name: full?.name || '',
+          barcode: full?.barcode || '',
+          buyPrice: full?.basePrice || '',
+          sellPrice: full?.sellPrice || '',
+        },
+      }))
+    }
+  }
+  const handleUpdateProduct = () => {
+    const payload = {
+      branchId: formData.branchId,
+      categoryIds: formData.categoryIds,
+      productId: formData.productId,
+      name: formData.editProduct.name,
+      barcode: formData.editProduct.barcode,
+      buyPrice: formData.editProduct.buyPrice,
+      sellPrice: formData.editProduct.sellPrice,
+    }
+    console.log('payload', payload)
+    dispatch(PostRestuarantItemData(payload)).unwrap()
+    setFormData({
+      branchId: '',
+      categoryIds: [],
+      productId: '',
+      editProduct: { name: '', barcode: '', buyPrice: '', sellPrice: '' },
+    })
+  }
+
+  const handleCreateProduct = () => {
+    dispatch(PostProduct(newProduct)).unwrap()
     setShowCreateModal(false)
     setNewProduct({ name: '', barcode: '', buyPrice: '', sellPrice: '' })
   }
@@ -95,119 +173,153 @@ const CreateRestuarantItem = () => {
   return (
     <>
       <Card className="shadow-sm">
-        <CardHeader className="bg-primary text-white">
-          <h5 className="mb-0">
-            <Icon icon="mdi:food" className="me-2" />
-            Create Restaurant Item
-          </h5>
+        <CardHeader className="text-white d-flex justify-content-between align-items-center flex-wrap">
+          <h4>Create Restaurant Item</h4>
+          <Button color="primary" onClick={() => onBack()}>
+            <Icon icon="mdi:arrow-left" width="16" height="16" className="me-1" />
+            Back 
+          </Button>
         </CardHeader>
         <CardBody>
           <Row className="g-3">
             <Col md={4}>
-              <FormGroup>
-                <Label>Branch</Label>
-                <Input
-                  type="select"
-                  value={branchId}
-                  onChange={(e) => {
-                    setBranchId(e.target.value)
-                    setCategoryId('')
-                    setSelectedProducts([])
-                    dispatch(GetSingleCategory(e.target.value))
-                  }}>
-                  <option value="" disabled>
-                    Select Branch
+              <Label>Branch</Label>
+              <Input type="select" value={formData.branchId} onChange={(e) => handleChange('branch', e.target.value)}>
+                <option value="">Select Branch</option>
+                {branchOptions?.map((b) => (
+                  <option key={b.value} value={b.value}>
+                    {b.label}
                   </option>
-                  {branch?.map((b) => (
-                    <option key={b.branchId} value={b.branchId}>
-                      {b.name}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
+                ))}
+              </Input>
             </Col>
             <Col md={4}>
-              <FormGroup>
-                <Label>Category</Label>
-                <Input
-                  type="select"
-                  value={categoryId}
-                  disabled={!branchId}
-                  onChange={(e) => {
-                    setCategoryId(e.target.value)
-                    dispatch(GetSingleProduct(e.target.value))
-                  }}>
-                  <option value="" disabled>
-                    Select Category
-                  </option>
-                  {[].concat(singleCat || []).map((cat) => (
-                    <option key={cat.dcid} value={cat.dcid}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </Input>
-              </FormGroup>
+              <Label>Categories</Label>
+              <Select
+                isMulti
+                isDisabled={!formData.branchId}
+                options={categoryOptions}
+                value={categoryOptions?.filter((c) => formData.categoryIds.includes(c.value))}
+                styles={customSelectStyles}
+                onChange={(val) => handleChange('category', val)}
+                placeholder="Select categories"
+              />
             </Col>
             <Col md={4}>
-              <FormGroup>
-                <Label>Products</Label>
-                <Select
-                  isMulti
-                  isSearchable
-                  options={productOptions}
-                  value={selectedProducts}
-                  isLoading={loading}
-                  onChange={setSelectedProducts}
-                  onInputChange={setSearchText}
-                  placeholder="Search or select products..."
-                  noOptionsMessage={() => (
-                    <div className="text-center p-2">
-                      <p className="mb-2">No product found</p>
-                      <Button size="sm" color="primary" onClick={() => setShowCreateModal(true)}>
-                        <Icon icon="mdi:plus" className="me-1" />
-                        Create New
-                      </Button>
-                    </div>
-                  )}
-                  styles={customSelectStyles}
-                />
-              </FormGroup>
+              <Label>Product</Label>
+              <Select
+                options={productOptions}
+                isSearchable
+                isClearable
+                styles={customSelectStyles}
+                isLoading={loading}
+                value={productOptions?.find((p) => p.value === formData.productId) || null}
+                onChange={(val) => handleChange('product', val)}
+                placeholder="Search product..."
+                noOptionsMessage={() => (
+                  <Button
+                    size="sm"
+                    color="primary"
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      setShowCreateModal(true)
+                    }}>
+                    + Create New Product
+                  </Button>
+                )}
+              />
             </Col>
           </Row>
+          {formData.productId && formData.branchId && formData.categoryIds.length > 0 && (
+            <Card className="mt-4">
+              <CardHeader>Create Selected Product</CardHeader>
+              <CardBody>
+                <Row>
+                  <Col md={6}>
+                    <Label>Name</Label>
+                    <Input
+                      value={formData.editProduct.name}
+                      onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, name: e.target.value } })}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <Label>Barcode</Label>
+                    <Input
+                      value={formData.editProduct.barcode}
+                      onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, barcode: e.target.value } })}
+                    />
+                  </Col>
+                </Row>
+                <Row className="mt-3">
+                  <Col md={6}>
+                    <Label>Buy Price</Label>
+                    <Input
+                      type="number"
+                      value={formData.editProduct.buyPrice}
+                      onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, buyPrice: e.target.value } })}
+                    />
+                  </Col>
+                  <Col md={6}>
+                    <Label>Sell Price</Label>
+                    <Input
+                      type="number"
+                      value={formData.editProduct.sellPrice}
+                      onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, sellPrice: e.target.value } })}
+                    />
+                  </Col>
+                </Row>
+
+                <div className="text-end mt-3">
+                  <Button color="primary" onClick={handleUpdateProduct}>
+                    Create Item
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+          )}
         </CardBody>
       </Card>
-      <Modal isOpen={showCreateModal} centered>
+      <Modal isOpen={showCreateModal} toggle={() => setShowCreateModal(false)} centered>
         <ModalHeader toggle={() => setShowCreateModal(false)}>Create New Product</ModalHeader>
         <ModalBody>
-          <FormGroup>
-            <Label>Product Name</Label>
-            <Input value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Barcode</Label>
-            <Input value={newProduct.barcode} onChange={(e) => setNewProduct({ ...newProduct, barcode: e.target.value })} />
-          </FormGroup>
-          <Row>
-            <Col md={6}>
-              <FormGroup>
-                <Label>Buy Price</Label>
-                <Input type="number" value={newProduct.buyPrice} onChange={(e) => setNewProduct({ ...newProduct, buyPrice: e.target.value })} />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup>
-                <Label>Sell Price</Label>
-                <Input type="number" value={newProduct.sellPrice} onChange={(e) => setNewProduct({ ...newProduct, sellPrice: e.target.value })} />
-              </FormGroup>
-            </Col>
-          </Row>
+          <Form>
+            <FormGroup>
+              <Label>Product Name</Label>
+              <Input value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} />
+            </FormGroup>
+            <FormGroup>
+              <Label>Categories</Label>
+              <Select
+                isMulti
+                options={categoryOptions}
+                value={categoryOptions?.filter((c) => formData.categoryIds.includes(c.value))}
+                styles={customSelectStyles}
+                onChange={(val) => handleChange('category', val)}
+                placeholder="Select categories"
+              />
+            </FormGroup>
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Buy Price</Label>
+                  <Input type="number" value={newProduct.buyPrice} onChange={(e) => setNewProduct({ ...newProduct, buyPrice: e.target.value })} />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Sell Price</Label>
+                  <Input type="number" value={newProduct.sellPrice} onChange={(e) => setNewProduct({ ...newProduct, sellPrice: e.target.value })} />
+                </FormGroup>
+              </Col>
+            </Row>
+          </Form>
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setShowCreateModal(false)}>
             Cancel
           </Button>
           <Button color="primary" onClick={handleCreateProduct}>
-            Save
+            Create Product
           </Button>
         </ModalFooter>
       </Modal>
