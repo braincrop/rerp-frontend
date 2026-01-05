@@ -9,6 +9,17 @@ export const AllProducts = async () => {
     throw error
   }
 }
+
+export const GetSingleByIdProducts = async (id) => {
+  try {
+    const response = await axiosInstance.get(`distinct-products/${id}`)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const PostProducts = async (data) => {
   try {
     const response = await axiosInstance.post('distinct-products', data)
@@ -20,7 +31,6 @@ export const PostProducts = async (data) => {
 
 export const UpdateProducts = async (data) => {
   const { dpid, updatedData } = data
-
   try {
     const response = await axiosInstance.put(`distinct-products/${data.dpid}`, {
       ...updatedData,

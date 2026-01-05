@@ -1,7 +1,7 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
-import { AllProducts, PostProducts, UpdateProducts, DeleteProduct } from '../../../api/products/productHelperApi';
+import { AllProducts, PostProducts, UpdateProducts, DeleteProduct, GetSingleByIdProducts } from '../../../api/products/productHelperApi';
 
 export const GetAllProduct = createAsyncThunk('Product/AllProduct', async () => {
   try {
@@ -25,6 +25,15 @@ export const PostProduct = createAsyncThunk('Product/postProduct', async (data,{
   }
 })
 
+export const GetSingleProduct = createAsyncThunk('Product/SingleProductById', async (data,{ rejectWithValue }) => {
+  try {
+    const response = await GetSingleByIdProducts(data)
+    return response.data
+  } catch (error) {
+    return rejectWithValue('Failed to get single product')
+  }
+})
+
 export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (data,{ rejectWithValue }) => {
   try {
     const response = await UpdateProducts(data)
@@ -45,6 +54,7 @@ export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async
 
 const initialState = {
   product: [],
+  singleProduct:[],
   loading: false,
   error: null,
 }
@@ -99,6 +109,22 @@ export const ProductSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+
+      builder
+      .addCase(GetSingleProduct.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(GetSingleProduct.fulfilled, (state, action) => {
+        state.loading = false
+        state.error = null
+        state.singleProduct = action.payload?.data
+      })
+      .addCase(GetSingleProduct.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+
+
     builder
       .addCase(DeleteProductData.pending, (state) => {
         state.loading = true

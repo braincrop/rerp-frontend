@@ -6,11 +6,7 @@ import { DeleteRestuarantItem, PostRestuarantItem, RestuarantItem, UpdateRestuar
 export const GetRestuarantItem = createAsyncThunk('ItemCategory/AllItem', async (data) => {
   try {
     const response = await RestuarantItem(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
     throw Error('Failed to fetch item-category')
   }
@@ -62,7 +58,7 @@ export const RestuarantItemSlice = createSlice({
         state.loading = false
         if (action.payload) {
           state.error = null
-          state.restuarantItem = action.payload?.data.data?.items
+          state.restuarantItem = action.payload?.data
         }
       })
       .addCase(GetRestuarantItem.rejected, (state, action) => {
@@ -75,6 +71,7 @@ export const RestuarantItemSlice = createSlice({
       })
       .addCase(PostRestuarantItemData.fulfilled, (state, action) => {
         state.loading = false
+        console.log('PostRestuarantItemData--', action.payload.data)
         if (action.payload?.statusCode === '201') {
           state.error = null
           state.restuarantItem.unshift(action.payload.data)

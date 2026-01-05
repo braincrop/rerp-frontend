@@ -1,6 +1,6 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { AllCategories, PostCategories, DeleteCategory, UpdateCategories } from '../../../api/category/categoryHelperApi'
+import { AllCategories, PostCategories, DeleteCategory, UpdateCategories, GetCategoriesById } from '../../../api/category/categoryHelperApi'
 import Notify from '../../../components/Notify'
 
 export const GetAllCategory = createAsyncThunk('Category/AllCategory', async () => {
@@ -25,6 +25,15 @@ export const PostCategory = createAsyncThunk('Category/postCategory', async (dat
   }
 })
 
+export const GetSingleCategory = createAsyncThunk('Category/SingleCategory', async (data, { rejectWithValue }) => {
+  try {
+    const response = await GetCategoriesById(data)
+    return response.data
+  } catch (error) {
+    return rejectWithValue('Failed to get single category')
+  }
+})
+
 export const UpdatedCategory = createAsyncThunk('Category/UpdateCategory', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateCategories(data)
@@ -45,6 +54,7 @@ export const DeleteCategoryData = createAsyncThunk('Category/DeleteCategory', as
 
 const initialState = {
   category: [],
+  singleCat:[],
   loading: false,
   error: null,
 }
@@ -54,7 +64,6 @@ export const CategorySlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    
     builder
       .addCase(PostCategory.pending, (state) => {
         state.loading = true
@@ -101,6 +110,21 @@ export const CategorySlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
+
+    builder
+      .addCase(GetSingleCategory.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(GetSingleCategory.fulfilled, (state, action) => {
+        state.loading = false
+        state.error = null
+        state.singleCat = action.payload?.data
+      })
+      .addCase(GetSingleCategory.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+
     builder
       .addCase(DeleteCategoryData.pending, (state) => {
         state.loading = true
