@@ -147,7 +147,7 @@ const CreateRestuarantItem = ({ onBack }) => {
   const handleUpdateProduct = () => {
     const payload = {
       branchId: formData.branchId,
-      categoryIds: formData.categoryIds,
+      itemSubCategoryIds: formData.categoryIds,
       productId: formData.productId,
       name: formData.editProduct.name,
       barcode: formData.editProduct.barcode,
