@@ -1,7 +1,14 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
-import { AllProducts, PostProducts, UpdateProducts, DeleteProduct, GetSingleByIdProducts } from '../../../api/products/productHelperApi';
+import {
+  AllProducts,
+  PostProducts,
+  UpdateProducts,
+  DeleteProduct,
+  GetSingleByIdProducts,
+  PostBulkUpsertProduct,
+} from '../../../api/products/productHelperApi'
 
 export const GetAllProduct = createAsyncThunk('Product/AllProduct', async () => {
   try {
@@ -16,7 +23,7 @@ export const GetAllProduct = createAsyncThunk('Product/AllProduct', async () => 
   }
 })
 
-export const PostProduct = createAsyncThunk('Product/postProduct', async (data,{ rejectWithValue }) => {
+export const PostProduct = createAsyncThunk('Product/postProduct', async (data, { rejectWithValue }) => {
   try {
     const response = await PostProducts(data)
     return response.data
@@ -25,7 +32,16 @@ export const PostProduct = createAsyncThunk('Product/postProduct', async (data,{
   }
 })
 
-export const GetSingleProduct = createAsyncThunk('Product/SingleProductById', async (data,{ rejectWithValue }) => {
+export const PostProductBulkUpsert = createAsyncThunk('Product/postProductBulkUpsert', async (data, { rejectWithValue }) => {
+  try {
+    const response = await PostBulkUpsertProduct(data)
+    return response.data
+  } catch (error) {
+    return rejectWithValue('Failed to post product')
+  }
+})
+
+export const GetSingleProduct = createAsyncThunk('Product/SingleProductById', async (data, { rejectWithValue }) => {
   try {
     const response = await GetSingleByIdProducts(data)
     return response.data
@@ -34,7 +50,7 @@ export const GetSingleProduct = createAsyncThunk('Product/SingleProductById', as
   }
 })
 
-export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (data,{ rejectWithValue }) => {
+export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateProducts(data)
     return response.data
@@ -43,7 +59,7 @@ export const UpdatedProduct = createAsyncThunk('Product/UpdateProduct', async (d
   }
 })
 
-export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async (data,{ rejectWithValue }) => {
+export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async (data, { rejectWithValue }) => {
   try {
     const response = await DeleteProduct(data)
     return response.data
@@ -54,7 +70,7 @@ export const DeleteProductData = createAsyncThunk('Product/DeleteProduct', async
 
 const initialState = {
   product: [],
-  singleProduct:[],
+  singleProduct: [],
   loading: false,
   error: null,
 }
@@ -73,13 +89,31 @@ export const ProductSlice = createSlice({
         if (action.payload?.statusCode === '201') {
           state.error = null
           state.product.unshift(action.payload.data)
-         Notify('success', action.payload.message)
+          Notify('success', action.payload.message)
         }
       })
       .addCase(PostProduct.rejected, (state, action) => {
         state.loading = false
-       state.error = action.payload || action.error.message
+        state.error = action.payload || action.error.message
       })
+
+    builder
+      .addCase(PostProductBulkUpsert.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(PostProductBulkUpsert.fulfilled, (state, action) => {
+        state.loading = false
+        console.log('PostProductBulkUpsert--', action.payload)
+        if (action.payload?.statusCode === '200') {
+          state.error = null
+          Notify('success', action.payload.message)
+        }
+      })
+      .addCase(PostProductBulkUpsert.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || action.error.message
+      })
+
     builder
       .addCase(UpdatedProduct.pending, (state) => {
         state.loading = true
@@ -110,7 +144,7 @@ export const ProductSlice = createSlice({
         state.error = action.error.message
       })
 
-      builder
+    builder
       .addCase(GetSingleProduct.pending, (state) => {
         state.loading = true
       })
@@ -123,7 +157,6 @@ export const ProductSlice = createSlice({
         state.loading = false
         state.error = action.error.message
       })
-
 
     builder
       .addCase(DeleteProductData.pending, (state) => {

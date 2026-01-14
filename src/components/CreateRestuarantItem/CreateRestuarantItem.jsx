@@ -154,7 +154,6 @@ const CreateRestuarantItem = ({ onBack }) => {
       buyPrice: formData.editProduct.buyPrice,
       sellPrice: formData.editProduct.sellPrice,
     }
-    console.log('payload', payload)
     dispatch(PostRestuarantItemData(payload)).unwrap()
     setFormData({
       branchId: '',

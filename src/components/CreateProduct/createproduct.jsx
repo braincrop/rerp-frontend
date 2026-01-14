@@ -114,10 +114,6 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       Notify('error', 'Product name is required')
       return false
     }
-    if (!productInput.memo?.trim()) {
-      Notify('error', 'Memo is required')
-      return false
-    }
     if (!productInput?.imagePath) {
       Notify('error', 'Product image is required')
       return false
