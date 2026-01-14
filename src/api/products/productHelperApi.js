@@ -29,6 +29,17 @@ export const PostProducts = async (data) => {
   }
 }
 
+export const PostBulkUpsertProduct = async (data) => {
+  console.log('data---', data)
+  try {
+    const response = await axiosInstance.post('distinct-products/bulk-upsert', data)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const UpdateProducts = async (data) => {
   const { dpid, updatedData } = data
   try {
