@@ -8,6 +8,7 @@ import {
   DeleteProduct,
   GetSingleByIdProducts,
   PostBulkUpsertProduct,
+  GetProductBySingleId,
 } from '../../../api/products/productHelperApi'
 
 export const GetAllProduct = createAsyncThunk('Product/AllProduct', async () => {
@@ -43,7 +44,7 @@ export const PostProductBulkUpsert = createAsyncThunk('Product/postProductBulkUp
 
 export const GetSingleProduct = createAsyncThunk('Product/SingleProductById', async (data, { rejectWithValue }) => {
   try {
-    const response = await GetSingleByIdProducts(data)
+    const response = await GetProductBySingleId(data)
     return response.data
   } catch (error) {
     return rejectWithValue('Failed to get single product')

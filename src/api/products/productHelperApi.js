@@ -10,7 +10,7 @@ export const AllProducts = async () => {
   }
 }
 
-export const GetSingleByIdProducts = async (id) => {
+export const GetProductBySingleId = async (id) => {
   try {
     const response = await axiosInstance.get(`distinct-products/${id}`)
     return response
