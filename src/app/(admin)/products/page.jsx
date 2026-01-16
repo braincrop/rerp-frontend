@@ -78,6 +78,8 @@ const Page = () => {
   const [deleteModal, setDeleteModal] = useState(false)
   const [assignModal, setAssignModal] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [viewModal, setViewModal] = useState(false)
+  const [ViewselectedProduct, ViewsetSelectedProduct] = useState(null)
   const [assignData, setAssignData] = useState({
     sku: '',
     branches: [],
@@ -92,6 +94,17 @@ const Page = () => {
     setSelectedIndex(index)
     setDeleteModal(true)
   }
+  const openViewModal = (product) => {
+    console.log('product', product)
+    ViewsetSelectedProduct(product)
+    setViewModal(true)
+  }
+
+  const closeViewModal = () => {
+    setViewModal(false)
+    ViewsetSelectedProduct(null)
+  }
+
   const branchOptions = Array.isArray(branch) ? branch.map((b) => ({ value: b.branchId, label: b.name })) : []
 
   const handleChange = (key, value) => {
@@ -124,10 +137,10 @@ const Page = () => {
       setModalType('create')
     }
   }
-    const handleCreateProduct = () => {
-      dispatch(PostProductBulkUpsert([assignData])).unwrap()
-      setAssignModal(false)
-    }
+  const handleCreateProduct = () => {
+    dispatch(PostProductBulkUpsert([assignData])).unwrap()
+    setAssignModal(false)
+  }
   const filteredProducts = useMemo(() => {
     return product.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
   }, [search, product])
@@ -215,27 +228,23 @@ const Page = () => {
                   <td>{prod.sellPrice}</td>
                   <td className="text-center">
                     <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                      <Button color="danger" size="sm" title="Assign-Product" className="me-1 w-sm-auto" onClick={() => openAssignModal(prod)}>
+                      <Button color="info" size="sm" className="text-white w-md-auto" title="View Product" onClick={() => openViewModal(prod)}>
+                        <Icon icon="mdi:eye" width={16} />
+                      </Button>
+                      <Button color="danger" size="sm" title="Assign-Product" className="w-sm-auto" onClick={() => openAssignModal(prod)}>
                         <Icon icon="mdi:source-branch" width={16} />
                       </Button>
-                      <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                        <Button
-                          color="warning"
-                          size="sm"
-                          className="text-white w-md-auto"
-                          title="Edit Product"
-                          onClick={() => openModal('edit', prod)}>
-                          <Icon icon="mdi:pencil" width={16} />
-                        </Button>
-                        <Button
-                          color="danger"
-                          size="sm"
-                          className="text-white w-md-auto"
-                          title="Delete Product"
-                          onClick={() => openDeleteModal(prod.dpid)}>
-                          <Icon icon="mdi:delete" width={16} />
-                        </Button>
-                      </div>
+                      <Button color="warning" size="sm" className="text-white w-md-auto" title="Edit Product" onClick={() => openModal('edit', prod)}>
+                        <Icon icon="mdi:pencil" width={16} />
+                      </Button>
+                      <Button
+                        color="danger"
+                        size="sm"
+                        className="text-white w-md-auto"
+                        title="Delete Product"
+                        onClick={() => openDeleteModal(prod.dpid)}>
+                        <Icon icon="mdi:delete" width={16} />
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -290,6 +299,78 @@ const Page = () => {
           </Button>
           <Button color="danger" onClick={handleCreateProduct}>
             Submit
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <Modal isOpen={viewModal} toggle={closeViewModal} size="lg" centered>
+        <ModalHeader toggle={closeViewModal}>Product Details</ModalHeader>
+
+        <ModalBody>
+          {ViewselectedProduct && (
+            <div className="container-fluid">
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Product Name</div>
+                <div className="col-8 fw-bold">{ViewselectedProduct.name || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">SKU</div>
+                <div className="col-8">{ViewselectedProduct.sku || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Sell Price</div>
+                <div className="col-8">${ViewselectedProduct.sellPrice}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Base Price</div>
+                <div className="col-8">${ViewselectedProduct.basePrice}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Shelf Life</div>
+                <div className="col-8">{ViewselectedProduct.shelfLife || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Tax Applied</div>
+                <div className="col-8">
+                  <span className={`badge ${ViewselectedProduct.taxApplied ? 'bg-success' : 'bg-secondary'}`}>
+                    {ViewselectedProduct.taxApplied ? 'Applied' : 'Not Applied'}
+                  </span>
+                </div>
+              </div>
+
+              <hr />
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Ingredients</div>
+                <div className="col-8">{ViewselectedProduct.ingredients || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Product Contains</div>
+                <div className="col-8">{ViewselectedProduct.productContains || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Description</div>
+                <div className="col-8">{ViewselectedProduct.productDescription || '-'}</div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-4 fw-semibold text-muted">Memo</div>
+                <div className="col-8">{ViewselectedProduct.memo || '-'}</div>
+              </div>
+            </div>
+          )}
+        </ModalBody>
+
+        <ModalFooter>
+          <Button color="secondary" onClick={closeViewModal}>
+            Close
           </Button>
         </ModalFooter>
       </Modal>
