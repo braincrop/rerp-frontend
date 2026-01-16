@@ -110,14 +110,6 @@ const Page = () => {
       Notify('error', 'Branch name is required')
       return
     }
-     else if (!BranchInput.outletAddress?.trim()) {
-      Notify('error', 'outletAddress is required')
-      return
-    }
-     else if (!BranchInput.memo?.trim()) {
-      Notify('error', 'memo is required')
-      return
-    }
     try {
       let resultAction
       if (modalType === 'create') {
@@ -291,7 +283,7 @@ const Page = () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Branch' : 'Edit Branch'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name</Label>
+            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
             <Input name="name" value={BranchInput?.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
