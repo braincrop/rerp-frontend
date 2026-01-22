@@ -6,6 +6,7 @@ import allBranch from "../slice/Branch/branchSlice";
 import allVendiSplashMachine from "../slice/VendingSplashMachine/VendingSplashMachine";
 import allItemCategory from "../slice/ItemCategory/ItemCategorySlice";
 import allRestuarantItem from "../slice/RestuarantItem/RestuarantItemSlice"
+import allUser from "../slice/Authentication/AuthenticationSlice"
 
 
 export function makeStore() {
@@ -17,7 +18,8 @@ export function makeStore() {
         allBranch:allBranch,
         allItemCategory:allItemCategory,
         allVendiSplashMachine:allVendiSplashMachine,
-        allRestuarantItem:allRestuarantItem
+        allRestuarantItem:allRestuarantItem,
+        allUser:allUser
     },
   });
 }
