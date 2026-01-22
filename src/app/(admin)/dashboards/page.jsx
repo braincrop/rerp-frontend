@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation'
 //   title: 'Analytics',
 // }
 
-const page = () => {
+const Page = () => {
   const router = useRouter()
 
   useEffect(() => {
@@ -52,4 +52,4 @@ const page = () => {
     </>
   )
 }
-export default page
+export default Page
