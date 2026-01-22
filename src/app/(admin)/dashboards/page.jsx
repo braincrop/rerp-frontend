@@ -1,13 +1,16 @@
 'use client'
 import Footer from '@/components/layout/Footer'
+import dynamic from 'next/dynamic'
 import React, { useEffect } from 'react'
-import Chart from './components/Chart'
+// import Chart from './components/Chart';
+const Chart = dynamic(() => import('./components/Chart'), { ssr: false })
 import User from './components/User'
 import Link from 'next/link'
 import IconifyIcon from '@/components/wrapper/IconifyIcon'
 import { Col, Row } from 'react-bootstrap'
 import Cards from './components/Cards'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
+
 // export const metadata = {
 //   title: 'Analytics',
 // }
