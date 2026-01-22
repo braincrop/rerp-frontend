@@ -1,8 +1,15 @@
+'use client';
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import IconifyIcon from '@/components/wrapper/IconifyIcon';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'
 import { Dropdown, DropdownHeader, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap';
 const ProfileDropdown = () => {
+  const router = useRouter();
+  const logOut = () => {
+    localStorage.removeItem('token');
+     router.replace('/auth/sign-in')
+  }
   return <Dropdown className=" topbar-item">
       <DropdownToggle type="button" className="topbar-button content-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span className="d-flex align-items-center">
@@ -30,7 +37,7 @@ const ProfileDropdown = () => {
           <span className="align-middle">Lock screen</span>
         </DropdownItem>
         <div className="dropdown-divider my-1" />
-        <DropdownItem className=" text-danger" href="/auth/sign-in">
+        <DropdownItem className=" text-danger" onClick={logOut}>
           <IconifyIcon icon="solar:logout-3-outline" className="align-middle me-2 fs-18" />
           <span className="align-middle">Logout</span>
         </DropdownItem>
