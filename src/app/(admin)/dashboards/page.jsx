@@ -1,4 +1,4 @@
-"use client";
+'use client'
 import Footer from '@/components/layout/Footer'
 import React, { useEffect } from 'react'
 import Chart from './components/Chart'
@@ -16,11 +16,11 @@ const Page = () => {
   const router = useRouter()
 
   useEffect(() => {
+  if (typeof window !== 'undefined') {
     const token = localStorage.getItem('token')
-    if (!token || token === 'undefined') {
-      router.replace('/auth/sign-in')
-    }
-  }, [])
+    if (!token) router.replace('/auth/sign-in')
+  }
+}, [])
 
   return (
     <>
