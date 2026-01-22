@@ -1,7 +1,7 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '@/components/Notify'
-import { RegisterUser } from '../../../api/Register/RegisterHelperApi'
+import { LoginUser, RegisterUser } from '../../../api/Authentication/AuthHelperApi'
 
 
 export const Registration = createAsyncThunk('Auth/Registration', async (data, { rejectWithValue }) => {
@@ -13,6 +13,14 @@ export const Registration = createAsyncThunk('Auth/Registration', async (data, {
   }
 })
 
+export const Login = createAsyncThunk('Auth/Login', async (data, { rejectWithValue }) => {
+  try {
+    const response = await LoginUser(data)
+    return response
+  } catch (error) {
+    return rejectWithValue(error.response?.data || { message: 'Something went wrong' })
+  }
+})
 
 const initialState = {
   devices: [],
@@ -38,6 +46,22 @@ export const Authentication = createSlice({
         state.error = action.payload?.message || action.error.message
         Notify('error', action.payload?.message || 'Registration failed')
       })
+
+       builder
+      .addCase(Login.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(Login.fulfilled, (state, action) => {
+        state.loading = false
+        localStorage.setItem('token', action.payload?.token);
+        Notify('success', action.payload?.message || 'User Login successfully');
+      })
+      .addCase(Login.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload?.message || action.error.message
+        Notify('error', action.payload?.message || 'Login failed')
+      })
+
   },
 })
 

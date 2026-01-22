@@ -23,7 +23,8 @@ const SignUp = () => {
     const { name, value } = e.target
     setData({ ...data, [name]: value })
   }
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     const { username, email, password } = data
     if (!username?.trim() || !email?.trim() || !password?.trim()) {
       Notify('error', 'Please fill all the fields')
@@ -41,11 +42,9 @@ const SignUp = () => {
       console.log('Registration failed:', error)
     }
   }
-
-  console.log(data)
   return (
     <>
-      <div className="account-pages" style={{paddingTop:'150px'}}>
+      <div className="account-pages" style={{ paddingTop: '150px' }}>
         <div className="container">
           <Row className=" justify-content-center">
             <Col md={6} lg={5}>
@@ -72,6 +71,7 @@ const SignUp = () => {
                       <Input name="username" value={data.username} onChange={(e) => handleChange(e)} type="text" placeholder="Enter your Name" />
                     </FormGroup>
                   </div>
+                  <form onSubmit={handleSubmit}>
                   <div className="mb-3">
                     <FormGroup>
                       <Label>
@@ -110,10 +110,11 @@ const SignUp = () => {
                     </div>
                   </div> */}
                   <div className="mb-1 text-center d-grid">
-                    <button className="btn btn-dark btn-lg fw-medium" onClick={handleSubmit}>
+                    <button className="btn btn-dark btn-lg fw-medium" type='submit'>
                       Sign Up
                     </button>
                   </div>
+                  </form>
                 </CardBody>
               </Card>
               <p className="text-center mt-4 text-white text-opacity-50">

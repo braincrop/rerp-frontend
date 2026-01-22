@@ -5,3 +5,8 @@ export const RegisterUser = async (data) => {
   const response = await axiosInstance.post('Auth/register', data)
   return response.data
 }
+
+export const LoginUser = async (data) => {
+  const response = await axiosInstance.post('Auth/login', data)
+  return response.data
+}
