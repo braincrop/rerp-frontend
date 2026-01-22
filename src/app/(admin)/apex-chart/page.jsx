@@ -26,7 +26,6 @@ const page = () => {
           </div>
         </Col>
       </Row>
-
       <AllApexChart />
     </>;
 };

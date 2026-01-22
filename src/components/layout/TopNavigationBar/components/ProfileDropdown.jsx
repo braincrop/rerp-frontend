@@ -7,8 +7,10 @@ import { Dropdown, DropdownHeader, DropdownItem, DropdownMenu, DropdownToggle } 
 const ProfileDropdown = () => {
   const router = useRouter();
   const logOut = () => {
-    localStorage.removeItem('token');
-     router.replace('/auth/sign-in')
+    if(typeof window !== 'undefined'){
+      localStorage.removeItem('token');
+      router.replace('/auth/sign-in')
+    }
   }
   return <Dropdown className=" topbar-item">
       <DropdownToggle type="button" className="topbar-button content-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
