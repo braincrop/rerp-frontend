@@ -1,14 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server'
 export function middleware(request) {
-  const response = NextResponse.next();
-  if (request.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboards', request.url));
+  const { pathname } = request.nextUrl
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/static') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next()
   }
-  return response;
+  const token = request.cookies.get('token')?.value
+  const publicRoutes = ['/auth/sign-in', '/auth/sign-up']
+  if (publicRoutes.includes(pathname)) {
+    if (token) {
+      return NextResponse.redirect(new URL('/dashboards', request.url))
+    }
+    return NextResponse.next()
+  }
+
+  if (!token) {
+    return NextResponse.redirect(
+      new URL('/auth/sign-in', request.url)
+    )
+  }
+
+  return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: '/'
-};
-export { default } from 'next-auth/middleware';
+  matcher: ['/((?!_next|static|favicon.ico).*)'],
+}

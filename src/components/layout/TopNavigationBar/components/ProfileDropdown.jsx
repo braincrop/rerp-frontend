@@ -9,6 +9,7 @@ const ProfileDropdown = () => {
   const logOut = () => {
     if(typeof window !== 'undefined'){
       localStorage.removeItem('token');
+      document.cookie = 'token=; Max-Age=0; path=/;'
       router.replace('/auth/sign-in')
     }
   }

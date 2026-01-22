@@ -32,7 +32,7 @@ const SignIn = () => {
     }
     try {
       await dispatch(Login(data)).unwrap()
-      router.push('/')
+      router.push('/dashboards')
     } catch (error) {
       console.log('Login failed:', error)
     }
