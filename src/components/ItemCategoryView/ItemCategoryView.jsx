@@ -131,10 +131,8 @@ const ItemCategoryView = ({ data, onBack }) => {
       }
       if (modalType === 'edit') {
         await dispatch(UpdateRestuarantItem(data)).unwrap()
-        // Notify('success', 'Item updated successfully')
       } else {
         await dispatch(PostRestuarantItemData(payload)).unwrap()
-        // Notify('success', 'Item created successfully')
       }
       setModalOpen(false)
     } catch (error) {
@@ -278,7 +276,8 @@ const ItemCategoryView = ({ data, onBack }) => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveItem}>
+          <Button color="primary" onClick={saveItem} disabled={loading}>
+             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

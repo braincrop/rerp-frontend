@@ -24,6 +24,7 @@ import { allCategories, GetSingleCategory } from '@/redux/slice/categories/Categ
 import { allProducts, GetAllProduct, GetSingleProduct, PostProduct } from '@/redux/slice/Products/productSlice'
 import { allItemCategory, GetItemCategory } from '@/redux/slice/ItemCategory/ItemCategorySlice'
 import { PostRestuarantItemData } from '@/redux/slice/RestuarantItem/RestuarantItemSlice'
+import Notify from '../Notify'
 
 const customSelectStyles = {
   control: (base) => ({
@@ -154,6 +155,9 @@ const CreateRestuarantItem = ({ onBack }) => {
       buyPrice: formData.editProduct.buyPrice,
       sellPrice: formData.editProduct.sellPrice,
     }
+    if(formData.editProduct.name === '' || formData.editProduct.barcode === '' 
+      || formData.editProduct.buyPrice === '' || formData.editProduct.sellPrice === '') 
+      return Notify('error', 'All fields are required')
     dispatch(PostRestuarantItemData(payload)).unwrap()
     setFormData({
       branchId: '',
@@ -176,7 +180,7 @@ const CreateRestuarantItem = ({ onBack }) => {
           <h4>Create Restaurant Item</h4>
           <Button color="primary" onClick={() => onBack()}>
             <Icon icon="mdi:arrow-left" width="16" height="16" className="me-1" />
-            Back 
+            Back
           </Button>
         </CardHeader>
         <CardBody>
@@ -235,15 +239,17 @@ const CreateRestuarantItem = ({ onBack }) => {
               <CardBody>
                 <Row>
                   <Col md={6}>
-                    <Label>Name</Label>
+                    <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
                     <Input
+                      required
                       value={formData.editProduct.name}
                       onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, name: e.target.value } })}
                     />
                   </Col>
                   <Col md={6}>
-                    <Label>Barcode</Label>
+                    <Label>Barcode <span style={{ color: '#e57373' }}>*</span></Label>
                     <Input
+                      required
                       value={formData.editProduct.barcode}
                       onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, barcode: e.target.value } })}
                     />
@@ -251,17 +257,19 @@ const CreateRestuarantItem = ({ onBack }) => {
                 </Row>
                 <Row className="mt-3">
                   <Col md={6}>
-                    <Label>Buy Price</Label>
+                    <Label>Buy Price <span style={{ color: '#e57373' }}>*</span></Label>
                     <Input
                       type="number"
+                      required
                       value={formData.editProduct.buyPrice}
                       onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, buyPrice: e.target.value } })}
                     />
                   </Col>
                   <Col md={6}>
-                    <Label>Sell Price</Label>
+                    <Label>Sell Price <span style={{ color: '#e57373' }}>*</span></Label>
                     <Input
                       type="number"
+                      required
                       value={formData.editProduct.sellPrice}
                       onChange={(e) => setFormData({ ...formData, editProduct: { ...formData.editProduct, sellPrice: e.target.value } })}
                     />
@@ -317,7 +325,8 @@ const CreateRestuarantItem = ({ onBack }) => {
           <Button color="secondary" onClick={() => setShowCreateModal(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={handleCreateProduct}>
+          <Button color="primary" onClick={handleCreateProduct} disabled={loading}>
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             Create Product
           </Button>
         </ModalFooter>

@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Select from 'react-select'
 import { postVideo } from '../../../api/VideoApi/videoHelperApi'
 import { allDevices, GetAllDevices } from '@/redux/slice/devicesSlice/DevicesSlice'
+import Notify from '@/components/Notify'
 
 const customStyles = {
   control: (provided, state) => ({
@@ -73,7 +74,6 @@ const Page = () => {
     endtime: '',
     vendronDeviceInfoIds: [],
   })
-
   useEffect(() => {
     dispatch(GetAllVendiMachine())
     dispatch(GetAllDevices())
@@ -103,9 +103,27 @@ const Page = () => {
     }
     setModalOpen(true)
   }
-
-  const saveProduct = async () => {
-    if (!VendiSplashMachine.name.trim()) return
+ const validateForm = () => {
+    if (!VendiSplashMachine.name?.trim()) {
+      Notify('error', 'Vendi name is required')
+      return false
+    }
+     if (!VendiSplashMachine.starttime) {
+      Notify('error', 'Start Time are required')
+      return false
+    }
+     if (!VendiSplashMachine.endtime) {
+      Notify('error', 'End Time are required')
+      return false
+    }
+    if (!VendiSplashMachine.vendronDeviceInfoIds) {
+      Notify('error', 'Assigned Device are required')
+      return false
+    }
+    return true
+  }
+  const saveVendiScreen = async () => {
+     if (!validateForm()) return
     if (modalType === 'create') {
       dispatch(PostVendiMachine(VendiSplashMachine)).unwrap()
       setModalOpen(false)
@@ -124,7 +142,6 @@ const Page = () => {
           },
         }),
       ).unwrap()
-      await dispatch(GetAllVendiMachine())
       setModalOpen(false)
     }
   }
@@ -262,10 +279,10 @@ const Page = () => {
       </Table>
 
       <Modal isOpen={modalOpen} centered>
-        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Branch' : 'Edit Branch'}</ModalHeader>
+        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Splash Screen' : 'Edit Splash Screen'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name</Label>
+            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
             <Input type="text" name="name" value={VendiSplashMachine.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
@@ -277,15 +294,15 @@ const Page = () => {
             <Input type="file" name="path" onChange={handleImageChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Start Time</Label>
+            <Label>Start Time <span style={{ color: '#e57373' }}>*</span></Label>
             <Input type="datetime-local" name="starttime" value={VendiSplashMachine.starttime || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>End Time</Label>
+            <Label>End Time <span style={{ color: '#e57373' }}>*</span></Label>
             <Input type="datetime-local" name="endtime" value={VendiSplashMachine.endtime || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label for="vendronDeviceInfoIds">Assigned Devices</Label>
+            <Label for="vendronDeviceInfoIds">Assigned Devices <span style={{ color: '#e57373' }}>*</span></Label>
             <Select
               isMulti
               isSearchable={true}
@@ -313,7 +330,8 @@ const Page = () => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveProduct}>
+          <Button color="primary" onClick={saveVendiScreen} disabled={loading}>
+             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

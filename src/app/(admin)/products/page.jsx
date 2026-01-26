@@ -297,127 +297,109 @@ const Page = () => {
           <Button color="secondary" onClick={() => setAssignModal(false)}>
             Cancel
           </Button>
-          <Button color="danger" onClick={handleCreateProduct}>
-            Submit
+          <Button color="danger" onClick={handleCreateProduct} disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                Loading...
+              </>
+            ) : (
+              'Submit'
+            )}
           </Button>
         </ModalFooter>
       </Modal>
 
-     <Modal isOpen={viewModal} toggle={closeViewModal} size="lg" centered>
-  <ModalHeader toggle={closeViewModal} className="bg-light">
-    <span className="fw-bold">Product Details</span>
-  </ModalHeader>
+      <Modal isOpen={viewModal} toggle={closeViewModal} size="lg" centered>
+        <ModalHeader toggle={closeViewModal} className="bg-light">
+          <span className="fw-bold">Product Details</span>
+        </ModalHeader>
 
-  <ModalBody className="">
-    {ViewselectedProduct && (
-      <div className="container-fluid">
+        <ModalBody className="">
+          {ViewselectedProduct && (
+            <div className="container-fluid">
+              {/* IMAGE + BASIC INFO */}
+              <div className="row mb-4 align-items-center">
+                <div className="col-md-3 text-center">
+                  <img
+                    src={ViewselectedProduct.imagePath || '/placeholder.png'}
+                    alt="product"
+                    className="img-fluid rounded border"
+                    style={{ maxHeight: '120px' }}
+                  />
+                </div>
 
-        {/* IMAGE + BASIC INFO */}
-        <div className="row mb-4 align-items-center">
-          <div className="col-md-3 text-center">
-            <img
-              src={ViewselectedProduct.imagePath || "/placeholder.png"}
-              alt="product"
-              className="img-fluid rounded border"
-              style={{ maxHeight: "120px" }}
-            />
-          </div>
+                <div className="col-md-9">
+                  <h5 className="fw-bold mb-1">{ViewselectedProduct.name}</h5>
+                  <div className="text-muted small mb-2">SKU: {ViewselectedProduct.sku || '-'}</div>
 
-          <div className="col-md-9">
-            <h5 className="fw-bold mb-1">{ViewselectedProduct.name}</h5>
-            <div className="text-muted small mb-2">
-              SKU: {ViewselectedProduct.sku || "-"}
-            </div>
+                  <span className={`badge ${ViewselectedProduct.taxApplied ? 'bg-success' : 'bg-secondary'}`}>
+                    {ViewselectedProduct.taxApplied ? 'Tax Applied' : 'No Tax'}
+                  </span>
+                </div>
+              </div>
 
-            <span
-              className={`badge ${
-                ViewselectedProduct.taxApplied
-                  ? "bg-success"
-                  : "bg-secondary"
-              }`}
-            >
-              {ViewselectedProduct.taxApplied ? "Tax Applied" : "No Tax"}
-            </span>
-          </div>
-        </div>
+              <hr />
 
-        <hr />
+              {/* PRICES */}
+              <div className="row mb-4">
+                <div className="col-md-6">
+                  <div className="border rounded p-3 h-100">
+                    <div className="text-muted small">Sell Price</div>
+                    <div className="fs-5 fw-bold text-primary">${ViewselectedProduct.sellPrice}</div>
+                  </div>
+                </div>
 
-        {/* PRICES */}
-        <div className="row mb-4">
-          <div className="col-md-6">
-            <div className="border rounded p-3 h-100">
-              <div className="text-muted small">Sell Price</div>
-              <div className="fs-5 fw-bold text-primary">
-                ${ViewselectedProduct.sellPrice}
+                <div className="col-md-6">
+                  <div className="border rounded p-3 h-100">
+                    <div className="text-muted small">Base Price</div>
+                    <div className="fs-5 fw-bold">${ViewselectedProduct.basePrice}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* DETAILS */}
+              <div className="row mb-3">
+                <div className="col-md-6 mb-3">
+                  <div className="text-muted small">Shelf Life</div>
+                  <div className="fw-semibold">{ViewselectedProduct.shelfLife || '-'}</div>
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <div className="text-muted small">Ingredients</div>
+                  <div className="fw-semibold">{ViewselectedProduct.ingredients || '-'}</div>
+                </div>
+              </div>
+
+              <div className="row mb-3">
+                <div className="col-md-6 mb-3">
+                  <div className="text-muted small">Product Contains</div>
+                  <div className="fw-semibold">{ViewselectedProduct.productContains || '-'}</div>
+                </div>
+
+                <div className="col-md-6 mb-3">
+                  <div className="text-muted small">Memo</div>
+                  <div className="fw-semibold">{ViewselectedProduct.memo || '-'}</div>
+                </div>
+              </div>
+
+              {/* DESCRIPTION */}
+              <div className="row">
+                <div className="col-12">
+                  <div className="text-muted small mb-1">Description</div>
+                  <div className="border rounded p-3 bg-light">{ViewselectedProduct.productDescription || '-'}</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+        </ModalBody>
 
-          <div className="col-md-6">
-            <div className="border rounded p-3 h-100">
-              <div className="text-muted small">Base Price</div>
-              <div className="fs-5 fw-bold">
-                ${ViewselectedProduct.basePrice}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* DETAILS */}
-        <div className="row mb-3">
-          <div className="col-md-6 mb-3">
-            <div className="text-muted small">Shelf Life</div>
-            <div className="fw-semibold">
-              {ViewselectedProduct.shelfLife || "-"}
-            </div>
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <div className="text-muted small">Ingredients</div>
-            <div className="fw-semibold">
-              {ViewselectedProduct.ingredients || "-"}
-            </div>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-md-6 mb-3">
-            <div className="text-muted small">Product Contains</div>
-            <div className="fw-semibold">
-              {ViewselectedProduct.productContains || "-"}
-            </div>
-          </div>
-
-          <div className="col-md-6 mb-3">
-            <div className="text-muted small">Memo</div>
-            <div className="fw-semibold">
-              {ViewselectedProduct.memo || "-"}
-            </div>
-          </div>
-        </div>
-
-        {/* DESCRIPTION */}
-        <div className="row">
-          <div className="col-12">
-            <div className="text-muted small mb-1">Description</div>
-            <div className="border rounded p-3 bg-light">
-              {ViewselectedProduct.productDescription || "-"}
-            </div>
-          </div>
-        </div>
-
-      </div>
-    )}
-  </ModalBody>
-
-  <ModalFooter className="bg-light">
-    <Button color="secondary" onClick={closeViewModal}>
-      Close
-    </Button>
-  </ModalFooter>
-</Modal>
-
+        <ModalFooter className="bg-light">
+          <Button color="secondary" onClick={closeViewModal}>
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
     </Container>
   )
 }
