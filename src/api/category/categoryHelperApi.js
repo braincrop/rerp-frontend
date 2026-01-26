@@ -3,7 +3,7 @@ import { axiosInstance } from '../axiosConfig'
 
 export const AllCategories = async () => {
   try {
-    const response = await axiosInstance.get('DistinctCategory')
+    const response = await axiosInstance.get('distinct-categories')
     return response
   } catch (error) {
     throw error
@@ -11,17 +11,28 @@ export const AllCategories = async () => {
 }
 export const PostCategories = async (data) => {
   try {
-    const response = await axiosInstance.post('DistinctCategory', data)
+    const response = await axiosInstance.post('distinct-categories', data)
     return response
   } catch (error) {
     throw error
   }
 }
 
+export const GetCategoriesById = async (data) => {
+  console.log('id-data', data) 
+  try {
+    const response = await axiosInstance.get(`distinct-categories/${data}`)
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const UpdateCategories = async (data) => {
   const { dcid, name } = data
   try {
-    const response = await axiosInstance.put(`DistinctCategory/${dcid}`, { name })
+    const response = await axiosInstance.put(`distinct-categories/${dcid}`, { name })
     return response
   } catch (error) {
     throw error
@@ -30,7 +41,7 @@ export const UpdateCategories = async (data) => {
 
 export const DeleteCategory = async (id) => {
   try {
-    const response = await axiosInstance.delete(`DistinctCategory/${id}`)
+    const response = await axiosInstance.delete(`distinct-categories/${id}`)
     return response
   } catch (error) {
     throw error

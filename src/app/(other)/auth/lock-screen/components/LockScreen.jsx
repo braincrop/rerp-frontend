@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import DarkLogo from '@/assets/images/logo-dark.png';

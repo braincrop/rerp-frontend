@@ -1,12 +1,45 @@
-import { PostProduct, UpdatedProduct } from '@/redux/slice/Products/productSlice'
+import { allProducts, GetSingleProduct, PostProduct, UpdatedProduct } from '@/redux/slice/Products/productSlice'
 import React, { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import Select from 'react-select'
 import { postImage } from '@/api/ImagesApi/imageHelperApi'
 import { Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap'
 import Notify from '../../components/Notify'
+import { allCategories, GetAllCategory } from '@/redux/slice/categories/CategorySlice'
 
+const customSelectStyles = {
+  control: (base) => ({
+    ...base,
+    backgroundColor: '#22282e',
+    borderColor: '#3a4551',
+    color: '#fff',
+  }),
+  menu: (base) => ({
+    ...base,
+    backgroundColor: '#22282e',
+  }),
+  option: (base, state) => ({
+    ...base,
+    backgroundColor: state.isFocused ? '#333' : '#22282e',
+    color: '#fff',
+  }),
+  multiValue: (base) => ({
+    ...base,
+    backgroundColor: '#333',
+  }),
+  multiValueLabel: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+  singleValue: (base) => ({
+    ...base,
+    color: '#fff',
+  }),
+}
 const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
   const dispatch = useDispatch()
+  const { singleProduct,loading } = useSelector(allProducts)
+  const { category } = useSelector(allCategories)
   const [productInput, setProductInput] = useState({
     name: '',
     memo: '',
@@ -18,20 +51,50 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     shelfLife: '',
     basePrice: '',
     sellPrice: '',
-    barcode: '',
+    sku: '',
     taxApplied: '',
-    categoryIds: '',
+    categoryIds: [],
   })
 
-  // console.log('Product Input:', productInput)
   useEffect(() => {
-    if (modalType === 'edit' && selectedProduct) {
+    if (modalType === 'edit') {
+      dispatch(GetSingleProduct(selectedProduct?.dpid))
+    }
+  }, [])
+
+  useEffect(() => {
+    if (modalType === 'edit' && singleProduct) {
       setProductInput({
-        ...selectedProduct,
-        categoryIds: selectedProduct.categoryIds?.join(',') || '',
+        name: singleProduct.name ?? '',
+        memo: singleProduct.memo ?? '',
+        imagePath: singleProduct.imagePath ?? '',
+        imagePathNf: singleProduct.imagePathNf ?? '',
+        productDescription: singleProduct.productDescription ?? '',
+        ingredients: singleProduct.ingredients ?? '',
+        productContains: singleProduct.productContains ?? '',
+        shelfLife: singleProduct.shelfLife ?? '',
+        basePrice: singleProduct.basePrice ?? '',
+        sellPrice: singleProduct.sellPrice ?? '',
+        sku: singleProduct.sku ?? '',
+        taxApplied: singleProduct.taxApplied ?? '',
+        categoryIds: Array.isArray(singleProduct.categoryIds)
+          ? singleProduct.categoryIds.map(Number)
+          : typeof singleProduct.categoryIds === 'string'
+            ? singleProduct.categoryIds.split(',').map(Number)
+            : [],
       })
     }
-  }, [selectedProduct, modalType])
+  }, [singleProduct, modalType])
+
+  useEffect(() => {
+    dispatch(GetAllCategory())
+  }, [])
+
+  const categoryOptions = category?.map((cat) => ({
+    value: cat.dcid,
+    label: cat.name,
+  }))
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setProductInput({ ...productInput, [name]: value })
@@ -43,7 +106,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       const res = await postImage(formData)
       setProductInput((prev) => ({
         ...prev,
-        [fieldName]: res?.url,
+        [fieldName]: res?.data.url,
       }))
     } catch (err) {
       console.error(err)
@@ -57,58 +120,13 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     }
   }
   const validateForm = () => {
-    if (!productInput.name.trim()) {
+    if (!productInput.name?.trim()) {
       Notify('error', 'Product name is required')
       return false
     }
-    if (!productInput.memo.trim()) {
-      Notify('error', 'Memo is required')
-      return false
-    }
-    if (!productInput.imagePath) {
-      Notify('error', 'Product image is required')
-      return false
-    }
-    if (!productInput.imagePathNf) {
-      Notify('error', 'Product NF image is required')
-      return false
-    }
-    if (!productInput.ingredients.trim()) {
-      Notify('error', 'Ingredients are required')
-      return false
-    }
-    if (!productInput.productContains.trim()) {
-      Notify('error', 'Product contains is required')
-      return false
-    }
-    if (!productInput.shelfLife.trim()) {
-      Notify('error', 'Shelf life is required')
-      return false
-    }
-    if (!productInput.basePrice) {
-      Notify('error', 'Base price is required')
-      return false
-    }
-    if (!productInput.sellPrice) {
-      Notify('error', 'Sell price is required')
-      return false
-    }
-    if (!productInput.barcode.trim()) {
-      Notify('error', 'Barcode is required')
-      return false
-    }
-    if (!productInput.taxApplied) {
-      Notify('error', 'Tax is required')
-      return false
-    }
-
-    if (!productInput.categoryIds.trim()) {
+    const id = productInput.categoryIds
+    if (!Array.isArray(id) || id.length === 0) {
       Notify('error', 'Category IDs are required')
-      return false
-    }
-
-    if (!productInput.productDescription.trim()) {
-      Notify('error', 'Description is required')
       return false
     }
     return true
@@ -122,34 +140,53 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       basePrice: Number(productInput.basePrice),
       sellPrice: Number(productInput.sellPrice),
       taxApplied: Number(productInput.taxApplied),
-      categoryIds: productInput.categoryIds.split(',').map((id) => Number(id.trim())),
     }
     try {
-    if (modalType === 'create') {
-      const resultAction = await dispatch(PostProduct(payload))
-      if (PostProduct.fulfilled.match(resultAction)) {
-        setShow(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to create product')
+      if (modalType === 'create') {
+        const resultAction = await dispatch(PostProduct(payload))
+        if (PostProduct.fulfilled.match(resultAction)) {
+          setShow(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to create product')
+        }
+      } else if (modalType === 'edit') {
+        const payload = {
+          ...productInput,
+          basePrice: Number(productInput.basePrice),
+          sellPrice: Number(productInput.sellPrice),
+          taxApplied: Number(productInput.taxApplied),
+        }
+        const updatedData = {
+          name: payload.name,
+          memo: payload.memo,
+          basePrice: payload.basePrice,
+          sellPrice: payload.sellPrice,
+          sku: payload.sku,
+          shelfLife: payload.shelfLife,
+          ingredients: payload.ingredients,
+          productContains: payload.productContains,
+          productDescription: payload.productDescription,
+          imagePath: payload.imagePath,
+          imagePathNf: payload.imagePathNf,
+          taxApplied: payload.taxApplied,
+          categoryIds: payload.categoryIds.map((id) => Number(id)),
+        }
+        const data = {
+          dpid: selectedProduct.dpid,
+          updatedData: updatedData,
+        }
+        const resultAction = await dispatch(UpdatedProduct(data))
+
+        if (UpdatedProduct.fulfilled.match(resultAction)) {
+          setShow(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to update product')
+        }
       }
-    } else if (modalType === 'edit') {
-      const updatedData = { ...payload }
-      const productId = selectedProduct.dpid
-      const data = {
-        dpid: productId,
-        updatedData: updatedData,
-      }
-      const resultAction = await dispatch(UpdatedProduct(data))
-      if (UpdatedProduct.fulfilled.match(resultAction)) {
-        setShow(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to update product')
-      }
+    } catch (error) {
+      console.error('Product operation failed:', error)
+      Notify('error', 'Something went wrong')
     }
-  } catch (error) {
-    console.error('Product operation failed:', error)
-    Notify('error', 'Something went wrong')
-  }
   }
 
   return (
@@ -157,8 +194,10 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       <Row className="g-2">
         <Col md={3}>
           <FormGroup>
-            <Label>Product Name</Label>
-            <Input name="name" value={productInput.name} onChange={handleChange} required />
+            <Label>
+              Product Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
+            <Input name="name" value={productInput.name} onChange={handleChange} />
           </FormGroup>
         </Col>
         <Col md={3}>
@@ -196,11 +235,19 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
             <Input name="productContains" value={productInput.productContains} onChange={handleChange} />
           </FormGroup>
         </Col>
-
         <Col md={3}>
           <FormGroup>
-            <Label>Category IDs</Label>
-            <Input name="categoryIds" value={productInput.categoryIds} onChange={handleChange} placeholder="1,2,3" />
+            <Label>
+              Category IDs <span style={{ color: '#e57373' }}>*</span>
+            </Label>
+            <Select
+              isMulti
+              options={categoryOptions}
+              value={categoryOptions.filter((option) => productInput.categoryIds.includes(option.value))}
+              onChange={(selectedOptions) => setProductInput({ ...productInput, categoryIds: selectedOptions.map((option) => option.value) })}
+              styles={customSelectStyles}
+              placeholder="Select categories..."
+            />
           </FormGroup>
         </Col>
 
@@ -214,21 +261,20 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         <Col md={3}>
           <FormGroup>
             <Label>Base Price</Label>
-            <Input type="number" name="basePrice" value={productInput.basePrice} onChange={handleChange} required />
+            <Input type="number" name="basePrice" value={productInput.basePrice} onChange={handleChange} />
           </FormGroup>
         </Col>
-
         <Col md={3}>
           <FormGroup>
             <Label>Sell Price</Label>
-            <Input type="number" name="sellPrice" value={productInput.sellPrice} onChange={handleChange} required />
+            <Input type="number" name="sellPrice" value={productInput.sellPrice} onChange={handleChange} />
           </FormGroup>
         </Col>
 
         <Col md={3}>
           <FormGroup>
-            <Label>Barcode</Label>
-            <Input name="barcode" value={productInput.barcode} onChange={handleChange} />
+            <Label>sku</Label>
+            <Input name="sku" value={productInput.sku} onChange={handleChange} />
           </FormGroup>
         </Col>
 
@@ -247,7 +293,8 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         </Col>
 
         <Col md={12} className="text-end">
-          <Button color="primary" type="submit">
+          <Button color="primary" type="submit" disabled={loading}>
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create Product' : 'Update Product'}
           </Button>
         </Col>

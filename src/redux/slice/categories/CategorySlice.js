@@ -1,6 +1,6 @@
 'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { AllCategories, PostCategories, DeleteCategory, UpdateCategories } from '../../../api/category/categoryHelperApi'
+import { AllCategories, PostCategories, DeleteCategory, UpdateCategories, GetCategoriesById } from '../../../api/category/categoryHelperApi'
 import Notify from '../../../components/Notify'
 
 export const GetAllCategory = createAsyncThunk('Category/AllCategory', async () => {
@@ -16,47 +16,45 @@ export const GetAllCategory = createAsyncThunk('Category/AllCategory', async () 
   }
 })
 
-export const PostCategory = createAsyncThunk('Category/postCategory', async (data) => {
+export const PostCategory = createAsyncThunk('Category/postCategory', async (data, { rejectWithValue }) => {
   try {
     const response = await PostCategories(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to post category')
+    return rejectWithValue('Failed to post category')
   }
 })
 
-export const UpdatedCategory = createAsyncThunk('Category/UpdateCategory', async (data) => {
+export const GetSingleCategory = createAsyncThunk('Category/SingleCategory', async (data, { rejectWithValue }) => {
+  try {
+    const response = await GetCategoriesById(data)
+    return response.data
+  } catch (error) {
+    return rejectWithValue('Failed to get single category')
+  }
+})
+
+export const UpdatedCategory = createAsyncThunk('Category/UpdateCategory', async (data, { rejectWithValue }) => {
   try {
     const response = await UpdateCategories(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    return response.data
   } catch (error) {
-    throw Error('Failed to update category')
+    return rejectWithValue('Failed to update category')
   }
 })
 
-export const DeleteCategoryData = createAsyncThunk('Category/DeleteCategory', async (data) => {
+export const DeleteCategoryData = createAsyncThunk('Category/DeleteCategory', async (id, { rejectWithValue }) => {
   try {
-    const response = await DeleteCategory(data)
-    const _response = {
-      data: response.data,
-      status: response.status,
-    }
-    return _response
+    const response = await DeleteCategory(id)
+    return response.data
   } catch (error) {
-    throw Error('Failed to delete category')
+    return rejectWithValue('Failed to delete category')
   }
 })
 
 const initialState = {
   category: [],
+  singleCat:[],
   loading: false,
   error: null,
 }
@@ -72,32 +70,33 @@ export const CategorySlice = createSlice({
       })
       .addCase(PostCategory.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 201) {
+        if (action.payload?.statusCode === '201') {
           state.error = null
           state.category.unshift(action.payload.data)
-          Notify('success', 'Category added successfully')
+          Notify('success', action.payload.message)
         }
       })
-      .addCase(UpdatedCategory.rejected, (state, action) => {
+      .addCase(PostCategory.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
+
     builder
       .addCase(UpdatedCategory.pending, (state) => {
         state.loading = true
       })
       .addCase(UpdatedCategory.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '200') {
+          state.error = null
           state.category = state.category.map((item) => (item.dcid === action.payload.data.dcid ? action.payload.data : item))
-          Notify('success', 'Category updated successfully')
+          Notify('success', action.payload.message)
         }
       })
-      .addCase(PostCategory.rejected, (state, action) => {
+      .addCase(UpdatedCategory.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
-
     builder
       .addCase(GetAllCategory.pending, (state) => {
         state.loading = true
@@ -105,28 +104,43 @@ export const CategorySlice = createSlice({
       .addCase(GetAllCategory.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        state.category = action.payload?.data
+        state.category = action.payload?.data.data
       })
       .addCase(GetAllCategory.rejected, (state, action) => {
         state.loading = false
         state.error = action.error.message
       })
+
+    builder
+      .addCase(GetSingleCategory.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(GetSingleCategory.fulfilled, (state, action) => {
+        state.loading = false
+        state.error = null
+        state.singleCat = action.payload?.data
+      })
+      .addCase(GetSingleCategory.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message
+      })
+
     builder
       .addCase(DeleteCategoryData.pending, (state) => {
         state.loading = true
       })
       .addCase(DeleteCategoryData.fulfilled, (state, action) => {
         state.loading = false
-        if (action.payload?.status === 200) {
+        if (action.payload?.statusCode === '204') {
           state.error = null
           const deletedId = action.meta.arg
           state.category = state.category.filter((item) => item.dcid !== deletedId)
-          Notify('success', 'Category deleted successfully')
+          Notify('success', action.payload.message)
         }
       })
       .addCase(DeleteCategoryData.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message
+        state.error = action.payload || action.error.message
       })
   },
 })
