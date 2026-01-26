@@ -124,7 +124,8 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       Notify('error', 'Product name is required')
       return false
     }
-    if (!productInput.categoryIds) {
+    const id = productInput.categoryIds
+    if (!Array.isArray(id) || id.length === 0) {
       Notify('error', 'Category IDs are required')
       return false
     }

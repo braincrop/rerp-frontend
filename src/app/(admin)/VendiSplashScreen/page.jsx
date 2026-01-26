@@ -74,6 +74,8 @@ const Page = () => {
     endtime: '',
     vendronDeviceInfoIds: [],
   })
+
+  console.log('VendiSplashMachine', VendiSplashMachine)
   useEffect(() => {
     dispatch(GetAllVendiMachine())
     dispatch(GetAllDevices())
@@ -103,27 +105,28 @@ const Page = () => {
     }
     setModalOpen(true)
   }
- const validateForm = () => {
+  const validateForm = () => {
     if (!VendiSplashMachine.name?.trim()) {
-      Notify('error', 'Vendi name is required')
+      Notify('error', 'Splash Screen name is required')
       return false
     }
-     if (!VendiSplashMachine.starttime) {
+    if (!VendiSplashMachine.starttime) {
       Notify('error', 'Start Time are required')
       return false
     }
-     if (!VendiSplashMachine.endtime) {
+    if (!VendiSplashMachine.endtime) {
       Notify('error', 'End Time are required')
       return false
     }
-    if (!VendiSplashMachine.vendronDeviceInfoIds) {
+    const ids = VendiSplashMachine.vendronDeviceInfoIds
+    if (!Array.isArray(ids) || ids.length === 0) {
       Notify('error', 'Assigned Device are required')
       return false
     }
     return true
   }
   const saveVendiScreen = async () => {
-     if (!validateForm()) return
+    if (!validateForm()) return
     if (modalType === 'create') {
       dispatch(PostVendiMachine(VendiSplashMachine)).unwrap()
       setModalOpen(false)
@@ -282,7 +285,9 @@ const Page = () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Splash Screen' : 'Edit Splash Screen'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input type="text" name="name" value={VendiSplashMachine.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
@@ -294,15 +299,21 @@ const Page = () => {
             <Input type="file" name="path" onChange={handleImageChange} />
           </FormGroup>
           <FormGroup>
-            <Label>Start Time <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Start Time <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input type="datetime-local" name="starttime" value={VendiSplashMachine.starttime || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label>End Time <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              End Time <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input type="datetime-local" name="endtime" value={VendiSplashMachine.endtime || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
-            <Label for="vendronDeviceInfoIds">Assigned Devices <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label for="vendronDeviceInfoIds">
+              Assigned Devices <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Select
               isMulti
               isSearchable={true}
@@ -331,7 +342,7 @@ const Page = () => {
             Cancel
           </Button>
           <Button color="primary" onClick={saveVendiScreen} disabled={loading}>
-             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>
