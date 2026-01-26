@@ -1,6 +1,6 @@
 'use client'
-import DarkLogo from '@/assets/images/logo-dark.png'
-import LightLogo from '@/assets/images/logo-light.png'
+import DarkLogo from '@/assets/images/Logo-primidigitals 1 (1).png'
+import LightLogo from '@/assets/images/Logo-primidigitals 1 (1).png'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -48,10 +48,10 @@ const SignIn = () => {
                 <div className="text-center">
                   <div className="mx-auto mb-4 text-center auth-logo">
                     <a className="logo-dark">
-                      <Image src={DarkLogo} height={32} alt="logo dark" />
+                      <Image src={DarkLogo} height={62} alt="logo dark" />
                     </a>
                     <a className="logo-light">
-                      <Image src={LightLogo} height={28} alt="logo light" />
+                      <Image src={LightLogo} height={62} alt="logo light" />
                     </a>
                   </div>
                   <h4 className="fw-bold text-dark mb-2">Welcome Back!</h4>

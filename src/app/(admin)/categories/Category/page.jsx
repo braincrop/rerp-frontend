@@ -21,46 +21,43 @@ const Page = () => {
   }, [])
 
   const openModal = (type, id = null) => {
-  setModalType(type)
-  setSelectedCategoryId(id)
-  if (type === 'edit' && id !== null) {
-    const selectedCategory = category.find((cat) => cat.dcid === id)
-    setCategoryInput(selectedCategory?.name || '')
-  } else {
-    setCategoryInput('')
-  }
-
-  setModalOpen(true)
-}
-
-const saveCategory = () => {
-  if (!categoryInput.trim()) return
-  if (modalType === 'create') {
-    dispatch(
-      PostCategory({
-        Name: categoryInput,
-      })
-    )
-  }
-  if (modalType === 'edit' && selectedCategoryId !== null) {
-    let data = {
-      dcid: selectedCategoryId,
-      name: categoryInput
+    setModalType(type)
+    setSelectedCategoryId(id)
+    if (type === 'edit' && id !== null) {
+      const selectedCategory = category.find((cat) => cat.dcid === id)
+      setCategoryInput(selectedCategory?.name || '')
+    } else {
+      setCategoryInput('')
     }
-    dispatch(
-      UpdatedCategory(data)
-    )
-  }
-  setModalOpen(false)
-}
 
+    setModalOpen(true)
+  }
+
+  const saveCategory = () => {
+    if (!categoryInput.trim()) return
+    if (modalType === 'create') {
+      dispatch(
+        PostCategory({
+          Name: categoryInput,
+        }),
+      )
+    }
+    if (modalType === 'edit' && selectedCategoryId !== null) {
+      let data = {
+        dcid: selectedCategoryId,
+        name: categoryInput,
+      }
+      dispatch(UpdatedCategory(data))
+    }
+    setModalOpen(false)
+  }
 
   const opendeleteModal = (index) => {
     setDeleteid(index)
     setDeleteModal(true)
   }
   const deleteCategory = () => {
-    dispatch(DeleteCategoryData(deleteid))
+    dispatch(DeleteCategoryData(deleteid)).unwrap()
     setDeleteModal(false)
   }
   return (
@@ -126,7 +123,8 @@ const saveCategory = () => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveCategory}>
+          <Button color="primary" onClick={saveCategory} disabled={loading}>
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

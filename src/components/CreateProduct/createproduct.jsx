@@ -38,7 +38,7 @@ const customSelectStyles = {
 }
 const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
   const dispatch = useDispatch()
-  const { singleProduct } = useSelector(allProducts)
+  const { singleProduct,loading } = useSelector(allProducts)
   const { category } = useSelector(allCategories)
   const [productInput, setProductInput] = useState({
     name: '',
@@ -196,7 +196,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
             <Label>
               Product Name <span style={{ color: '#e57373' }}>*</span>
             </Label>
-            <Input name="name" value={productInput.name} onChange={handleChange} required />
+            <Input name="name" value={productInput.name} onChange={handleChange} />
           </FormGroup>
         </Col>
         <Col md={3}>
@@ -292,7 +292,8 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
         </Col>
 
         <Col md={12} className="text-end">
-          <Button color="primary" type="submit">
+          <Button color="primary" type="submit" disabled={loading}>
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create Product' : 'Update Product'}
           </Button>
         </Col>

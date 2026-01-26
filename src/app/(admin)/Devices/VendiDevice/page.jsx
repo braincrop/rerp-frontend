@@ -4,6 +4,7 @@ import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, I
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
 import { allDevices, DeleteDeviceData, GetAllDevices, PostDevice, UpdatedDevice } from '@/redux/slice/devicesSlice/DevicesSlice'
+import Notify from '@/components/Notify'
 
 const Page = () => {
   const dispatch = useDispatch()
@@ -155,7 +156,7 @@ const saveDevice = async () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Device' : 'Edit Device'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name</Label>
+            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
             <Input name="name" value={DeviceInput?.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
@@ -164,14 +165,15 @@ const saveDevice = async () => {
           </FormGroup>
           <FormGroup>
             <Label>Ip</Label>
-            <Input name="ip" type="number" value={DeviceInput?.ip || ''} onChange={handleInputChange} />
+            <Input name="ip" value={DeviceInput?.ip || ''} onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveDevice}>
+          <Button color="primary" onClick={saveDevice} disabled={loading}>
+             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

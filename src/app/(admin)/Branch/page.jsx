@@ -75,7 +75,7 @@ const Page = () => {
 
   const openItemCategoryBulkModal = (deviceId) => {
     setSelectedDeviceId(deviceId)
-    setSelectedCategories([]) // reset
+    setSelectedCategories([])
     setItemCategoryBulkModal(true)
   }
 
@@ -105,7 +105,7 @@ const Page = () => {
     setModalOpen(true)
   }
 
-  const saveProduct = async () => {
+  const saveBranch = async () => {
     if (!BranchInput.name?.trim()) {
       Notify('error', 'Branch name is required')
       return
@@ -253,10 +253,20 @@ const Page = () => {
 
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                    <Button color="info" size="sm" title="Assign-Item" className="me-1 w-sm-auto" onClick={() => openItemCategoryBulkModal(branch.branchId)}>
-                      <Icon icon="mdi:playlist-edit" width={16}  />
+                    <Button
+                      color="info"
+                      size="sm"
+                      title="Assign-Item"
+                      className="me-1 w-sm-auto"
+                      onClick={() => openItemCategoryBulkModal(branch.branchId)}>
+                      <Icon icon="mdi:playlist-edit" width={16} />
                     </Button>
-                    <Button color="danger" size="sm" title='Assign-Branch' className="me-1 w-sm-auto" onClick={() => openAssignBranchesModal(branch.branchId)}>
+                    <Button
+                      color="danger"
+                      size="sm"
+                      title="Assign-Branch"
+                      className="me-1 w-sm-auto"
+                      onClick={() => openAssignBranchesModal(branch.branchId)}>
                       <Icon icon="mdi:source-branch" width={16} />
                     </Button>
                     <Button color="warning" size="sm" title="Edit" className="me-1 w-sm-auto" onClick={() => openModal('edit', branch)}>
@@ -283,7 +293,9 @@ const Page = () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Branch' : 'Edit Branch'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input name="name" value={BranchInput?.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
@@ -303,7 +315,8 @@ const Page = () => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveProduct}>
+          <Button color="primary" onClick={saveBranch} disabled={loading}>
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>
@@ -336,7 +349,8 @@ const Page = () => {
           <Button color="secondary" outline onClick={() => setAssignBranchesModal(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={AssignBranches}>
+          <Button color="primary" onClick={AssignBranches} disabled={loading}>
+               {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             <Icon icon="mdi:check-circle-outline" className="me-1" />
             Assign
           </Button>
@@ -369,7 +383,8 @@ const Page = () => {
           <Button color="secondary" outline onClick={() => setItemCategoryBulkModal(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={submitItemCategoryBulk}>
+          <Button color="primary" onClick={submitItemCategoryBulk} disabled={loading}>
+               {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             <Icon icon="mdi:check-circle-outline" className="me-1" />
             Assign
           </Button>
