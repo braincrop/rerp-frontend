@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import React, { useEffect } from 'react';
-import DarkLogo from '@/assets/images/logo-dark.png';
-import LightLogo from '@/assets/images/logo-light.png';
+import DarkLogo from '@/assets/images/Logo-primidigitals 1 (1).png'
+import LightLogo from '@/assets/images/Logo-primidigitals 1 (1).png'
 import Image from 'next/image';
 import * as yup from 'yup';
 import TextFormInput from '@/components/from/TextFormInput';
@@ -11,12 +11,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
 const ResetPassword = () => {
-  useEffect(() => {
-    document.body.classList.add('authentication-bg');
-    return () => {
-      document.body.classList.remove('authentication-bg');
-    };
-  }, []);
   const messageSchema = yup.object({
     email: yup.string().email().required('Please enter Email')
   });
@@ -27,8 +21,7 @@ const ResetPassword = () => {
     resolver: yupResolver(messageSchema)
   });
   return <>
-      <div className="">
-        <div className="account-pages py-5">
+        <div className="account-pages" style={{ paddingTop: '150px' }}>
           <div className="container">
             <Row className=" justify-content-center">
               <Col md={6} lg={5}>
@@ -37,10 +30,10 @@ const ResetPassword = () => {
                     <div className="text-center">
                       <div className="mx-auto mb-4 text-center auth-logo">
                         <Link href="/dashboards" className="logo-dark">
-                          <Image src={DarkLogo} height={32} alt="logo dark" />
+                          <Image src={DarkLogo} height={62} alt="logo dark" />
                         </Link>
                         <Link href="/dashboards" className="logo-light">
-                          <Image src={LightLogo} height={28} alt="logo light" />
+                          <Image src={LightLogo} height={62} alt="logo light" />
                         </Link>
                       </div>
                       <h4 className="fw-bold text-dark mb-2">Reset Password</h4>
@@ -70,7 +63,6 @@ const ResetPassword = () => {
             </Row>
           </div>
         </div>
-      </div>
     </>;
 };
 export default ResetPassword;

@@ -12,7 +12,6 @@ const Page = () => {
   const [modalType, setModalType] = useState('')
   const [deleteid, setDeleteid] = useState('')
   const [deleteModal, setDeleteModal] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState(null)
   const [categoryInput, setCategoryInput] = useState('')
   const [selectedCategoryId, setSelectedCategoryId] = useState(null)
 
@@ -29,7 +28,6 @@ const Page = () => {
     } else {
       setCategoryInput('')
     }
-
     setModalOpen(true)
   }
 
@@ -69,7 +67,6 @@ const Page = () => {
           Create New
         </Button>
       </div>
-
       <Table bordered hover responsive className="shadow-sm rounded">
         <thead className="table-light">
           <tr>

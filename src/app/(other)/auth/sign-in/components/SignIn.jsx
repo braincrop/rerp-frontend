@@ -74,7 +74,7 @@ const SignIn = () => {
                   </FormGroup>
                 </div>
                 <div className="mb-3">
-                  <Link href={''} className="float-end text-muted  ms-1">
+                  <Link href='/auth/reset-password' className="float-end text-muted  ms-1">
                     Forgot password?{' '}
                   </Link>
                   <FormGroup>
@@ -104,12 +104,12 @@ const SignIn = () => {
                 </form>
               </CardBody>
             </Card>
-            <p className="text-center mt-4 text-white text-opacity-50">
+            {/* <p className="text-center mt-4 text-white text-opacity-50">
               Don&apos;t have an account?
               <Link href="/auth/sign-up" className="text-decoration-none text-white fw-bold">
                 Sign Up
               </Link>
-            </p>
+            </p> */}
           </Col>
         </Row>
       </div>
