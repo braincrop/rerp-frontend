@@ -143,15 +143,15 @@ export const MENU_ITEMS = [{
     url: "/user-management",
     children: [
       {
+        key: "user",
+        label: "Users",
+        url: "/UserManagement/RegisterUser",
+        parentKey: "user-management"
+      },
+       {
         key: "roles",
         label: "Roles",
         url: "/user-management/roles",
-        parentKey: "user-management"
-      },
-      {
-        key: "user",
-        label: "Users",
-        url: "/user-management/users",
         parentKey: "user-management"
       }
     ]

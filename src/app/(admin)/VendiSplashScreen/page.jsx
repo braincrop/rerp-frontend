@@ -75,7 +75,6 @@ const Page = () => {
     vendronDeviceInfoIds: [],
   })
 
-  console.log('VendiSplashMachine', VendiSplashMachine)
   useEffect(() => {
     dispatch(GetAllVendiMachine())
     dispatch(GetAllDevices())
