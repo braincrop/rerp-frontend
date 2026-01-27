@@ -55,11 +55,8 @@ export const Authentication = createSlice({
         state.loading = false
         if(typeof window !== 'undefined'){
            localStorage.setItem('token', action.payload?.token)
+           document.cookie = `token=${action.payload?.token}; path=/; sameSite=lax;`
         }
-        if(typeof window !== 'undefined'){
-         document.cookie = `token=${action.payload?.token}; path=/; sameSite=lax;`
-        }
-        Notify('success','User Login successfully');
       })
       .addCase(Login.rejected, (state, action) => {
         state.loading = false
