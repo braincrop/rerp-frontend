@@ -59,7 +59,7 @@ export const Authentication = createSlice({
         if(typeof window !== 'undefined'){
          document.cookie = `token=${action.payload?.token}; path=/; sameSite=lax;`
         }
-        Notify('success', action.payload?.message || 'User Login successfully');
+        Notify('success','User Login successfully');
       })
       .addCase(Login.rejected, (state, action) => {
         state.loading = false
