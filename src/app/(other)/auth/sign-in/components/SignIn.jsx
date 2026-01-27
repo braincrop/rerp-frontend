@@ -24,20 +24,20 @@ const SignIn = () => {
   }
 
   const handleSubmit = async (e) => {
-     e.preventDefault()
+    e.preventDefault()
     const { email, password } = data
     if (!email?.trim() || !password?.trim()) {
       Notify('error', 'Please fill all the fields')
       return
     }
     try {
-      await dispatch(Login(data)).unwrap()
-      router.push('/dashboards')
+      await dispatch(Login(data))
+        .unwrap()
+        .then(() => router.replace('/dashboards'))
     } catch (error) {
       console.log('Login failed:', error)
     }
   }
-  console.log('data', data)
   return (
     <div className="account-pages" style={{ paddingTop: '150px' }}>
       <div className="container">
@@ -58,49 +58,49 @@ const SignIn = () => {
                   <p className="text-muted">Sign in to your account to continue</p>
                 </div>
                 <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                  <FormGroup>
-                    <Label>
-                      Email <span style={{ color: '#e57373' }}>*</span>
-                    </Label>
-                    <Input
-                      name="email"
-                      label="Email"
-                      value={data.email}
-                      onChange={(e) => handleChange(e)}
-                      type="text"
-                      placeholder="Enter your Email"
-                    />
-                  </FormGroup>
-                </div>
-                <div className="mb-3">
-                  <Link href='/auth/reset-password' className="float-end text-muted  ms-1">
-                    Forgot password?{' '}
-                  </Link>
-                  <FormGroup>
-                    <Label>
-                      Password <span style={{ color: '#e57373' }}>*</span>
-                    </Label>
-                    <Input
-                      name="password"
-                      type="password"
-                      value={data.password}
-                      onChange={(e) => handleChange(e)}
-                      placeholder="Enter your Password"
-                    />
-                  </FormGroup>
-                </div>
-                {/* <div className="form-check mb-3">
+                  <div className="mb-3">
+                    <FormGroup>
+                      <Label>
+                        Email <span style={{ color: '#e57373' }}>*</span>
+                      </Label>
+                      <Input
+                        name="email"
+                        label="Email"
+                        value={data.email}
+                        onChange={(e) => handleChange(e)}
+                        type="text"
+                        placeholder="Enter your Email"
+                      />
+                    </FormGroup>
+                  </div>
+                  <div className="mb-3">
+                    <Link href="/auth/reset-password" className="float-end text-muted  ms-1">
+                      Forgot password?{' '}
+                    </Link>
+                    <FormGroup>
+                      <Label>
+                        Password <span style={{ color: '#e57373' }}>*</span>
+                      </Label>
+                      <Input
+                        name="password"
+                        type="password"
+                        value={data.password}
+                        onChange={(e) => handleChange(e)}
+                        placeholder="Enter your Password"
+                      />
+                    </FormGroup>
+                  </div>
+                  {/* <div className="form-check mb-3">
                   <input type="checkbox" className="form-check-input" id="remember-me" />
                   <label className="form-check-label" htmlFor="remember-me">
                     Remember me
                   </label>
                 </div> */}
-                <div className="d-grid">
-                  <button className="btn btn-dark btn-lg fw-medium" type="submit">
-                    Sign In
-                  </button>
-                </div>
+                  <div className="d-grid">
+                    <button className="btn btn-dark btn-lg fw-medium" type="submit">
+                      Sign In
+                    </button>
+                  </div>
                 </form>
               </CardBody>
             </Card>
