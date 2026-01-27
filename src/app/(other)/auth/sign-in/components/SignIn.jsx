@@ -31,11 +31,11 @@ const SignIn = () => {
       return
     }
     try {
-      await dispatch(Login(data))
-        .unwrap()
-        .then(() => router.replace('/dashboards'))
+      await dispatch(Login(data)).unwrap()
+      router.replace('/dashboards')
+      Notify('success', 'User Login successfully')
     } catch (error) {
-      console.log('Login failed:', error)
+      Notify('error', 'Login failed')
     }
   }
   return (
