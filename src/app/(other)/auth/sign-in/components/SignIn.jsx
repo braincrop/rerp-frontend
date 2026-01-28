@@ -40,7 +40,7 @@ const SignIn = () => {
       router.replace('/dashboards')
       Notify('success', 'User Login successfully')
     } catch (error) {
-      Notify('error', 'Login failed')
+      console.log('Login failed:', error)
     }
   }
   return (
