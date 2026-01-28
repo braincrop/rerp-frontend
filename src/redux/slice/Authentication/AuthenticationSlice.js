@@ -68,7 +68,7 @@ export const Authentication = createSlice({
         state.error = action.payload?.message || action.error.message
         Notify('error', action.payload?.message || 'Something went wrong')
       })
-      
+
     builder
       .addCase(Login.pending, (state) => {
         state.loading = true
@@ -79,6 +79,8 @@ export const Authentication = createSlice({
            localStorage.setItem('token', action.payload?.token)
            document.cookie = `token=${action.payload?.token}; path=/; sameSite=lax;`
         }
+        // console.log('dataa--', action.payload)
+        //  Notify('success', action.payload?.message || 'Login successfully')
       })
       .addCase(Login.rejected, (state, action) => {
         state.loading = false
