@@ -32,6 +32,12 @@ export default function RootLayout({ children }) {
             <AppProvidersWrapper>{children}</AppProvidersWrapper>
           </ReduxProvider>
         </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          closeOnClick
+          pauseOnHover
+        />
       </body>
     </html>
   )
