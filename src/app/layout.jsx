@@ -26,6 +26,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head></head>
       <body className={roboto.className} data-bs-theme="dark">
+        <ToastContainer position="top-right" autoClose={3000} closeOnClick pauseOnHover />
         <div id="__next_splash">
           <ReduxProvider>
             <AppProvidersWrapper>{children}</AppProvidersWrapper>

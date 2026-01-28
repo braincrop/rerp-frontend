@@ -22,7 +22,7 @@ export const GetAllVendiMachine = createAsyncThunk('VendiMachine/AllVendiMachine
 })
 
 export const PostVendiMachine = createAsyncThunk('VendiMachine/postVendiMachine', async (data, { rejectWithValue }) => {
-  console.log("data-in-redux",data)
+  
   try {
     const response = await PostVendiSplashMachine(data)
     return response.data
