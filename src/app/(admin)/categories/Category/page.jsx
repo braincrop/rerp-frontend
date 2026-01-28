@@ -88,12 +88,14 @@ const Page = () => {
                 <td>{cat.dcid}</td>
                 <td>{cat.name}</td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', cat.dcid)}>
-                    <Icon icon="mdi:pencil" width="16" />
-                  </Button>
-                  <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.dcid)}>
-                    <Icon icon="mdi:delete" width="16" />
-                  </Button>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <Button color="warning" size="sm" className="me-1 w-sm-auto" onClick={() => openModal('edit', cat.dcid)}>
+                      <Icon icon="mdi:pencil" width="16" />
+                    </Button>
+                    <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.dcid)} className="me-1 w-sm-auto">
+                      <Icon icon="mdi:delete" width="16" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))

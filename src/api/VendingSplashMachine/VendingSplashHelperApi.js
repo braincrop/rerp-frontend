@@ -10,7 +10,6 @@ export const AllVendiSplashMachine = async () => {
   }
 }
 export const PostVendiSplashMachine = async (data) => {
-  console.log('data---', data)
   try {
     const response = await axiosInstance.post('vm-splashes', data)
     return response

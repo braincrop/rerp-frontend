@@ -10,3 +10,8 @@ export const LoginUser = async (data) => {
   const response = await axiosInstance.post('Auth/login', data)
   return response.data
 }
+
+export const ForgotUserPass = async (data) => {
+  const response = await axiosInstance.post('users/reset-password-simple', data)
+  return response.data
+}

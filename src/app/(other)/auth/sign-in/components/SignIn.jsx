@@ -22,7 +22,12 @@ const SignIn = () => {
     const { name, value } = e.target
     setData({ ...data, [name]: value })
   }
-
+ useEffect(() => {
+    document.body.classList.add('authentication-bg');
+    return () => {
+      document.body.classList.remove('authentication-bg');
+    };
+  }, []);
   const handleSubmit = async (e) => {
     e.preventDefault()
     const { email, password } = data
@@ -39,7 +44,7 @@ const SignIn = () => {
     }
   }
   return (
-    <div className="account-pages" style={{ paddingTop: '150px' }}>
+    <div className="account-pages">
       <div className="container">
         <Row className="justify-content-center">
           <Col md={6} lg={5}>
@@ -47,9 +52,6 @@ const SignIn = () => {
               <CardBody className="p-5">
                 <div className="text-center">
                   <div className="mx-auto mb-4 text-center auth-logo">
-                    <a className="logo-dark">
-                      <Image src={DarkLogo} height={62} alt="logo dark" />
-                    </a>
                     <a className="logo-light">
                       <Image src={LightLogo} height={62} alt="logo light" />
                     </a>
