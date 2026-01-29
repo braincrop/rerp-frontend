@@ -3,8 +3,8 @@ import AppProvidersWrapper from '@/components/wrapper/AppProvidersWrapper'
 import { DEFAULT_PAGE_TITLE } from '@/context/constants'
 import { Roboto } from 'next/font/google'
 import { ReduxProvider } from './ReduxProvider'
-import ClientToast from '../components/ClientToast';
-
+import ClientToast from '@/components/ClientToast'
+import { AlertProvider } from '@/context/AlertContext'
 
 const roboto = Roboto({
   display: 'swap',
@@ -27,18 +27,12 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head></head>
       <body className={roboto.className} data-bs-theme="dark">
-        <ClientToast />
-        <div id="__next_splash">
-          <ReduxProvider>
+        <ReduxProvider>
+        <ClientToast/>
+          {/* <AlertProvider> */}
             <AppProvidersWrapper>{children}</AppProvidersWrapper>
-          </ReduxProvider>
-        </div>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          closeOnClick
-          pauseOnHover
-        />
+          {/* </AlertProvider> */}
+        </ReduxProvider>
       </body>
     </html>
   )
