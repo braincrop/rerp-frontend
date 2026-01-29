@@ -1,12 +1,13 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import { AllUser, AllUserManagement, DeleteUserInfo } from '@/redux/slice/UserManegement/UserManagementSlice'
 import UserForm from './component/UserForm'
 import { Spinner } from 'react-bootstrap'
+import { decodeJwt } from '@/utils/decodeJwt'
 
 const Page = () => {
   const dispatch = useDispatch()
@@ -16,10 +17,28 @@ const Page = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const [tokenEmail, setTokenEmail] = useState(null)
 
   useEffect(() => {
     dispatch(AllUser())
-  }, [dispatch])
+  }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token')
+      if (token) {
+        const decoded = decodeJwt(token)
+        setTokenEmail(decoded?.email || decoded?.Email || null)
+      }
+    }
+  }, [])
+
+  const filteredUsers = useMemo(() => {
+    if (!tokenEmail) return users || []
+    return (users || []).filter((user) => user.email?.toLowerCase() !== tokenEmail.toLowerCase())
+  }, [users, tokenEmail])
+
+  console.log('filteredUsers', filteredUsers,tokenEmail)
 
   const openCreate = () => {
     setMode('create')
@@ -74,14 +93,14 @@ const Page = () => {
                     Loading Users...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : users?.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center">
                     No Data Found
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                filteredUsers?.map((user) => (
                   <tr key={user.id}>
                     <td>{user.userName || '-'}</td>
                     <td>{user.email || '-'}</td>

@@ -42,30 +42,24 @@ const UserForm = ({ mode, initialData, onBack }) => {
   }
 
   const validate = () => {
-  // Name required
-  if (!formData.UserName) return Notify('error', 'Name is required');
-  if (!formData.email) return Notify('error', 'Email is required');
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(formData.email)) return Notify('error', 'Invalid email format');
-  if (mode === 'create') {
-    if (!formData.password) return Notify('error', 'Password is required');
-    if (formData.password.length < 6)
-      return Notify('error', 'Password must be at least 6 characters long');
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])/;
-    if (!passwordRegex.test(formData.password)) {
-      return Notify(
-        'error',
-        'Password must have at least 1 uppercase letter, 1 number, and 1 special character'
-      );
+    // Name required
+    if (!formData.UserName) return Notify('error', 'Name is required')
+    if (!formData.email) return Notify('error', 'Email is required')
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email)) return Notify('error', 'Invalid email format')
+    if (mode === 'create') {
+      if (!formData.password) return Notify('error', 'Password is required')
+      if (formData.password.length < 6) return Notify('error', 'Password must be at least 6 characters long')
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-])/
+      if (!passwordRegex.test(formData.password)) {
+        return Notify('error', 'Password must have at least 1 uppercase letter, 1 number, and 1 special character')
+      }
+      if (!formData.ConfirmPassword) return Notify('error', 'Confirm Password is required')
+      if (formData.password !== formData.ConfirmPassword) return Notify('error', 'Passwords do not match')
     }
-    if (!formData.ConfirmPassword) return Notify('error', 'Confirm Password is required');
-    if (formData.password !== formData.ConfirmPassword)
-      return Notify('error', 'Passwords do not match');
+
+    return true
   }
-
-  return true;
-};
-
 
   const handleSubmit = async () => {
     if (!validate()) return
@@ -94,21 +88,40 @@ const UserForm = ({ mode, initialData, onBack }) => {
       <div className="row mb-3">
         <div className="col-md-4">
           <FormGroup>
-            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input name="UserName" value={formData.UserName} onChange={handleChange} />
           </FormGroup>
         </div>
         <div className="col-md-4">
           <FormGroup>
-            <Label>Email <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Email <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input name="email" value={formData.email} onChange={handleChange} disabled={mode === 'edit'} />
             {mode === 'edit' && <span className="text-muted m-1">Email cannot be changed</span>}
           </FormGroup>
         </div>
         <div className="col-md-4">
           <FormGroup>
-            <Label>Phone <span style={{ color: '#e57373' }}>*</span></Label>
-            <Input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} />
+            <Label>
+              Phone <span style={{ color: '#e57373' }}>*</span>
+            </Label>
+            <Input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '')
+                setFormData({
+                  ...formData,
+                  phoneNumber: value,
+                })
+              }}
+              placeholder="Enter phone number"
+              maxLength={15}
+            />
           </FormGroup>
         </div>
       </div>
@@ -116,7 +129,9 @@ const UserForm = ({ mode, initialData, onBack }) => {
         <div className="row mb-3">
           <div className="col-md-4">
             <FormGroup className="position-relative">
-              <Label>Password <span style={{ color: '#e57373' }}>*</span></Label>
+              <Label>
+                Password <span style={{ color: '#e57373' }}>*</span>
+              </Label>
               <Input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} />
               <span
                 onClick={() => setShowPassword(!showPassword)}
@@ -133,7 +148,9 @@ const UserForm = ({ mode, initialData, onBack }) => {
           </div>
           <div className="col-md-4">
             <FormGroup className="position-relative">
-              <Label>Confirm Password <span style={{ color: '#e57373' }}>*</span></Label>
+              <Label>
+                Confirm Password <span style={{ color: '#e57373' }}>*</span>
+              </Label>
               <Input
                 type={showConfirmPassword ? 'text' : 'password'}
                 name="ConfirmPassword"
@@ -155,7 +172,9 @@ const UserForm = ({ mode, initialData, onBack }) => {
           </div>
           <div className="col-md-4">
             <FormGroup>
-              <Label>Role <span style={{ color: '#e57373' }}>*</span></Label>
+              <Label>
+                Role <span style={{ color: '#e57373' }}>*</span>
+              </Label>
               <Input type="select" name="role" value={formData.role} onChange={handleChange}>
                 <option value="">Select</option>
                 <option value="Admin">Admin</option>
@@ -168,7 +187,9 @@ const UserForm = ({ mode, initialData, onBack }) => {
         <div className="row mb-3">
           <div className="col-md-4">
             <FormGroup>
-              <Label>Role <span style={{ color: '#e57373' }}>*</span></Label>
+              <Label>
+                Role <span style={{ color: '#e57373' }}>*</span>
+              </Label>
               <Input type="select" name="role" value={formData.role} onChange={handleChange}>
                 <option value="">Select</option>
                 <option value="Admin">Admin</option>
