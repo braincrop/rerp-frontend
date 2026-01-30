@@ -42,7 +42,6 @@ const UserForm = ({ mode, initialData, onBack }) => {
   }
 
   const validate = () => {
-    // Name required
     if (!formData.UserName) return Notify('error', 'Name is required')
     if (!formData.email) return Notify('error', 'Email is required')
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -56,14 +55,13 @@ const UserForm = ({ mode, initialData, onBack }) => {
       }
       if (!formData.ConfirmPassword) return Notify('error', 'Confirm Password is required')
       if (formData.password !== formData.ConfirmPassword) return Notify('error', 'Passwords do not match')
+      if (!formData.role) return Notify('error', 'Role is required')
     }
-
     return true
   }
 
   const handleSubmit = async () => {
     if (!validate()) return
-
     if (mode === 'create') {
       await dispatch(PostUser(formData)).unwrap()
     } else {
