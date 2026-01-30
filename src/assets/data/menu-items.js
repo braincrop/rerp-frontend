@@ -131,7 +131,7 @@ export const MENU_ITEMS = [{
       {
         key: "add-language",
         label: "Add Translation",
-        url: "/language/add-translation",
+        url: "/Translation",
         parentKey: "language"
       }
     ]
