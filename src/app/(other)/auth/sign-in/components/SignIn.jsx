@@ -7,13 +7,40 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Card, CardBody, Col, Row } from 'react-bootstrap'
 import { Form, FormGroup, Label, Input, Button } from 'reactstrap'
-import { useDispatch } from 'react-redux'
-import { Login } from '@/redux/slice/Authentication/AuthenticationSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { allUser, Login } from '@/redux/slice/Authentication/AuthenticationSlice'
 import Notify from '@/components/Notify'
+import { Spinner } from 'reactstrap'
+
+export function FullScreenLoader() {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        background: 'rgba(0, 0, 0, 0.75)',
+        zIndex: 999999,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backdropFilter: 'blur(2px)',
+      }}
+    >
+      <Spinner style={{ width: '3rem', height: '3rem' }} />
+      <p className="mt-3 text-light">Please wait...</p>
+    </div>
+  )
+}
 
 const SignIn = () => {
   const dispatch = useDispatch()
+  const { loading } = useSelector(allUser)
   const router = useRouter()
+  const [routeLoading, setRouteLoading] = useState(false)
   const [data, setData] = useState({
     email: '',
     password: '',
@@ -22,12 +49,12 @@ const SignIn = () => {
     const { name, value } = e.target
     setData({ ...data, [name]: value })
   }
- useEffect(() => {
-    document.body.classList.add('authentication-bg');
+  useEffect(() => {
+    document.body.classList.add('authentication-bg')
     return () => {
-      document.body.classList.remove('authentication-bg');
-    };
-  }, []);
+      document.body.classList.remove('authentication-bg')
+    }
+  }, [])
   const handleSubmit = async (e) => {
     e.preventDefault()
     const { email, password } = data
@@ -37,16 +64,20 @@ const SignIn = () => {
     }
     try {
       await dispatch(Login(data)).unwrap()
-      router.replace('/dashboards')
+      setRouteLoading(true)
       Notify('success', 'User Login successfully')
+      router.replace('/dashboards')
     } catch (error) {
       console.log('Login failed:', error)
+      setRouteLoading(false)
     }
   }
+  const showLoader = loading || routeLoading
   return (
     <div className="account-pages">
       <div className="container">
         <Row className="justify-content-center">
+            {showLoader && <FullScreenLoader />}
           <Col md={6} lg={5}>
             <Card className="border-0 shadow-lg">
               <CardBody className="p-5">
@@ -100,7 +131,7 @@ const SignIn = () => {
                 </div> */}
                   <div className="d-grid">
                     <button className="btn btn-dark btn-lg fw-medium" type="submit">
-                      Sign In
+                       Sign in
                     </button>
                   </div>
                 </form>
