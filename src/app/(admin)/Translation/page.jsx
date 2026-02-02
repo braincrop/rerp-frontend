@@ -68,7 +68,7 @@ const Page = () => {
               <tr>
                 <td>English</td>
                 <td>en</td>
-                <td>2025-12-17 11:03:16</td>
+                <td>/locales/ar/translation.json</td>
                 <td>
                    <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
                         {/* <Button size="sm" color="warning" className="me-1 w-sm-auto" onClick={() => openEdit(user)}> */}
