@@ -58,12 +58,31 @@ const Page = () => {
           <Table bordered responsive>
             <thead>
               <tr>
-                <th>Language</th>
-                <th>Last Modified</th>
+                <th>Language Name</th>
+                <th>Language Code</th>
                 <th>File Path</th>
                 <th>Action</th>
               </tr>
             </thead>
+            <tbody>
+              <tr>
+                <td>English</td>
+                <td>en</td>
+                <td>2025-12-17 11:03:16</td>
+                <td>
+                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                        {/* <Button size="sm" color="warning" className="me-1 w-sm-auto" onClick={() => openEdit(user)}> */}
+                        <Button size="sm" color="warning" className="me-1 w-sm-auto" >
+                          <Icon icon="mdi:pencil" />
+                        </Button>
+                        {/* <Button size="sm" color="danger" className="me-1 w-sm-auto" onClick={() => openDelete(user.id)}> */}
+                        <Button size="sm" color="danger" className="me-1 w-sm-auto">
+                          <Icon icon="mdi:delete" />
+                        </Button>
+                      </div>
+                </td>
+              </tr>
+            </tbody>
             {/* <tbody>
               {loading ? (
                 <tr>
