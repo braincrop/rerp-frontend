@@ -4,7 +4,7 @@ import AppMenu from './components/AppMenu';
 import { getMenuItems } from '@/helpers/Manu';
 import SimplebarReactClient from '@/components/wrapper/SimplebarReactClient';
 import LogoBox from '@/components/wrapper/LogoBox';
-const page = () => {
+const Page = () => {
     const [menuItems, setMenuItems] = useState([])
 
   useEffect(() => {
@@ -19,4 +19,4 @@ const page = () => {
       </SimplebarReactClient>
     </div>;
 };
-export default page;
+export default Page;
