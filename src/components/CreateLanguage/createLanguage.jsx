@@ -1,20 +1,20 @@
-'use client';
+'use client'
 import React, { useEffect, useState } from 'react'
-import { Button, Input, FormGroup, Label, Card, CardBody, Table } from 'reactstrap';
+import { Button, Input, FormGroup, Label, Card, CardBody, Table } from 'reactstrap'
 import { Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Notify from '@/components/Notify'
-import { allTranslation, GetAllTranslation, PostTranslation } from '@/redux/slice/Translation/TranslationSlice'
+import { allTranslation, GetAllTranslation, PostTranslation, UpdateTranslationData } from '@/redux/slice/Translation/TranslationSlice'
 
 const CreateLanguage = ({ mode, initialData, onBack }) => {
   const dispatch = useDispatch()
-  const { allTranslationBase,loading } = useSelector(allTranslation)
+  const { allTranslationBase, loading } = useSelector(allTranslation)
   const [formData, setFormData] = useState({
     lang: '',
     name: '',
     isAll: {
-    branchName: "string",
-    selected: true
+      branchName: 'string',
+      selected: true,
     },
     sections: [],
   })
@@ -23,14 +23,31 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
     dispatch(GetAllTranslation())
   }, [])
 
+useEffect(() => {
+  if (mode === 'edit' && initialData) {
+    setFormData({
+      id: initialData.id,
+      lang: initialData.lang || '',
+      name: initialData.name || '',
+      isAll: initialData.isAll || { branchName: 'string', selected: true },
+      sections: initialData.sections
+        ? initialData.sections.map(section => ({
+            ...section,
+            keys: section.keys.map(k => ({ ...k })),
+          }))
+        : [],
+    });
+  }
+}, [mode, initialData]);
+
   useEffect(() => {
-    if (allTranslationBase && allTranslationBase.sections) {
+    if (mode !== 'edit' && allTranslationBase && allTranslationBase.sections) {
       setFormData((prev) => ({
         ...prev,
         sections: JSON.parse(JSON.stringify(allTranslationBase.sections)),
       }))
     }
-  }, [allTranslationBase])
+  }, [allTranslationBase,mode])
 
   const handleTranslationChange = (sIdx, kIdx, value) => {
     const newSections = [...formData.sections]
@@ -44,21 +61,22 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
   }
 
   const handleSubmit = async () => {
-   if(!formData.lang) return Notify('error', 'Language Code is required')
-   if(!formData.name) return Notify('error', 'Language Name is required')
+    if (!formData.lang) return Notify('error', 'Language Code is required')
+    if (!formData.name) return Notify('error', 'Language Name is required')
     if (mode === 'create') {
-        await dispatch(PostTranslation(formData)).unwrap()
+      await dispatch(PostTranslation(formData)).unwrap()
     } else {
-      //   await dispatch(
-      //     UpdatedUserInfo({
-      //       id: formData.id,
-      //       updatedData: formData,
-      //     }),
-      //   ).unwrap()
+      const data ={
+        id: formData.lang,
+        updatedData: formData
+      }
+        await dispatch(
+          UpdateTranslationData(data),
+        ).unwrap()
     }
     onBack()
   }
-  console.log('formData', formData)
+
   return (
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -73,7 +91,7 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
             <Label>
               Language Code <span style={{ color: '#e57373' }}>*</span>
             </Label>
-            <Input name="lang"  placeholder="e.g  fr,ar,is" value={formData.lang} onChange={handleChange} />
+            <Input name="lang" placeholder="e.g  fr,ar,is" value={formData.lang} onChange={handleChange} />
           </FormGroup>
         </div>
         <div className="col-md-4">
@@ -122,7 +140,7 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
           ))
         ) : (
           <div className="d-flex justify-content-center">
-              <Spinner size="sm" className="me-2" />
+            <Spinner size="sm" className="me-2" />
             <h5>Loading translations...</h5>
           </div>
         )}
@@ -132,9 +150,9 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
         <Button color="secondary" onClick={onBack}>
           Cancel
         </Button>
-        <Button color="primary" onClick={handleSubmit}>
-          {loading ? 'Saving...' : mode === 'create' ? 'Create' : 'Update'}
-        
+        <Button color="primary" onClick={handleSubmit} disabled={loading}>
+          {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
+            {mode === 'create' ? 'Create' : 'Update'}
         </Button>
       </div>
     </div>

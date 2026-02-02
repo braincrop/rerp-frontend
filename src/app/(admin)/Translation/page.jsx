@@ -2,12 +2,14 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
-import CreateLanguage from '../../../components/CreateLanguage/createLanguage';
+import CreateLanguage from '../../../components/CreateLanguage/createLanguage'
+import { allTranslation, GetSingleTranslationData } from '@/redux/slice/Translation/TranslationSlice'
 
 const Page = () => {
   const dispatch = useDispatch()
+  const { translation, loading } = useSelector(allTranslation)
   const [view, setView] = useState('list')
   const [mode, setMode] = useState('create')
   const [selectedUser, setSelectedUser] = useState(null)
@@ -16,10 +18,8 @@ const Page = () => {
   const [tokenEmail, setTokenEmail] = useState(null)
 
   useEffect(() => {
-    // dispatch(AllUser())
+    dispatch(GetSingleTranslationData())
   }, [])
-
-
   const openCreate = () => {
     setMode('create')
     setSelectedUser(null)
@@ -28,6 +28,7 @@ const Page = () => {
   const backToList = () => {
     setView('list')
     setSelectedUser(null)
+    dispatch(GetSingleTranslationData())
   }
   const openEdit = (user) => {
     setMode('edit')
@@ -60,56 +61,34 @@ const Page = () => {
               <tr>
                 <th>Language Name</th>
                 <th>Language Code</th>
-                <th>File Path</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>English</td>
-                <td>en</td>
-                <td>/locales/ar/translation.json</td>
-                <td>
-                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                        {/* <Button size="sm" color="warning" className="me-1 w-sm-auto" onClick={() => openEdit(user)}> */}
-                        <Button size="sm" color="warning" className="me-1 w-sm-auto" >
-                          <Icon icon="mdi:pencil" />
-                        </Button>
-                        {/* <Button size="sm" color="danger" className="me-1 w-sm-auto" onClick={() => openDelete(user.id)}> */}
-                        <Button size="sm" color="danger" className="me-1 w-sm-auto">
-                          <Icon icon="mdi:delete" />
-                        </Button>
-                      </div>
-                </td>
-              </tr>
-            </tbody>
-            {/* <tbody>
               {loading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-4">
                     <Spinner size="sm" className="me-2" />
-                    Loading Users...
+                    Loading language...
                   </td>
                 </tr>
-              ) : users?.length === 0 ? (
+              ) : translation?.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center">
                     No Data Found
                   </td>
                 </tr>
               ) : (
-                filteredUsers?.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.userName || '-'}</td>
-                    <td>{user.email || '-'}</td>
-                    <td>{user.phoneNumber || '-'}</td>
-                    <td>{user.role[0] || '-'}</td>
+                [translation]?.map((item,index) => (
+                  <tr key={index}>
+                    <td>{item.name || '-'}</td>
+                    <td>{item.lang || '-'}</td>
                     <td>
                       <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                        <Button size="sm" color="warning" className="me-1 w-sm-auto" onClick={() => openEdit(user)}>
+                        <Button size="sm" color="warning" className="me-1 w-sm-auto" onClick={() => openEdit(item)}>
                           <Icon icon="mdi:pencil" />
                         </Button>
-                        <Button size="sm" color="danger" className="me-1 w-sm-auto" onClick={() => openDelete(user.id)}>
+                        <Button size="sm" color="danger" className="me-1 w-sm-auto" onClick={() => openDelete(item.lang)}>
                           <Icon icon="mdi:delete" />
                         </Button>
                       </div>
@@ -117,7 +96,7 @@ const Page = () => {
                   </tr>
                 ))
               )}
-            </tbody> */}
+            </tbody>
           </Table>
         </>
       )}
