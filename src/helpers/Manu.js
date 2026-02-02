@@ -1,7 +1,20 @@
 import { MENU_ITEMS } from '@/assets/data/menu-items';
+import { getUserRole } from '@/utils/decodeJwt';
 export const getMenuItems = () => {
-  return MENU_ITEMS;
-};
+  if (typeof window === 'undefined') return []
+  const userRole = getUserRole()
+  return MENU_ITEMS.filter(item => {
+    if (!item.role) return true
+    if (!userRole) return false
+    const itemRoles = Array.isArray(item.role)
+      ? item.role
+      : [item.role]
+    return itemRoles
+      .map(r => String(r).toLowerCase().trim())
+      .includes(String(userRole).toLowerCase().trim())
+  })
+}
+
 
 export const findAllParent = (menuItems, menuItem) => {
   let parents = [];

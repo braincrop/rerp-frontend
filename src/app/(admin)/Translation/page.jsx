@@ -4,14 +4,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import { Icon } from '@iconify/react'
-import { AllUser, AllUserManagement, DeleteUserInfo } from '@/redux/slice/UserManegement/UserManagementSlice'
-import UserForm from './component/UserForm'
-import { Spinner } from 'react-bootstrap'
-import { decodeJwt } from '@/utils/decodeJwt'
+import CreateLanguage from '../../../components/CreateLanguage/createLanguage';
 
 const Page = () => {
   const dispatch = useDispatch()
-  const { users, loading } = useSelector(AllUserManagement)
   const [view, setView] = useState('list')
   const [mode, setMode] = useState('create')
   const [selectedUser, setSelectedUser] = useState(null)
@@ -20,23 +16,9 @@ const Page = () => {
   const [tokenEmail, setTokenEmail] = useState(null)
 
   useEffect(() => {
-    dispatch(AllUser())
+    // dispatch(AllUser())
   }, [])
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token')
-      if (token) {
-        const decoded = decodeJwt(token)
-        setTokenEmail(decoded?.email || decoded?.Email || null)
-      }
-    }
-  }, [])
-
-  const filteredUsers = useMemo(() => {
-    if (!tokenEmail) return users || []
-    return (users || []).filter((user) => user.email?.toLowerCase() !== tokenEmail.toLowerCase())
-  }, [users, tokenEmail])
 
   const openCreate = () => {
     setMode('create')
@@ -59,7 +41,7 @@ const Page = () => {
   }
 
   const confirmDelete = async () => {
-    await dispatch(DeleteUserInfo(deleteId)).unwrap()
+    // await dispatch(DeleteUserInfo(deleteId)).unwrap()
     setDeleteModal(false)
   }
 
@@ -68,22 +50,21 @@ const Page = () => {
       {view === 'list' && (
         <>
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="fw-bold">Users</h2>
+            <h2 className="fw-bold">Translation</h2>
             <Button color="primary" onClick={openCreate}>
-              Create User
+              Add New
             </Button>
           </div>
           <Table bordered responsive>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Role</th>
+                <th>Language</th>
+                <th>Last Modified</th>
+                <th>File Path</th>
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            {/* <tbody>
               {loading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-4">
@@ -117,11 +98,11 @@ const Page = () => {
                   </tr>
                 ))
               )}
-            </tbody>
+            </tbody> */}
           </Table>
         </>
       )}
-      {view === 'form' && <UserForm mode={mode} initialData={selectedUser} onBack={backToList} />}
+      {view === 'form' && <CreateLanguage mode={mode} initialData={selectedUser} onBack={backToList} />}
       <Modal isOpen={deleteModal} toggle={() => setDeleteModal(false)} centered>
         <ModalHeader>Delete User</ModalHeader>
         <ModalBody>Are you sure?</ModalBody>

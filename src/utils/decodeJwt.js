@@ -15,3 +15,21 @@ export function decodeJwt(token) {
     return null
   }
 }
+export const getDecodedToken = () => {
+  if (typeof window === 'undefined') return null
+  const token = localStorage.getItem('token')
+  if (!token) return null
+
+  return decodeJwt(token)
+}
+export const getUserRole = () => {
+  const decoded = getDecodedToken()
+  const role =
+    decoded?.role ||
+    decoded?.Role ||
+    decoded?.userRole ||
+    decoded?.user_role ||
+    null
+
+  return role ? String(role).toLowerCase().trim() : null
+}
