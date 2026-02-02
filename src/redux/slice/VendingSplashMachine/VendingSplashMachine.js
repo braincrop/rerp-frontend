@@ -1,4 +1,3 @@
-'use client'
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
 import {
