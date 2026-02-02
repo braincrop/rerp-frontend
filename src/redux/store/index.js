@@ -8,7 +8,7 @@ import allItemCategory from '../slice/ItemCategory/ItemCategorySlice'
 import allRestuarantItem from '../slice/RestuarantItem/RestuarantItemSlice'
 import allUser from '../slice/Authentication/AuthenticationSlice'
 import AllUserManagement from '../slice/UserManegement/UserManagementSlice'
-
+import allTranslation from "../slice/Translation/TranslationSlice";
 export function makeStore() {
   return configureStore({
     reducer: {
@@ -21,6 +21,7 @@ export function makeStore() {
       allRestuarantItem: allRestuarantItem,
       allUser: allUser,
       AllUserManagement: AllUserManagement,
+      allTranslation:allTranslation
     },
   })
 }

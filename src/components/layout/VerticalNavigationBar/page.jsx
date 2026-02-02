@@ -1,10 +1,17 @@
-import React from 'react';
+'use client'
+import React, { useEffect, useState } from 'react';
 import AppMenu from './components/AppMenu';
 import { getMenuItems } from '@/helpers/Manu';
 import SimplebarReactClient from '@/components/wrapper/SimplebarReactClient';
 import LogoBox from '@/components/wrapper/LogoBox';
 const page = () => {
-  const menuItems = getMenuItems();
+    const [menuItems, setMenuItems] = useState([])
+
+  useEffect(() => {
+    const items = getMenuItems()
+    setMenuItems(items)
+  }, [])
+  
   return <div className="app-sidebar">
       <LogoBox />
       <SimplebarReactClient className="scrollbar" data-simplebar>
