@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Input, FormGroup, Label, Card, CardBody, Table } from 'reactstrap'
 import { Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
+import { Icon } from '@iconify/react'
 import Notify from '@/components/Notify'
 import { allTranslation, GetAllTranslation, PostTranslation, UpdateTranslationData } from '@/redux/slice/Translation/TranslationSlice'
 
@@ -23,22 +24,24 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
     dispatch(GetAllTranslation())
   }, [])
 
-useEffect(() => {
-  if (mode === 'edit' && initialData) {
-    setFormData({
-      id: initialData.id,
-      lang: initialData.lang || '',
-      name: initialData.name || '',
-      isAll: initialData.isAll || { branchName: 'string', selected: true },
-      sections: initialData.sections
-        ? initialData.sections.map(section => ({
-            ...section,
-            keys: section.keys.map(k => ({ ...k })),
-          }))
-        : [],
-    });
-  }
-}, [mode, initialData]);
+  console.log('formData', formData)
+
+  useEffect(() => {
+    if (mode === 'edit' && initialData) {
+      setFormData({
+        id: initialData.id,
+        lang: initialData.lang || '',
+        name: initialData.name || '',
+        isAll: initialData.isAll || { branchName: 'string', selected: true },
+        sections: initialData.sections
+          ? initialData.sections.map((section) => ({
+              ...section,
+              keys: section.keys.map((k) => ({ ...k })),
+            }))
+          : [],
+      })
+    }
+  }, [mode, initialData])
 
   useEffect(() => {
     if (mode !== 'edit' && allTranslationBase && allTranslationBase.sections) {
@@ -47,7 +50,7 @@ useEffect(() => {
         sections: JSON.parse(JSON.stringify(allTranslationBase.sections)),
       }))
     }
-  }, [allTranslationBase,mode])
+  }, [allTranslationBase, mode])
 
   const handleTranslationChange = (sIdx, kIdx, value) => {
     const newSections = [...formData.sections]
@@ -66,17 +69,103 @@ useEffect(() => {
     if (mode === 'create') {
       await dispatch(PostTranslation(formData)).unwrap()
     } else {
-      const data ={
+      const data = {
         id: formData.lang,
-        updatedData: formData
+        updatedData: formData,
       }
-        await dispatch(
-          UpdateTranslationData(data),
-        ).unwrap()
+      await dispatch(UpdateTranslationData(data)).unwrap()
     }
     onBack()
   }
+  const handleAddKey = (sIdx) => {
+    setFormData((prev) => {
+      const newSections = [...prev.sections]
 
+      const newKeyObj = {
+        key: `new_key_${Date.now()}`, // unique temp key
+        defaultValue: '',
+        translatedValue: '',
+        __isNew: true, // optional: for UI logic
+      }
+
+      newSections[sIdx] = {
+        ...newSections[sIdx],
+        keys: [...newSections[sIdx].keys, newKeyObj],
+      }
+
+      return { ...prev, sections: newSections }
+    })
+  }
+  const handleKeyFieldChange = (sIdx, kIdx, field, value) => {
+    setFormData((prev) => {
+      const newSections = [...prev.sections]
+      const newKeys = [...newSections[sIdx].keys]
+
+      newKeys[kIdx] = {
+        ...newKeys[kIdx],
+        [field]: value,
+      }
+
+      newSections[sIdx] = {
+        ...newSections[sIdx],
+        keys: newKeys,
+      }
+
+      return { ...prev, sections: newSections }
+    })
+  }
+  const handleDeleteKey = (sIdx, kIdx) => {
+    setFormData((prev) => {
+      const newSections = [...prev.sections]
+      const newKeys = newSections[sIdx].keys.filter((_, index) => index !== kIdx)
+
+      newSections[sIdx] = {
+        ...newSections[sIdx],
+        keys: newKeys,
+      }
+
+      return { ...prev, sections: newSections }
+    })
+  }
+ const handleAddSection = () => {
+  setFormData(prev => ({
+    ...prev,
+    sections: [
+      {
+        name: '',
+        __isNew: true,
+        keys: [
+          {
+            key: '',
+            defaultValue: '',
+            translatedValue: '',
+            __isNew: true,
+          },
+        ],
+      },
+      ...prev.sections,
+    ],
+  }));
+};
+
+  const handleSectionFieldChange = (sIdx, value) => {
+    setFormData((prev) => {
+      const newSections = [...prev.sections]
+
+      newSections[sIdx] = {
+        ...newSections[sIdx],
+        name: value,
+      }
+
+      return { ...prev, sections: newSections }
+    })
+  }
+  const handleDeleteSection = (sIdx) => {
+    setFormData((prev) => ({
+      ...prev,
+      sections: prev.sections.filter((_, index) => index !== sIdx),
+    }))
+  }
   return (
     <div className="mb-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -97,19 +186,48 @@ useEffect(() => {
         <div className="col-md-4">
           <FormGroup>
             <Label>
-              Lnaguage Name <span style={{ color: '#e57373' }}>*</span>
+              Language Name <span style={{ color: '#e57373' }}>*</span>
             </Label>
             <Input name="name" value={formData.name} placeholder="e.g france, Arabic, Iceland" onChange={handleChange} />
           </FormGroup>
         </div>
       </div>
       <div className="row mb-3">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+        
+          <Button size="sm" onClick={handleAddSection}>
+            <Icon icon="mdi:folder-plus" width="20" height="20" />
+            Add Section
+          </Button>
+        </div>
         {formData.sections && formData.sections.length > 0 ? (
           formData.sections.map((section, sIdx) => (
-            <div key={sIdx} className="mb-4">
-              <h5 className="text-muted mb-2" style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
-                {section.name}
-              </h5>
+            <div key={sIdx} className="mb-4 border rounded p-2">
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                {section.__isNew ? (
+                  <Input
+                    type="text"
+                    value={section.name}
+                    onChange={(e) => handleSectionFieldChange(sIdx, e.target.value)}
+                    placeholder="Enter section name"
+                    style={{ maxWidth: 250 }}
+                  />
+                ) : (
+                  <h5 className="text-muted mb-0" style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
+                    {section.name}
+                  </h5>
+                )}
+                <div className="d-flex gap-2">
+                  <Button size="sm" onClick={() => handleAddKey(sIdx)} title="Add new key">
+                    <Icon icon="mdi:plus" width="20" height="20" />
+                  </Button>
+                  {section.__isNew && (
+                    <Button color="danger" size="sm" onClick={() => handleDeleteSection(sIdx)} title="Delete section">
+                      <Icon icon="mdi:delete" />
+                    </Button>
+                  )}
+                </div>
+              </div>
               <Table bordered hover responsive size="sm">
                 <thead className="bg-light">
                   <tr>
@@ -122,15 +240,48 @@ useEffect(() => {
                   {section.keys &&
                     section.keys.map((item, kIdx) => (
                       <tr key={`${sIdx}-${kIdx}`}>
-                        <td className="align-middle text-secondary">{item.key}</td>
-                        <td className="align-middle">{item.defaultValue}</td>
+                        {/* KEY */}
                         <td>
+                          {item.__isNew ? (
+                            <Input
+                              type="text"
+                              value={item.key}
+                              onChange={(e) => handleKeyFieldChange(sIdx, kIdx, 'key', e.target.value)}
+                              placeholder="Enter key"
+                            />
+                          ) : (
+                            <span className="text-secondary">{item.key}</span>
+                          )}
+                        </td>
+
+                        {/* DEFAULT VALUE */}
+                        <td>
+                          {item.__isNew ? (
+                            <Input
+                              type="text"
+                              value={item.defaultValue}
+                              onChange={(e) => handleKeyFieldChange(sIdx, kIdx, 'defaultValue', e.target.value)}
+                              placeholder="Enter default value"
+                            />
+                          ) : (
+                            item.defaultValue
+                          )}
+                        </td>
+
+                        {/* TRANSLATION + DELETE KEY */}
+                        <td className="d-flex align-items-center gap-2">
                           <Input
                             type="text"
                             value={item.translatedValue || ''}
                             onChange={(e) => handleTranslationChange(sIdx, kIdx, e.target.value)}
                             placeholder="Enter translation"
                           />
+
+                          {item.__isNew && (
+                            <Button color="danger" size="sm" onClick={() => handleDeleteKey(sIdx, kIdx)} title="Delete key">
+                              <Icon icon="mdi:delete" />
+                            </Button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -146,13 +297,13 @@ useEffect(() => {
         )}
       </div>
 
-      <div className="d-flex gap-2">
+      <div className="sticky-action-bar d-flex justify-content-end gap-2">
         <Button color="secondary" onClick={onBack}>
           Cancel
         </Button>
         <Button color="primary" onClick={handleSubmit} disabled={loading}>
           {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
-            {mode === 'create' ? 'Create' : 'Update'}
+          {mode === 'create' ? 'Create' : 'Update'}
         </Button>
       </div>
     </div>

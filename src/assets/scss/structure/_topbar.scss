@@ -1,6 +1,14 @@
 // 
 // topbar.scss
 // 
+.sticky-action-bar {
+  position: sticky;
+  bottom: 0;
+//   background: #fff;
+  padding: 12px 0;
+//   border-top: 1px solid #e5e5e5;
+  z-index: 10;
+}
 
 .app-topbar {
      top: 0;
