@@ -241,12 +241,7 @@ const Page = () => {
                 <td>{item.name}</td>
                 <td>{item.memo}</td>
                 <td
-                  style={{
-                    maxWidth: '150px',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}>
+                  >
                   <a href={item.path} target="_blank" rel="noopener noreferrer" className="text-primary fw-semibold text-decoration-underline">
                     View Video
                   </a>
