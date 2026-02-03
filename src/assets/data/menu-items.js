@@ -83,8 +83,8 @@ export const MENU_ITEMS = [
     key: 'sms-service',
     label: 'SMS Service',
     icon: 'solar:chat-round-linear',
-    url: '/sms-service',
-     role: ['Admin', 'PowerUser'],
+    url: '/SmsService',
+    role: ['Admin', 'PowerUser'],
   },
   {
     key: 'mobile-notification',

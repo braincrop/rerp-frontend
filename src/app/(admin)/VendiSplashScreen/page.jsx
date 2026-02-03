@@ -14,6 +14,7 @@ import Select from 'react-select'
 import { postVideo } from '../../../api/VideoApi/videoHelperApi'
 import { allDevices, GetAllDevices } from '@/redux/slice/devicesSlice/DevicesSlice'
 import Notify from '@/components/Notify'
+import Link from 'next/link'
 
 const customStyles = {
   control: (provided, state) => ({
@@ -246,7 +247,9 @@ const Page = () => {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}>
-                  {item.path}
+                  <a href={item.path} target="_blank" rel="noopener noreferrer" className="text-primary fw-semibold text-decoration-underline">
+                    View Video
+                  </a>
                 </td>
                 <td>{new Date(item.createdOn).toLocaleString()}</td>
                 <td>{new Date(item.startTime).toLocaleString()}</td>
