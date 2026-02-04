@@ -9,9 +9,18 @@ export const GetTranslationData = async () => {
   }
 }
 
-export const GetSingleTranslation = async () => {
+export const GetSingleTranslation = async (data) => {
   try {
-    const response = await axiosInstance.get('translations/en')
+    const response = await axiosInstance.get(`translations/${data}`)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const GetAllTranslation = async () => {
+  try {
+    const response = await axiosInstance.get('translations')
     return response.data
   } catch (error) {
     throw error
