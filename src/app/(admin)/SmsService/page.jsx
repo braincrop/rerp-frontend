@@ -16,7 +16,7 @@ const Page = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('SMS Form Data:', form);
-    // TODO: API call here
+
   };
 
   return (
@@ -28,12 +28,8 @@ const Page = () => {
         className="border rounded p-4 shadow-sm"
         style={{ width: '100%', maxWidth: 500 }}
       >
-        {/* HEADING */}
         <h3 className="text-center mb-4">SMS Service</h3>
-
-        {/* FORM */}
         <form onSubmit={handleSubmit}>
-          {/* SENT TYPE */}
           <FormGroup>
             <Label for="sentType">Sent Type</Label>
             <Input
@@ -48,8 +44,6 @@ const Page = () => {
               <option value="otp">OTP</option>
             </Input>
           </FormGroup>
-
-          {/* SEND TO */}
           <FormGroup>
             <Label for="sendTo">Send To</Label>
             <Input
@@ -65,8 +59,6 @@ const Page = () => {
               <option value="custom">Custom Number</option>
             </Input>
           </FormGroup>
-
-          {/* MESSAGE */}
           <FormGroup>
             <Label for="message">Message</Label>
             <Input
@@ -78,8 +70,6 @@ const Page = () => {
               placeholder="Enter your SMS message here..."
             />
           </FormGroup>
-
-          {/* SUBMIT */}
           <div className="d-grid mt-3">
             <Button color="primary" type="submit">
               Send SMS
