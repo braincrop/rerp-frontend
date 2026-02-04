@@ -62,7 +62,7 @@ export const MENU_ITEMS = [
     key: 'coupons',
     label: 'Coupons',
     icon: 'solar:ticket-sale-linear',
-    url: '/Coupons',
+    url: '/Coupon',
     role: ['Admin', 'PowerUser'],
   },
   {

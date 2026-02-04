@@ -5,11 +5,11 @@ import { Spinner } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Icon } from '@iconify/react'
 import Notify from '@/components/Notify'
-import { allTranslation, GetAllTranslation, PostTranslation, UpdateTranslationData } from '@/redux/slice/Translation/TranslationSlice'
+import { allTranslation, GetAllTranslation, GetSingleTranslationData, PostTranslation, TranslationBase, UpdateTranslationData } from '@/redux/slice/Translation/TranslationSlice'
 
 const CreateLanguage = ({ mode, initialData, onBack }) => {
   const dispatch = useDispatch()
-  const { allTranslationBase, loading } = useSelector(allTranslation)
+  const { allTranslationBase, loading,Singletranslation } = useSelector(allTranslation)
   const [formData, setFormData] = useState({
     lang: '',
     name: '',
@@ -21,27 +21,31 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
   })
 
   useEffect(() => {
-    dispatch(GetAllTranslation())
+    dispatch(TranslationBase())
   }, [])
 
-  console.log('formData', formData)
+  useEffect(()=>{
+    if(mode ==='edit'){
+      dispatch(GetSingleTranslationData(initialData.lang))
+    }
+  },[])
 
   useEffect(() => {
-    if (mode === 'edit' && initialData) {
+    if (mode === 'edit' && Singletranslation) {
       setFormData({
-        id: initialData.id,
-        lang: initialData.lang || '',
-        name: initialData.name || '',
-        isAll: initialData.isAll || { branchName: 'string', selected: true },
-        sections: initialData.sections
-          ? initialData.sections.map((section) => ({
+        id: Singletranslation.id,
+        lang: Singletranslation.lang || '',
+        name: Singletranslation.name || '',
+        isAll: Singletranslation.isAll || { branchName: 'string', selected: true },
+        sections: Singletranslation.sections
+          ? Singletranslation.sections.map((section) => ({
               ...section,
               keys: section.keys.map((k) => ({ ...k })),
             }))
           : [],
       })
     }
-  }, [mode, initialData])
+  }, [mode, Singletranslation])
 
   useEffect(() => {
     if (mode !== 'edit' && allTranslationBase && allTranslationBase.sections) {
@@ -82,10 +86,10 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
       const newSections = [...prev.sections]
 
       const newKeyObj = {
-        key: `new_key_${Date.now()}`, // unique temp key
+        key: `new_key_${Date.now()}`,
         defaultValue: '',
         translatedValue: '',
-        __isNew: true, // optional: for UI logic
+        __isNew: true,
       }
 
       newSections[sIdx] = {
@@ -151,7 +155,6 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
   const handleSectionFieldChange = (sIdx, value) => {
     setFormData((prev) => {
       const newSections = [...prev.sections]
-
       newSections[sIdx] = {
         ...newSections[sIdx],
         name: value,
@@ -253,8 +256,6 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
                             <span className="text-secondary">{item.key}</span>
                           )}
                         </td>
-
-                        {/* DEFAULT VALUE */}
                         <td>
                           {item.__isNew ? (
                             <Input
@@ -267,8 +268,6 @@ const CreateLanguage = ({ mode, initialData, onBack }) => {
                             item.defaultValue
                           )}
                         </td>
-
-                        {/* TRANSLATION + DELETE KEY */}
                         <td className="d-flex align-items-center gap-2">
                           <Input
                             type="text"

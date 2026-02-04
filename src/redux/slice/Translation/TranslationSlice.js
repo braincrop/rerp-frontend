@@ -1,8 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '../../../components/Notify'
-import { GetSingleTranslation, GetTranslationData, PostTanslation, UpdateTranlsation } from '../../../api/Translation/TranslationHelperApi'
+import {
+  DeleteTranslation,
+  GetAllTranslation,
+  GetSingleTranslation,
+  GetTranslationData,
+  PostTanslation,
+  UpdateTranlsation,
+} from '../../../api/Translation/TranslationHelperApi'
 
-export const GetAllTranslation = createAsyncThunk('Translation/TranslationBase', async () => {
+export const TranslationBase = createAsyncThunk('Translation/TranslationBase', async () => {
   try {
     const response = await GetTranslationData()
     return response
@@ -11,9 +18,18 @@ export const GetAllTranslation = createAsyncThunk('Translation/TranslationBase',
   }
 })
 
-export const GetSingleTranslationData = createAsyncThunk('Translation/SingleTranslation', async () => {
+export const Translation = createAsyncThunk('Translation/AllTranslation', async () => {
   try {
-    const response = await GetSingleTranslation()
+    const response = await GetAllTranslation()
+    return response
+  } catch (error) {
+    throw Error('Failed to fetch Branch')
+  }
+})
+
+export const GetSingleTranslationData = createAsyncThunk('Translation/SingleTranslation', async (data) => {
+  try {
+    const response = await GetSingleTranslation(data)
     return response.data
   } catch (error) {
     throw Error('Failed to fetch Branch')
@@ -37,9 +53,18 @@ export const UpdateTranslationData = createAsyncThunk('translation/UpdateTransla
     return rejectWithValue('Failed to update UserInfo')
   }
 })
+export const TranslationDelete = createAsyncThunk('UserManagement/Delete', async (data, { rejectWithValue }) => {
+  try {
+    const response = await DeleteTranslation(data)
+    return response
+  } catch (error) {
+    return rejectWithValue('Failed to delete User')
+  }
+})
 
 const initialState = {
   allTranslationBase: [],
+  Singletranslation: [],
   translation: [],
   loading: false,
   error: null,
@@ -51,19 +76,31 @@ export const TranslationSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(GetAllTranslation.pending, (state) => {
+      .addCase(TranslationBase.pending, (state) => {
         state.loading = true
       })
-      .addCase(GetAllTranslation.fulfilled, (state, action) => {
+      .addCase(TranslationBase.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
         state.allTranslationBase = action.payload.data
       })
-      .addCase(GetAllTranslation.rejected, (state, action) => {
+      .addCase(TranslationBase.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload || action.error.message
       })
-
+    builder
+      .addCase(Translation.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(Translation.fulfilled, (state, action) => {
+        state.loading = false
+        state.error = null
+        state.translation = action.payload.data
+      })
+      .addCase(Translation.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || action.error.message
+      })
     builder
       .addCase(GetSingleTranslationData.pending, (state) => {
         state.loading = true
@@ -71,7 +108,7 @@ export const TranslationSlice = createSlice({
       .addCase(GetSingleTranslationData.fulfilled, (state, action) => {
         state.loading = false
         state.error = null
-        state.translation = action.payload
+        state.Singletranslation = action.payload
       })
       .addCase(GetSingleTranslationData.rejected, (state, action) => {
         state.loading = false
@@ -102,13 +139,31 @@ export const TranslationSlice = createSlice({
         state.loading = false
         if (action.payload?.statusCode === '200') {
           state.error = null
-          //  state.translation = state.translation.map((item) => (item.id === action.payload.data.id ? action.payload.data : item))
+          // state.translation = state.translation.map((item) => (item.lang === action.payload.lang ? action.payload.lang : item))
           Notify('success', action.payload.message)
         }
       })
       .addCase(UpdateTranslationData.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload || action.error.message
+      })
+    builder
+      .addCase(TranslationDelete.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(TranslationDelete.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload?.statusCode === '204') {
+          state.error = null
+          const deletedId = action.meta.arg
+          state.translation = state.translation.filter((item) => item.lang !== deletedId)
+          // Notify('success', action.payload.message)
+        }
+      })
+      .addCase(TranslationDelete.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || action.error.message
+        // Notify('error', action.payload?.message || 'Something went wrong')
       })
   },
 })

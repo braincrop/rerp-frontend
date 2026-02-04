@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import CreateLanguage from '../../../components/CreateLanguage/createLanguage'
-import { allTranslation, GetSingleTranslationData } from '@/redux/slice/Translation/TranslationSlice'
+import { allTranslation, Translation, TranslationDelete } from '@/redux/slice/Translation/TranslationSlice'
 
 const Page = () => {
   const dispatch = useDispatch()
@@ -14,11 +14,11 @@ const Page = () => {
   const [selectedUser, setSelectedUser] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
-  const [tokenEmail, setTokenEmail] = useState(null)
 
   useEffect(() => {
-    dispatch(GetSingleTranslationData())
+    dispatch(Translation())
   }, [])
+
   const openCreate = () => {
     setMode('create')
     setSelectedUser(null)
@@ -27,7 +27,7 @@ const Page = () => {
   const backToList = () => {
     setView('list')
     setSelectedUser(null)
-    dispatch(GetSingleTranslationData())
+    dispatch(Translation())
   }
   const openEdit = (user) => {
     setMode('edit')
@@ -41,7 +41,7 @@ const Page = () => {
   }
 
   const confirmDelete = async () => {
-    // await dispatch(DeleteUserInfo(deleteId)).unwrap()
+    await dispatch(TranslationDelete(deleteId)).unwrap()
     setDeleteModal(false)
   }
 
@@ -78,7 +78,7 @@ const Page = () => {
                   </td>
                 </tr>
               ) : (
-                [translation]?.map((item,index) => (
+                translation?.map((item, index) => (
                   <tr key={index}>
                     <td>{item.name || '-'}</td>
                     <td>{item.lang || '-'}</td>
