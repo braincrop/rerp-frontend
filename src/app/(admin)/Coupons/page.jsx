@@ -1,147 +1,126 @@
 'use client'
-import React, { useState, useMemo } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
+import React, { useState, useMemo, useEffect } from 'react'
+import {
+  Table,
+  Button,
+  Container,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  FormGroup,
+  Label,
+  Row,
+  Col,
+  Spinner,
+  InputGroupText,
+  InputGroup,
+} from 'reactstrap'
 import { Icon } from '@iconify/react'
-
-const initialProducts = [
-  {
-    id: 1,
-    code: 'EYW198',
-    amount: "5.00",
-    maxdiscount: "10.00",
-    minamount: "1.00",
-    used: 'false',
-    expiredate: '2023-12-31',
-  },
-  {
-    id: 2,
-    code: 'KDP442',
-    amount: "8.00",
-    maxdiscount: "15.00",
-    minamount: "3.00",
-    used: 'true',
-    expiredate: '2024-01-15',
-  },
-  {
-    id: 3,
-    code: 'QWL553',
-    amount: "12.00",
-    maxdiscount: "20.00",
-    minamount: "5.00",
-    used: 'false',
-    expiredate: '2024-02-10',
-  },
-  {
-    id: 4,
-    code: 'ZMX821',
-    amount: "7.00",
-    maxdiscount: "14.00",
-    minamount: "2.00",
-    used: 'false',
-    expiredate: '2024-03-01',
-  },
-  {
-    id: 5,
-    code: 'PLR199',
-    amount: "10.00",
-    maxdiscount: "18.00",
-    minamount: "4.00",
-    used: 'true',
-    expiredate: '2024-04-12',
-  },
-  {
-    id: 6,
-    code: 'HQT662',
-    amount: "15.00",
-    maxdiscount: "25.00",
-    minamount: "6.00",
-    used: 'false',
-    expiredate: '2024-05-20',
-  },
-  {
-    id: 7,
-    code: 'MDX744',
-    amount: "9.00",
-    maxdiscount: "16.00",
-    minamount: "3.50",
-    used: 'false',
-    expiredate: '2024-06-30',
-  },
-  {
-    id: 8,
-    code: 'BRP900',
-    amount: "6.50",
-    maxdiscount: "12.00",
-    minamount: "2.50",
-    used: 'true',
-    expiredate: '2024-07-18',
-  },
-  {
-    id: 9,
-    code: 'VFW310',
-    amount: "4.00",
-    maxdiscount: "9.00",
-    minamount: "1.50",
-    used: 'false',
-    expiredate: '2024-08-05',
-  },
-  {
-    id: 10,
-    code: 'TXA555',
-    amount: "20.00",
-    maxdiscount: "30.00",
-    minamount: "10.00",
-    used: 'false',
-    expiredate: '2024-09-25',
-  },
-];
-
+import { useDispatch, useSelector } from 'react-redux'
+import { allCoupons, DeleteCouponsData, GetAllCoupons, PostCoupon, UpdatedCoupons } from '@/redux/slice/Coupons/couponsSlice'
+import Notify from '@/components/Notify'
 
 const Page = () => {
-  const [products, setProducts] = useState(initialProducts)
-  const [search, setSearch] = useState('')
-  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const { coupons, loading } = useSelector(allCoupons)
+  const dispatch = useDispatch()
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState('')
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [deleted,setDeleted] = useState('');
-  const [used,setUsed] = useState('');
-  const [productInput, setProductInput] = useState({
+  const [selectedIndex, setSelectedIndex] = useState(null)
+  const [CouponsInput, setCouponsInput] = useState({
     code: '',
     amount: '',
     maxdiscount: '',
-    minamount: '',
-    used: '',
-    expiredate: '',
+    mindiscount: '',
+    expiryDate: '',
   })
   const [deleteModal, setDeleteModal] = useState(false)
+
+  useEffect(() => {
+    dispatch(GetAllCoupons())
+  }, [])
+
+  const generateCouponCode = () => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    const numbers = '0123456789'
+
+    let alphaPart = ''
+    let numberPart = ''
+
+    // 3 alphabets
+    for (let i = 0; i < 3; i++) {
+      alphaPart += letters.charAt(Math.floor(Math.random() * letters.length))
+    }
+
+    // 3 numbers
+    for (let i = 0; i < 3; i++) {
+      numberPart += numbers.charAt(Math.floor(Math.random() * numbers.length))
+    }
+
+    return `${alphaPart}${numberPart}` // e.g. ABC123
+  }
+  const handleGenerateCode = () => {
+    const newCode = generateCouponCode()
+    setCouponsInput((prev) => ({
+      ...prev,
+      code: newCode,
+    }))
+  }
+
+  console.log('coupons', CouponsInput)
+
   const openModal = (type, index = null) => {
+    console.log('index', index)
     setModalType(type)
-    setSelectedIndex(index)
     if (type === 'edit' && index !== null) {
-      setProductInput(products[index])
+      setCouponsInput({
+        couponsId: index.couponId,
+        code: index.code || '',
+        amount: index.amount || '',
+        maxdiscount: index.maxDiscount || '',
+        mindiscount: index.minDiscount || '',
+        expiryDate: index.expiryDate ? new Date(index.expiryDate).toISOString().slice(0, 16) : '',
+      })
     } else {
-      setProductInput({
+      setCouponsInput({
         code: '',
         amount: '',
         maxdiscount: '',
-        minamount: '',
-        used: '',
-        expiredate: '',
+        mindiscount: '',
+        expiryDate: '',
       })
     }
 
     setModalOpen(true)
   }
-  const saveProduct = () => {
-    if (!productInput.product.trim()) return
-    if (modalType === 'create') {
-      setProducts([...products, { ...productInput, id: Date.now() }])
+  const saveCoupons = () => {
+    if (!CouponsInput.code.trim()) {
+      Notify('error', 'Code is required')
+      return
     }
-    if (modalType === 'edit' && selectedIndex !== null) {
-      const updated = [...products]
-      updated[selectedIndex] = { ...productInput }
-      setProducts(updated)
+     if (!CouponsInput.amount.trim()) {
+      Notify('error', 'Amount is required')
+      return
+    }
+     if (!CouponsInput.maxdiscount.trim()) {
+      Notify('error', 'Max Discount is required')
+      return
+    }
+      if (!CouponsInput.mindiscount.trim()) {
+      Notify('error', 'Min Discount is required')
+      return
+    }
+      if (!CouponsInput.expiryDate.trim()) {
+      Notify('error', 'Expire Date is required')
+      return
+    }
+    if (modalType === 'create') {
+      dispatch(PostCoupon(CouponsInput)).unwrap()
+    }
+    if (modalType === 'edit') {
+      const id = CouponsInput.couponsId
+      dispatch(UpdatedCoupons({ id: id, updatedData: CouponsInput })).unwrap()
     }
     setModalOpen(false)
   }
@@ -151,40 +130,44 @@ const Page = () => {
   }
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setProductInput((prev) => ({
+
+    setCouponsInput((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
   const confirmDelete = () => {
-    const updated = products.filter((_, i) => i !== selectedIndex)
-    setProducts(updated)
+    dispatch(DeleteCouponsData(selectedIndex)).unwrap()
     setDeleteModal(false)
   }
-  const filteredProducts = useMemo(() => {
-    return products?.filter((p) => p.amount.toLowerCase().includes(search.toLowerCase()))
-  }, [search, products])
+  // const filteredCouponss = useMemo(() => {
+  //   return Couponss?.filter((p) => p.amount.toLowerCase().includes(search.toLowerCase()))
+  // }, [search, Couponss])
 
-  const paginated = filteredProducts.slice(0, itemsPerPage)
+  // const paginated = filteredCouponss.slice(0, itemsPerPage)
 
   return (
     <Container className="mt-5">
-      <Row className="mb-4">
+      {/* <Row className="d-flex justify-content-between align-items-center mb-4">
         <Col md="2">
           <Input type="text" placeholder="Amount$..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </Col>
         <Col md="2">
-            <Input type="select" value={deleted} onChange={(e) => setDeleted(e.target.value)}>
-            <option value='' disabled>--IsDeleted--</option>
-            <option value='true'>true</option>
-            <option value='false'>false</option>
+          <Input type="select" value={deleted} onChange={(e) => setDeleted(e.target.value)}>
+            <option value="" disabled>
+              --IsDeleted--
+            </option>
+            <option value="true">true</option>
+            <option value="false">false</option>
           </Input>
         </Col>
-         <Col md="2">
-            <Input type="select" value={used} onChange={(e) => setUsed(e.target.value)}>
-            <option value='' disabled>--IsUsed--</option>
-            <option value='true'>true</option>
-            <option value='false'>false</option>
+        <Col md="2">
+          <Input type="select" value={used} onChange={(e) => setUsed(e.target.value)}>
+            <option value="" disabled>
+              --IsUsed--
+            </option>
+            <option value="true">true</option>
+            <option value="false">false</option>
           </Input>
         </Col>
         <Col md="2">
@@ -194,8 +177,8 @@ const Page = () => {
             <option value={20}>20</option>
           </Input>
         </Col>
-        <Col md="4" className="text-end">
-          <Button color="primary" onClick={() => openModal('create')} className='me-1'>
+        <Col md="10" className="text-end">
+          <Button color="primary" onClick={() => openModal('create')} className="me-1">
             <Icon icon="mdi:plus" width={18} className="me-1" />
             Add Coupon
           </Button>
@@ -204,7 +187,14 @@ const Page = () => {
             Multiple Coupon
           </Button>
         </Col>
-      </Row>
+      </Row> */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold">Coupons</h2>
+        <Button color="primary" onClick={() => openModal('create')}>
+          <Icon icon="mdi:plus" width="16" height="16" className="me-2" />
+          Create New
+        </Button>
+      </div>
       <Table bordered hover responsive className="shadow-sm rounded">
         <thead className="table-light">
           <tr>
@@ -212,83 +202,104 @@ const Page = () => {
             <th>Code</th>
             <th>Amount</th>
             <th>Max Discount</th>
-            <th>Min Amount</th>
-            <th>used</th>
+            <th>Min Discount</th>
             <th>Expire Date</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
-
         <tbody>
-          {paginated.length > 0 ? (
-            paginated.map((prod, index) => (
-              <tr key={prod.id}>
+          {loading ? (
+            <tr>
+              <td colSpan={9} className="text-center">
+                <Spinner size="sm" /> Loading...
+              </td>
+            </tr>
+          ) : coupons?.length > 0 ? (
+            coupons.map((prod, index) => (
+              <tr key={prod.couponId}>
                 <td>{index + 1}</td>
-                <td>{prod.code}</td>
-                <td>{prod.amount}</td>
-                <td>{prod.maxdiscount}</td>
-                <td>{prod.minamount}</td>
-                <td>{prod.used}</td>
-                <td>{prod.expiredate}</td>
+                <td>{prod.code || '-'}</td>
+                <td>{prod.amount || '-'}</td>
+                <td>{prod.maxDiscount || '-'}</td>
+                <td>{prod.minDiscount || '-'}</td>
+                <td>
+                  {prod.expiryDate
+                    ? new Date(prod.expiryDate).toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    : '-'}
+                </td>
                 <td className="text-center">
-                  <Button color="warning" size="sm" className="me-2 text-white" onClick={() => openModal('edit', index)}>
-                    <Icon icon="mdi:pencil" width={16} />
-                  </Button>
-                  <Button color="danger" size="sm" onClick={() => openDeleteModal(index)}>
-                    <Icon icon="mdi:delete" width={16} />
-                  </Button>
+                  <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                    <Button color="warning" size="sm" className="me-1 w-sm-auto" onClick={() => openModal('edit', prod)}>
+                      <Icon icon="mdi:pencil" width={16} />
+                    </Button>
+                    <Button color="danger" size="sm" className="me-1 w-sm-auto" onClick={() => openDeleteModal(prod.couponId)}>
+                      <Icon icon="mdi:delete" width={16} />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="9" className="text-center text-muted py-4">
-                No Product Found
+              <td colSpan={9} className="text-center text-muted py-4">
+                No coupons Found
               </td>
             </tr>
           )}
         </tbody>
       </Table>
       <Modal isOpen={modalOpen} toggle={() => setModalOpen(!modalOpen)} centered>
-        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Product' : 'Edit Product'}</ModalHeader>
+        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Coupon' : 'Edit Coupon'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Product Name</Label>
-            <Input type="text" value={productInput.product} onChange={handleInputChange} />
+            <Label>
+              Code <span style={{ color: '#e57373' }}>*</span>
+            </Label>
+            <InputGroup>
+              <Input
+                type="text"
+                name="code"
+                value={CouponsInput.code}
+                onChange={(e) =>
+                  handleInputChange({
+                    target: { name: 'code', value: e.target.value.toUpperCase() },
+                  })
+                }
+                placeholder="Enter or generate code"
+              />
+              <InputGroupText style={{ cursor: 'pointer' }} onClick={handleGenerateCode} title="Generate Code">
+                <Icon icon="mdi:refresh" width={18} />
+              </InputGroupText>
+            </InputGroup>
           </FormGroup>
 
           <FormGroup>
-            <Label>Category</Label>
-            <Input type="text" value={productInput.category} onChange={handleInputChange} />
+            <Label>Amount <span style={{ color: '#e57373' }}>*</span></Label>
+            <Input type="number" name="amount" value={CouponsInput.amount} onChange={handleInputChange} />
           </FormGroup>
-
           <FormGroup>
-            <Label>Branch</Label>
-            <Input type="text" value={productInput.branch} onChange={handleInputChange} />
+            <Label>Max Discount <span style={{ color: '#e57373' }}>*</span></Label>
+            <Input type="number" name="maxdiscount" value={CouponsInput.maxdiscount} onChange={handleInputChange} />
           </FormGroup>
-
           <FormGroup>
-            <Label>Vendor No</Label>
-            <Input type="text" value={productInput.vendorNo} onChange={handleInputChange} />
+            <Label>Min Discount <span style={{ color: '#e57373' }}>*</span></Label>
+            <Input type="number" name="mindiscount" value={CouponsInput.mindiscount} onChange={handleInputChange} />
           </FormGroup>
-
           <FormGroup>
-            <Label>Content</Label>
-            <Input type="text" value={productInput.content} onChange={handleInputChange} />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Tax Category</Label>
-            <Input type="text" value={productInput.taxCategory} onChange={handleInputChange} />
-          </FormGroup>
-
-          <FormGroup>
-            <Label>Status</Label>
-            <Input type="select" value={productInput.status} onChange={handleInputChange}>
-              <option value="Active">Active</option>
-              <option value="Synced">Synced</option>
-              <option value="Inactive">Inactive</option>
-            </Input>
+            <Label>Expire Date <span style={{ color: '#e57373' }}>*</span></Label>
+            <Input
+              type="datetime-local"
+              name="expiryDate"
+              min={new Date().toISOString().slice(0, 16)}
+              value={CouponsInput.expiryDate}
+              onChange={handleInputChange}
+            />
           </FormGroup>
         </ModalBody>
 
@@ -296,7 +307,7 @@ const Page = () => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveProduct}>
+          <Button color="primary" onClick={saveCoupons}>
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>

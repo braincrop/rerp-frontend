@@ -181,7 +181,6 @@ const Page = () => {
       branchId: selectedDeviceId,
       distinctCategoryIds: selectedCategories.map((item) => item.value),
     }
-    console.log('payload', payload)
     try {
       const result = await dispatch(PostItemCategoryBulk(payload))
       if (PostItemCategoryBulk.fulfilled.match(result)) {
