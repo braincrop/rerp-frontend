@@ -44,11 +44,11 @@ const Page = () => {
     }))
   }
   const saveEmails = () => {
-    if (!Emailtype.name.trim()){
+    if (!Emailtype.name){
         Notify('error', 'Name is required')
         return
     }
-    if(!Emailtype.memo.trim()){
+    if(!Emailtype.memo){
         Notify('error', 'Memo is required')
         return
     }

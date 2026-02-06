@@ -99,19 +99,19 @@ const Page = () => {
       Notify('error', 'Code is required')
       return
     }
-     if (!CouponsInput.amount.trim()) {
+     if (!CouponsInput.amount) {
       Notify('error', 'Amount is required')
       return
     }
-     if (!CouponsInput.maxdiscount.trim()) {
+     if (!CouponsInput.maxdiscount) {
       Notify('error', 'Max Discount is required')
       return
     }
-      if (!CouponsInput.mindiscount.trim()) {
+      if (!CouponsInput.mindiscount) {
       Notify('error', 'Min Discount is required')
       return
     }
-      if (!CouponsInput.expiryDate.trim()) {
+      if (!CouponsInput.expiryDate) {
       Notify('error', 'Expire Date is required')
       return
     }
