@@ -11,6 +11,7 @@ import AllUserManagement from '../slice/UserManegement/UserManagementSlice'
 import allTranslation from "../slice/Translation/TranslationSlice";
 import allCoupons from "../slice/Coupons/couponsSlice";
 import AllEmailType from "../slice/EmailType/EmailTypeSlice";
+import AllEmployees from "../slice/Employees/EmployeeSlice";
 export function makeStore() {
   return configureStore({
     reducer: {
@@ -25,7 +26,8 @@ export function makeStore() {
       AllUserManagement: AllUserManagement,
       allTranslation:allTranslation,
       allCoupons:allCoupons,
-      AllEmailType:AllEmailType
+      AllEmailType:AllEmailType,
+      AllEmployees:AllEmployees
     },
   })
 }
