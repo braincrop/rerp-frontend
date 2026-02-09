@@ -206,7 +206,18 @@ const Page = () => {
             <Label>
               Work Phone <span style={{ color: '#e57373' }}>*</span>
             </Label>
-            <Input name="workPhone" value={productInput.workPhone} onChange={handleInputChange} />
+            <Input
+              name="workPhone"
+              value={productInput.workPhone}
+              onChange={(e) => {
+                const value = e.target.value.replace(/[^0-9]/g, '')
+                setProductInput({
+                  ...productInput,
+                  workPhone: value,
+                })
+              }}
+              maxLength={15}
+            />
           </FormGroup>
           <FormGroup>
             <Label>
