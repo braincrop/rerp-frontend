@@ -12,6 +12,8 @@ import allTranslation from "../slice/Translation/TranslationSlice";
 import allCoupons from "../slice/Coupons/couponsSlice";
 import AllEmailType from "../slice/EmailType/EmailTypeSlice";
 import AllEmployees from "../slice/Employees/EmployeeSlice";
+import allEmailReceipt from "../slice/EmailReceipt/EmailReceiptSlice";
+import allRoles from "../slice/Role/RoleSlice";
 export function makeStore() {
   return configureStore({
     reducer: {
@@ -27,7 +29,9 @@ export function makeStore() {
       allTranslation:allTranslation,
       allCoupons:allCoupons,
       AllEmailType:AllEmailType,
-      AllEmployees:AllEmployees
+      AllEmployees:AllEmployees,
+      allEmailReceipt:allEmailReceipt,
+      allRoles:allRoles
     },
   })
 }

@@ -249,7 +249,6 @@ const Page = () => {
                 <td>{branch.memo || '-'}</td>
                 <td>{branch.mobileOrdering === null ? '-' : branch.mobileOrdering ? 'Yes' : 'No'}</td>
                 <td>{branch.revenueCenterId || '-'}</td>
-
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
                     <Button
