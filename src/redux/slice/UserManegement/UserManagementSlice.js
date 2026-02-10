@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import Notify from '@/components/Notify'
 import { DeleteUser, GetAllUser, RegisterUser, UpdateUser } from '../../../api/UserManagement/UserManagementHelperApi'
+import { AssignRole } from '@/api/Roles/RoleHelperApi'
 
 export const AllUser = createAsyncThunk('UserManagement/AllUser', async (_, { rejectWithValue }) => {
   try {

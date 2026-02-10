@@ -175,7 +175,7 @@ export const MENU_ITEMS = [
       {
         key: 'roles',
         label: 'Roles',
-        url: '/user-management/roles',
+        url: '/Roles',
         parentKey: 'user-management',
         role: ['Admin'],
       },
@@ -197,7 +197,7 @@ export const MENU_ITEMS = [
       {
         key: 'receipt',
         label: 'Receipts',
-        url: '/email-management/receipts',
+        url: '/EmailReceipt',
         parentKey: 'email-management',
       },
     ],

@@ -3,62 +3,56 @@ import React, { useEffect, useState } from 'react'
 import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import { useDispatch, useSelector } from 'react-redux'
-import { AllEmailType, DeleteEmailTypeData, GetAllEmails, PostEmails, UpdatedEmailType } from '@/redux/slice/EmailType/EmailTypeSlice'
+import { DeleteRoleData, GetAllRoles, PostRoles, UpdatedRoles, allRoles } from '@/redux/slice/Role/RoleSlice'
 import Notify from '@/components/Notify'
 
 const Page = () => {
   const dispatch = useDispatch()
-  const { EmailType,loading } = useSelector(AllEmailType)
+  const { Role, loading } = useSelector(allRoles)
   const [modalOpen, setModalOpen] = useState(false)
   const [modalType, setModalType] = useState('')
   const [deleteid, setDeleteid] = useState('')
   const [deleteModal, setDeleteModal] = useState(false)
-  const [Emailtype, setEmailtype] = useState({
+  const [Roles, setRoles] = useState({
     name: '',
-    memo: '',
   })
- 
 
   useEffect(() => {
-    dispatch(GetAllEmails())
+    dispatch(GetAllRoles())
   }, [])
+
+  console.log('Role', Role)
 
   const openModal = (type, id = null) => {
     setModalType(type)
-    if (type === 'edit' && id !== null) {
-      setEmailtype({
-        id: id.emailTypeId || '',
+    if (type === 'edit') {
+      setRoles({
+        id: id.id || '',
         name: id.name || '',
-        memo: id.memo || '',
       })
     } else {
-      setEmailtype('')
+      setRoles('')
     }
     setModalOpen(true)
   }
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setEmailtype((prev) => ({
+    setRoles((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
   const saveEmails = () => {
-    if (!Emailtype.name){
-        Notify('error', 'Name is required')
-        return
-    }
-    if(!Emailtype.memo){
-        Notify('error', 'Memo is required')
-        return
+    if (!Roles.name) {
+      Notify('error', 'Name is required')
+      return
     }
     if (modalType === 'create') {
-      dispatch(
-        PostEmails(Emailtype)).unwrap()
+      dispatch(PostRoles(Roles)).unwrap()
     }
     if (modalType === 'edit') {
-      const id = Emailtype.id
-      dispatch(UpdatedEmailType({ id: id, updatedData: Emailtype })).unwrap()
+      const id = Roles.id
+      dispatch(UpdatedRoles({ id: id, updatedData: Roles })).unwrap()
     }
     setModalOpen(false)
   }
@@ -68,13 +62,13 @@ const Page = () => {
     setDeleteModal(true)
   }
   const deleteCategory = () => {
-    dispatch(DeleteEmailTypeData(deleteid)).unwrap()
+    dispatch(DeleteRoleData(deleteid)).unwrap()
     setDeleteModal(false)
   }
   return (
     <Container className="mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="fw-bold">Emails</h2>
+        <h2 className="fw-bold">Roles</h2>
         <Button color="primary" onClick={() => openModal('create')}>
           <Icon icon="mdi:plus" width="16" height="16" className="me-2" />
           Create New
@@ -85,7 +79,6 @@ const Page = () => {
           <tr>
             <th>#</th>
             <th>Name</th>
-            <th>Memo</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
@@ -96,18 +89,17 @@ const Page = () => {
                 <Spinner size="sm" /> Loading...
               </td>
             </tr>
-          ) : EmailType?.length > 0 ? (
-            EmailType.map((cat,index) => (
-              <tr key={cat.emailTypeId}>
-                <td>{index +1}</td>
+          ) : Role?.length > 0 ? (
+            Role.map((cat, index) => (
+              <tr key={cat.id}>
+                <td>{index + 1}</td>
                 <td>{cat.name}</td>
-                <td>{cat.memo}</td>
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
                     <Button color="warning" size="sm" className="me-1 w-sm-auto" onClick={() => openModal('edit', cat)}>
                       <Icon icon="mdi:pencil" width="16" />
                     </Button>
-                    <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.emailTypeId)} className="me-1 w-sm-auto">
+                    <Button color="danger" size="sm" onClick={() => opendeleteModal(cat.id)} className="me-1 w-sm-auto">
                       <Icon icon="mdi:delete" width="16" />
                     </Button>
                   </div>
@@ -117,7 +109,7 @@ const Page = () => {
           ) : (
             <tr>
               <td colSpan="3" className="text-center text-muted py-4">
-                No Email found
+                No Role found
               </td>
             </tr>
           )}
@@ -125,15 +117,13 @@ const Page = () => {
       </Table>
 
       <Modal isOpen={modalOpen} toggle={() => setModalOpen(!modalOpen)} centered>
-        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Add Email Category' : 'Edit Email Category'}</ModalHeader>
+        <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Add Role' : 'Edit Role'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
-            <Input type="text" value={Emailtype.name || ''} name="name" onChange={handleInputChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label>Memo <span style={{ color: '#e57373' }}>*</span></Label>
-            <Input type="text" value={Emailtype.memo || ''} name="memo" onChange={handleInputChange} />
+            <Label>
+              Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
+            <Input type="text" value={Roles.name || ''} name="name" onChange={handleInputChange} />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
@@ -148,9 +138,9 @@ const Page = () => {
       </Modal>
 
       <Modal isOpen={deleteModal} toggle={() => setDeleteModal(!deleteModal)} centered>
-        <ModalHeader toggle={() => setDeleteModal(!deleteModal)}>Delete Email</ModalHeader>
+        <ModalHeader toggle={() => setDeleteModal(!deleteModal)}>Delete Role</ModalHeader>
         <ModalBody>
-          <p>Are you sure you want to delete this Email Type?</p>
+          <p>Are you sure you want to delete this Role?</p>
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setDeleteModal(false)}>
