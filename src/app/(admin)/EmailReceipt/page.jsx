@@ -55,7 +55,7 @@ const Page = () => {
   const [EmailReceipts, setEmailReceipts] = useState({
     email: '',
     memo: '',
-    emailRecipientId: [],
+    emailTypeIds: [],
   })
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const Page = () => {
         id: id.emailRecipientId || '',
         email: id.email || '',
         memo: id.memo || '',
-        emailRecipientId: Array.isArray(id.emailTypeIds)
+        emailTypeIds: Array.isArray(id.emailTypeIds)
           ? id.emailTypeIds.map(Number)
           : typeof id.emailTypeIds === 'string'
             ? id.emailTypeIds.split(',').map(Number)
@@ -83,7 +83,7 @@ const Page = () => {
       setEmailReceipts({
         email: '',
         memo: '',
-        emailRecipientId: [],
+        emailTypeIds: [],
       })
     }
     setModalOpen(true)
@@ -110,7 +110,7 @@ const Page = () => {
       Notify('error', 'Memo is required')
       return
     }
-     const id = EmailReceipts.emailRecipientId
+     const id = EmailReceipts.emailTypeIds
     if (!Array.isArray(id) || id.length === 0) {
       Notify('error', 'Email IDs are required')
       return
@@ -209,11 +209,11 @@ const Page = () => {
             <Select
               isMulti
               options={EmailTypeOptions}
-              value={EmailTypeOptions?.filter((option) => (EmailReceipts?.emailRecipientId || []).includes(option.value))}
+              value={EmailTypeOptions?.filter((option) => (EmailReceipts?.emailTypeIds || []).includes(option.value))}
               onChange={(selectedOptions) =>
                 setEmailReceipts({
                   ...EmailReceipts,
-                  emailRecipientId: selectedOptions.map((option) => option.value),
+                  emailTypeIds: selectedOptions.map((option) => option.value),
                 })
               }
               styles={customSelectStyles}
