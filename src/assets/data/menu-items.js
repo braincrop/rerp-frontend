@@ -130,7 +130,7 @@ export const MENU_ITEMS = [
       {
         key: 'commands',
         label: 'Commands',
-        url: '/device/commands',
+        url: '/Commands',
         parentKey: 'devices',
       },
     ],
