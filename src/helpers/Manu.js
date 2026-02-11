@@ -1,19 +1,25 @@
 import { MENU_ITEMS } from '@/assets/data/menu-items';
 import { getUserRole } from '@/utils/decodeJwt';
+
 export const getMenuItems = () => {
   if (typeof window === 'undefined') return []
   const userRole = getUserRole()
+  // console.log('userRole', userRole)
+  const normalizedRole = String(userRole || '').toLowerCase().trim()
   return MENU_ITEMS.filter(item => {
+    if (normalizedRole === 'Admin' || normalizedRole === 'admin') return true
     if (!item.role) return true
-    if (!userRole) return false
+    if (!normalizedRole) return false
     const itemRoles = Array.isArray(item.role)
       ? item.role
       : [item.role]
+
     return itemRoles
       .map(r => String(r).toLowerCase().trim())
-      .includes(String(userRole).toLowerCase().trim())
+      .includes(normalizedRole)
   })
 }
+
 
 
 export const findAllParent = (menuItems, menuItem) => {
