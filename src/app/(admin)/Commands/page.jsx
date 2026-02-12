@@ -26,7 +26,15 @@ const Page = () => {
     if (!selectedDevice) return
     setActiveCard('splash')
     try {
-      await dispatch(PostUpdateVendiSplash(selectedDevice)).unwrap()
+      await dispatch(
+        PostUpdateVendiSplash({
+          id: selectedDevice,
+          updatedData: {
+            type: 'string',
+            data: 'string',
+          },
+        }),
+      ).unwrap()
     } finally {
       setActiveCard(null)
     }
@@ -36,7 +44,15 @@ const Page = () => {
     if (!selectedDevice) return
     setActiveCard('product')
     try {
-      await dispatch(PostWsUpdateproducts(selectedDevice)).unwrap()
+      await dispatch(
+        PostWsUpdateproducts({
+          id: selectedDevice,
+          updatedData: {
+            type: 'string',
+            data: 'string',
+          },
+        }),
+      ).unwrap()
     } finally {
       setActiveCard(null)
     }
@@ -46,7 +62,15 @@ const Page = () => {
     if (!selectedDevice) return
     setActiveCard('language')
     try {
-      await dispatch(PostWsUpdateLanguages(selectedDevice)).unwrap()
+      await dispatch(
+        PostWsUpdateLanguages({
+          id: selectedDevice,
+          updatedData: {
+            type: 'string',
+            data: 'string',
+          },
+        }),
+      ).unwrap()
     } finally {
       setActiveCard(null)
     }
