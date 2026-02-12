@@ -16,58 +16,53 @@ const Page = () => {
   const [selectedDevice, setSelectedDevice] = useState('')
   const { Wsloading } = useSelector(AllWebSocketCommandSlice)
   const { devices, loading } = useSelector(allDevices)
+  const [activeCard, setActiveCard] = useState(null)
 
   useEffect(() => {
     dispatch(GetAllDevices())
   }, [])
 
-  const handleUpdateSplash = () => {
-    if (selectedDevice) {
-      dispatch(
-        PostUpdateVendiSplash({
-          id: selectedDevice,
-          updatedData: {
-            type: 'string',
-            data: 'string',
-          },
-        }),
-      ).unwrap()
+  const handleUpdateSplash = async () => {
+    if (!selectedDevice) return
+    setActiveCard('splash')
+    try {
+      await dispatch(PostUpdateVendiSplash(selectedDevice)).unwrap()
+    } finally {
+      setActiveCard(null)
     }
   }
 
-  const handleUpdateproducts = () => {
-    if (selectedDevice) {
-      dispatch(
-        PostWsUpdateproducts({
-          id: selectedDevice,
-          updatedData: {
-            type: 'string',
-            data: 'string',
-          },
-        }),
-      ).unwrap()
-    }
-  }
-  const handleUpdateLanguages = () => {
-    if (selectedDevice) {
-      dispatch(
-        PostWsUpdateLanguages({
-          id: selectedDevice,
-          updatedData: {
-            type: 'string',
-            data: 'string',
-          },
-        }),
-      ).unwrap()
+  const handleUpdateproducts = async () => {
+    if (!selectedDevice) return
+    setActiveCard('product')
+    try {
+      await dispatch(PostWsUpdateproducts(selectedDevice)).unwrap()
+    } finally {
+      setActiveCard(null)
     }
   }
 
-  const isCardDisabled = loading || Wsloading || !selectedDevice
-  const cardClass = `text-center p-4 h-100 shadow-sm ${isCardDisabled ? 'opacity-50' : 'cursor-pointer'}`
+  const handleUpdateLanguages = async () => {
+    if (!selectedDevice) return
+    setActiveCard('language')
+    try {
+      await dispatch(PostWsUpdateLanguages(selectedDevice)).unwrap()
+    } finally {
+      setActiveCard(null)
+    }
+  }
+
+  const isSplashLoading = activeCard === 'splash'
+  const isProductLoading = activeCard === 'product'
+  const isLanguageLoading = activeCard === 'language'
+  const isCardDisabled = loading || !selectedDevice || activeCard !== null
+  const cardClass = `text-center p-4 h-100 shadow-sm cursor-pointer ${isCardDisabled ? 'opacity-50' : ''}`
+
   const cardStyle = {
     cursor: isCardDisabled ? 'not-allowed' : 'pointer',
     pointerEvents: isCardDisabled ? 'none' : 'auto',
   }
+
   return (
     <div className="container py-4">
       <Card className="p-3">
@@ -91,6 +86,11 @@ const Page = () => {
         <Row className="g-3">
           <Col md="6">
             <Card className={cardClass} style={cardStyle} onClick={handleUpdateSplash}>
+              {isSplashLoading && (
+                <div className="custom-card-overlay">
+                  <Spinner size="sm" />
+                </div>
+              )}
               <Icon icon="solar:gallery-linear" width="40" className="mb-2 text-success d-block mx-auto" />
               <h6 className="fw-bold">Update Splash</h6>
               <p className="text-muted mb-0">Refresh the device splash screen</p>
@@ -99,6 +99,12 @@ const Page = () => {
 
           <Col md="6">
             <Card className={cardClass} style={cardStyle} onClick={handleUpdateproducts}>
+              {isProductLoading && (
+                <div className="custom-card-overlay">
+                  <Spinner size="sm" />
+                </div>
+              )}
+
               <Icon icon="solar:box-linear" width="40" className="mb-2 text-success d-block mx-auto" />
               <h6 className="fw-bold">Update Product</h6>
               <p className="text-muted mb-0">Update vending product info</p>
@@ -107,10 +113,15 @@ const Page = () => {
 
           <Col md="6">
             <Card className={cardClass} style={cardStyle} onClick={handleUpdateLanguages}>
+              {isLanguageLoading && (
+                <div className="custom-card-overlay">
+                  <Spinner size="sm" />
+                </div>
+              )}
+
               <Icon icon="ion:language-sharp" width="40" className="mb-2 text-success d-block mx-auto" />
               <h6 className="fw-bold">Update Languages</h6>
               <p className="text-muted mb-0">Sync Languages to Vending Machines</p>
-               
             </Card>
           </Col>
         </Row>
