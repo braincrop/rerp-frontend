@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useMemo, useEffect } from 'react'
-import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col } from 'reactstrap'
+import { Table, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Input, FormGroup, Label, Row, Col, Spinner } from 'reactstrap'
 import { Icon } from '@iconify/react'
 import {
   allVendiSplashMachine,
@@ -67,6 +67,8 @@ const Page = () => {
   const [modalType, setModalType] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
+  const [showUploadSuccess, setShowUploadSuccess] = useState(false)
+  const [uploadingField, setUploadingField] = useState(null)
   const [VendiSplashMachine, setVendiSplashMachine] = useState({
     name: '',
     memo: '',
@@ -82,6 +84,7 @@ const Page = () => {
   }, [])
 
   const openModal = (type, item = null) => {
+    console.log('item', item)
     setModalType(type)
     if (type === 'edit' && item) {
       setVendiSplashMachine({
@@ -171,27 +174,34 @@ const Page = () => {
     }))
   }
 
-  const uploadImage = async (file, fieldName) => {
+  const uploadVideo = async (file, fieldName) => {
     try {
+      setUploadingField(fieldName)
       const formData = new FormData()
       formData.append('file', file)
       const res = await postVideo(formData)
       setVendiSplashMachine((prev) => ({
         ...prev,
-        [fieldName]: res?.data.url,
+        [fieldName]: res?.data?.url,
       }))
+      setShowUploadSuccess(true)
+      setTimeout(() => {
+        setShowUploadSuccess(false)
+      }, 3000)
     } catch (err) {
       console.error(err)
+    } finally {
+      setUploadingField(null)
     }
   }
 
   const handleImageChange = (e) => {
     const { name, files } = e.target
     if (files?.length) {
-      uploadImage(files[0], name)
+      uploadVideo(files[0], name)
     }
   }
-
+  const isButtonDisabled = loading || uploadingField !== null
   // const filteredProducts = useMemo(() => {
   //   return VendiMachine.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
   // }, [search, VendiMachine])
@@ -240,8 +250,7 @@ const Page = () => {
                 <td>{index + 1}</td>
                 <td>{item.name}</td>
                 <td>{item.memo}</td>
-                <td
-                  >
+                <td>
                   <a href={item.path} target="_blank" rel="noopener noreferrer" className="text-primary fw-semibold text-decoration-underline">
                     View Video
                   </a>
@@ -293,8 +302,25 @@ const Page = () => {
           </FormGroup>
           <FormGroup>
             <Label>File</Label>
-            <Input type="file" name="path" onChange={handleImageChange} />
+            <div className="position-relative">
+              <Input type="file" name="path" onChange={handleImageChange} disabled={uploadingField === 'path'} />
+              {uploadingField === 'path' && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                  }}>
+                  <Spinner size="sm" />
+                </div>
+              )}
+            </div>
+            {showUploadSuccess && !uploadingField && (
+              <small className="text-success d-block mt-2">✔ Uploaded Successfully</small>
+            )}
           </FormGroup>
+
           <FormGroup>
             <Label>
               Start Time <span style={{ color: '#e57373' }}>*</span>
@@ -338,9 +364,9 @@ const Page = () => {
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
-          <Button color="primary" onClick={saveVendiScreen} disabled={loading}>
-            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
-            {modalType === 'create' ? 'Create' : 'Save'}
+          <Button color="primary" onClick={saveVendiScreen} disabled={isButtonDisabled}>
+            {(loading || uploadingField) && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
+            {uploadingField ? 'Uploading...' : loading ? 'Saving...' : modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>
       </Modal>
