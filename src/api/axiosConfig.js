@@ -3,6 +3,7 @@ import axios from 'axios'
 const baseURL = process.env.NEXT_PUBLIC_API_URL
 const localUrl = 'http://25.11.249.196:5007/api/'
 
+
 const axiosInstance = axios.create({
   baseURL: baseURL,
 })
