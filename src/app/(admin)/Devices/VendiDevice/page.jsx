@@ -8,15 +8,17 @@ import Notify from '@/components/Notify'
 
 const Page = () => {
   const dispatch = useDispatch()
-  const { devices, loading } = useSelector(allDevices);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [deleteid, setDeleteid] = useState('');
+  const { devices, loading } = useSelector(allDevices)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalType, setModalType] = useState('')
+  const [deleteid, setDeleteid] = useState('')
   const [deleteModal, setDeleteModal] = useState(false)
   const [DeviceInput, setDeviceInput] = useState({
     name: '',
     deviceName: '',
     ip: '',
+    isActive: '',
+    // isConnected: true,
   })
 
   useEffect(() => {
@@ -31,60 +33,69 @@ const Page = () => {
         deviceName: device.deviceName || '',
         ip: device.ip || '',
         id: device.id,
+        isActive: device.isActive,
+        // isConnected: device.isConnected,
       })
     } else {
       setDeviceInput({
         name: '',
         deviceName: '',
         ip: '',
+        isActive: '',
+        // isConnected: true,
       })
     }
     setModalOpen(true)
   }
 
-const saveDevice = async () => {
-  if (!DeviceInput.name?.trim()) {
-    Notify('error', 'Device name is required')
-    return
-  }
-  try {
-    let resultAction
-    if (modalType === 'create') {
-      resultAction = await dispatch(PostDevice(DeviceInput))
-      if (PostDevice.fulfilled.match(resultAction)) {
-        await dispatch(GetAllDevices())
-        setModalOpen(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to create device')
-      }
-    } else if (modalType === 'edit') {
-      resultAction = await dispatch(
-        UpdatedDevice({
-          id: DeviceInput.id,
-          updatedData: {
-            name: DeviceInput.name,
-            deviceName: DeviceInput.deviceName,
-            ip: DeviceInput.ip,
-          },
-        })
-      )
-      if (UpdatedDevice.fulfilled.match(resultAction)) {
-        await dispatch(GetAllDevices())
-        setModalOpen(false)
-      } else {
-        Notify('error', resultAction.payload || 'Failed to update device')
-      }
+  const saveDevice = async () => {
+    if (!DeviceInput.name?.trim()) {
+      Notify('error', 'Device name is required')
+      return
     }
-  } catch (error) {
-    console.error(error)
-    Notify('error', 'Something went wrong')
+    try {
+      let resultAction
+      if (modalType === 'create') {
+        resultAction = await dispatch(PostDevice(DeviceInput))
+        if (PostDevice.fulfilled.match(resultAction)) {
+          await dispatch(GetAllDevices())
+          setModalOpen(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to create device')
+        }
+      } else if (modalType === 'edit') {
+        resultAction = await dispatch(
+          UpdatedDevice({
+            id: DeviceInput.id,
+            updatedData: {
+              name: DeviceInput.name,
+              deviceName: DeviceInput.deviceName,
+              ip: DeviceInput.ip,
+              isActive: DeviceInput.isActive,
+              isConnected: DeviceInput.isConnected,
+            },
+          }),
+        )
+        if (UpdatedDevice.fulfilled.match(resultAction)) {
+          await dispatch(GetAllDevices())
+          setModalOpen(false)
+        } else {
+          Notify('error', resultAction.payload || 'Failed to update device')
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      Notify('error', 'Something went wrong')
+    }
   }
-}
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setDeviceInput((prev) => ({ ...prev, [name]: value }))
-  }
+ const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  setDeviceInput((prev) => ({
+    ...prev,
+    [name]: name === 'isActive' ? value === 'true' : value,
+  }));
+};
 
   const opendeleteModal = (index) => {
     setDeleteid(index)
@@ -110,7 +121,8 @@ const saveDevice = async () => {
             <th>Name</th>
             <th>Device Name</th>
             <th>IP Address</th>
-            <th>Status</th>
+            <th>isActive</th>
+            <th>isConnected</th>
             <th className="text-center">Actions</th>
           </tr>
         </thead>
@@ -131,14 +143,17 @@ const saveDevice = async () => {
                 <td>{device.deviceName}</td>
                 <td>{device.ip}</td>
                 <td>{device.isActive ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}</td>
+                <td>
+                  {device.isConnected ? <span className="badge bg-success">Active</span> : <span className="badge bg-secondary">Inactive</span>}
+                </td>
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                  <Button color="warning" size="sm" className="text-white w-md-auto" onClick={() => openModal('edit', device)}>
-                    <Icon icon="mdi:pencil" width={16} />
-                  </Button>
-                  <Button color="danger" size="sm" className="text-white w-md-auto" onClick={() => opendeleteModal(device.id)}>
-                    <Icon icon="mdi:delete" width={16} />
-                  </Button>
+                    <Button color="warning" size="sm" className="text-white w-md-auto" onClick={() => openModal('edit', device)}>
+                      <Icon icon="mdi:pencil" width={16} />
+                    </Button>
+                    <Button color="danger" size="sm" className="text-white w-md-auto" onClick={() => opendeleteModal(device.id)}>
+                      <Icon icon="mdi:delete" width={16} />
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -156,7 +171,9 @@ const saveDevice = async () => {
         <ModalHeader toggle={() => setModalOpen(!modalOpen)}>{modalType === 'create' ? 'Create Device' : 'Edit Device'}</ModalHeader>
         <ModalBody>
           <FormGroup>
-            <Label>Name <span style={{ color: '#e57373' }}>*</span></Label>
+            <Label>
+              Name <span style={{ color: '#e57373' }}>*</span>
+            </Label>
             <Input name="name" value={DeviceInput?.name || ''} onChange={handleInputChange} />
           </FormGroup>
           <FormGroup>
@@ -167,13 +184,29 @@ const saveDevice = async () => {
             <Label>Ip</Label>
             <Input name="ip" value={DeviceInput?.ip || ''} onChange={handleInputChange} />
           </FormGroup>
+          <FormGroup>
+            <Label>Is Active</Label>
+            <Input type="select" name="isActive" value={DeviceInput?.isActive ?? ''} onChange={handleInputChange}>
+              <option value="">Select Status</option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </Input>
+          </FormGroup>
+          {/* <FormGroup>
+            <Label>Is Connected</Label>
+            <Input type="select" name="isConnected" value={DeviceInput?.isConnected ?? ''} onChange={handleInputChange}>
+              <option value="">Select Status</option>
+              <option value="true">True</option>
+              <option value="false">False</option>
+            </Input>
+          </FormGroup> */}
         </ModalBody>
         <ModalFooter>
           <Button color="secondary" onClick={() => setModalOpen(false)}>
             Cancel
           </Button>
           <Button color="primary" onClick={saveDevice} disabled={loading}>
-             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
+            {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create' : 'Save'}
           </Button>
         </ModalFooter>
