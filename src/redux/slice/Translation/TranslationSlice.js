@@ -5,6 +5,7 @@ import {
   GetAllTranslation,
   GetSingleTranslation,
   GetTranslationData,
+  PostAssignTranslation,
   PostTanslation,
   UpdateTranlsation,
 } from '../../../api/Translation/TranslationHelperApi'
@@ -41,9 +42,19 @@ export const PostTranslation = createAsyncThunk('translation/postTranslation', a
     const response = await PostTanslation(data)
     return response
   } catch (error) {
-    return rejectWithValue('Failed to post Branch')
+    return rejectWithValue('Failed to post Translation')
   }
 })
+
+export const AssignTranslationToBranch = createAsyncThunk('translation/AssignTranslation', async (data, { rejectWithValue }) => {
+  try {
+    const response = await PostAssignTranslation(data)
+    return response
+  } catch (error) {
+    return rejectWithValue('Failed to Assign Branch')
+  }
+})
+
 
 export const UpdateTranslationData = createAsyncThunk('translation/UpdateTranslation', async (data, { rejectWithValue }) => {
   try {
@@ -131,6 +142,23 @@ export const TranslationSlice = createSlice({
         state.loading = false
         state.error = action.payload || action.error.message
       })
+
+        builder
+      .addCase(AssignTranslationToBranch.pending, (state) => {
+        state.loading = true
+      })
+      .addCase(AssignTranslationToBranch.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload?.statusCode === '200') {
+          state.error = null
+          Notify('success', action.payload.message)
+        }
+      })
+      .addCase(AssignTranslationToBranch.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || action.error.message
+      })
+
     builder
       .addCase(UpdateTranslationData.pending, (state) => {
         state.loading = true
