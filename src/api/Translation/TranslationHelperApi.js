@@ -36,6 +36,16 @@ export const PostTanslation = async (data) => {
   }
 }
 
+export const PostAssignTranslation = async (data) => {
+  try {
+    const response = await axiosInstance.post('translations/assign-to-branches', data)
+    return response.data
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const UpdateTranlsation= async (data) => {
   const { id, updatedData } = data
   try {

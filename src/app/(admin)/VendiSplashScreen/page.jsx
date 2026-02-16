@@ -189,6 +189,8 @@ const Page = () => {
         setShowUploadSuccess(false)
       }, 3000)
     } catch (err) {
+      console.log('received-error', err)
+      Notify('error', err?.message)
       console.error(err)
     } finally {
       setUploadingField(null)
