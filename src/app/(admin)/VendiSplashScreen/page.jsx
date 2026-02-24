@@ -246,7 +246,13 @@ const Page = () => {
           </tr>
         </thead>
         <tbody>
-          {VendiMachine?.length > 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={9} className="text-center mt-2">
+                <Spinner size="sm" /> Loading...
+              </td>
+            </tr>
+          ) : VendiMachine?.length > 0 ? (
             VendiMachine.map((item, index) => (
               <tr key={item.vmSplashId}>
                 <td>{index + 1}</td>
@@ -262,17 +268,17 @@ const Page = () => {
                 <td>{new Date(item.endTime).toLocaleString()}</td>
                 <td>
                   {item.vendronDeviceInfoIds?.length > 0 ? (
-                    <span className="badge bg-success">{item?.vendronDeviceInfoIds?.map((id) => id).join(', ')} Devices</span>
+                    <span className="badge bg-success">{item?.vendronDeviceInfoIds.join(', ')} Devices</span>
                   ) : (
                     <span className="badge bg-secondary">Not Assigned</span>
                   )}
                 </td>
                 <td className="text-center">
                   <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
-                    <Button color="warning" size="sm" className=" text-white w-md-auto" onClick={() => openModal('edit', item)}>
+                    <Button color="warning" size="sm" className="text-white w-md-auto" onClick={() => openModal('edit', item)}>
                       <Icon icon="mdi:pencil" width={16} />
                     </Button>
-                    <Button color="danger" size="sm" className=" text-white w-md-auto" onClick={() => openDeleteModal(item.vmSplashId)}>
+                    <Button color="danger" size="sm" className="text-white w-md-auto" onClick={() => openDeleteModal(item.vmSplashId)}>
                       <Icon icon="mdi:delete" width={16} />
                     </Button>
                   </div>
@@ -281,7 +287,7 @@ const Page = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center text-muted py-4">
+              <td colSpan="9" className="text-center text-muted py-4">
                 No Splash Screen
               </td>
             </tr>
@@ -318,9 +324,7 @@ const Page = () => {
                 </div>
               )}
             </div>
-            {showUploadSuccess && !uploadingField && (
-              <small className="text-success d-block mt-2">✔ Uploaded Successfully</small>
-            )}
+            {showUploadSuccess && !uploadingField && <small className="text-success d-block mt-2">✔ Uploaded Successfully</small>}
           </FormGroup>
 
           <FormGroup>
