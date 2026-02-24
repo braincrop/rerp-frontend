@@ -9,12 +9,12 @@ import {
   PostUpdateVendiSplash,
   PostWsUpdateLanguages,
   PostWsUpdateproducts,
-} from '@/redux/slice/WebSocketCommands/WebSocketSlice'
+} from '@/redux/slice/WebSocketCommands/WebSocketSlice';
 
 const Page = () => {
   const dispatch = useDispatch()
   const [selectedDevice, setSelectedDevice] = useState('')
-  const { Wsloading } = useSelector(AllWebSocketCommandSlice)
+  const { Wsloading } = useSelector(AllWebSocketCommandSlice);
   const { devices, loading } = useSelector(allDevices)
   const [activeCard, setActiveCard] = useState(null)
 

@@ -3,7 +3,7 @@ import { axiosInstance } from '../axiosConfig'
 
 export const AllVendiSplashMachine = async () => {
   try {
-    const response = await axiosInstance.get('vm-splashes')
+    const response = await axiosInstance.get('v1/VmSplash')
     return response
   } catch (error) {
     throw error
@@ -11,7 +11,7 @@ export const AllVendiSplashMachine = async () => {
 }
 export const PostVendiSplashMachine = async (data) => {
   try {
-    const response = await axiosInstance.post('vm-splashes', data)
+    const response = await axiosInstance.post('v1/VmSplash', data)
     return response
   } catch (error) {
     throw error
@@ -22,7 +22,7 @@ export const UpdateVendiSplashMachine = async (data) => {
   const { id, updatedData } = data
 
   try {
-    const response = await axiosInstance.put(`vm-splashes/${id}`, {
+    const response = await axiosInstance.put(`v1/VmSplash/${id}`, {
       ...updatedData,
     })
     return response
@@ -33,7 +33,7 @@ export const UpdateVendiSplashMachine = async (data) => {
 
 export const DeleteVendingSplashMachine = async (id) => {
   try {
-    const response = await axiosInstance.delete(`vm-splashes/${id}`)
+    const response = await axiosInstance.delete(`v1/VmSplash/${id}`)
     return response
   } catch (error) {
     throw error

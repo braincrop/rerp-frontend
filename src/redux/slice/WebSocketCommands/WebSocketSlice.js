@@ -107,7 +107,7 @@ export const WebSocketCommandSlice = createSlice({
       })
       .addCase(PostWsUpdateLanguages.fulfilled, (state, action) => {
         state.Wsloading = false
-        if (action.payload?.statusCode === '201') {
+        if (action.payload?.statusCode === '200') {
           state.error = null
           Notify('success', action.payload.message)
         }
