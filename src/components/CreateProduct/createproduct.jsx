@@ -3,9 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Select from 'react-select'
 import { postImage } from '@/api/ImagesApi/imageHelperApi'
-import { Row, Col, Form, FormGroup, Label, Input, Button } from 'reactstrap'
+import { Row, Col, Form, FormGroup, Label, Input, Button, Table } from 'reactstrap'
 import Notify from '../../components/Notify'
 import { allCategories, GetAllCategory } from '@/redux/slice/categories/CategorySlice'
+import { allTranslation, Translation } from '@/redux/slice/Translation/TranslationSlice'
 
 const customSelectStyles = {
   control: (base) => ({
@@ -38,7 +39,8 @@ const customSelectStyles = {
 }
 const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
   const dispatch = useDispatch()
-  const { singleProduct,loading } = useSelector(allProducts)
+  const { translation } = useSelector(allTranslation)
+  const { singleProduct, loading } = useSelector(allProducts)
   const { category } = useSelector(allCategories)
   const [productInput, setProductInput] = useState({
     name: '',
@@ -54,13 +56,45 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
     sku: '',
     taxApplied: '',
     categoryIds: [],
+    translations: {},
   })
 
+  console.log('translation-data---', productInput)
   useEffect(() => {
     if (modalType === 'edit') {
       dispatch(GetSingleProduct(selectedProduct?.dpid))
     }
   }, [])
+  useEffect(() => {
+    if (translation?.length) {
+      const formatted = {}
+      translation.forEach((item) => {
+        formatted[item.lang] = {
+          name: '',
+          productDescription: '',
+        }
+      })
+      setProductInput((prev) => ({
+        ...prev,
+        translations: formatted,
+      }))
+    }
+  }, [translation])
+
+  useEffect(() => {
+    if (productInput.name) {
+      setProductInput((prev) => ({
+        ...prev,
+        translations: {
+          ...prev.translations,
+          en: {
+            ...prev.translations?.en,
+            name: productInput.name,
+          },
+        },
+      }))
+    }
+  }, [productInput.name])
 
   useEffect(() => {
     if (modalType === 'edit' && singleProduct) {
@@ -88,6 +122,7 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
 
   useEffect(() => {
     dispatch(GetAllCategory())
+    dispatch(Translation())
   }, [])
 
   const categoryOptions = category?.map((cat) => ({
@@ -188,7 +223,18 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
       Notify('error', 'Something went wrong')
     }
   }
-
+  const handleTranslationChange = (lang, field, value) => {
+    setProductInput((prev) => ({
+      ...prev,
+      translations: {
+        ...prev.translations,
+        [lang]: {
+          ...prev.translations[lang],
+          [field]: value,
+        },
+      },
+    }))
+  }
   return (
     <Form onSubmit={handleSubmit}>
       <Row className="g-2">
@@ -291,8 +337,49 @@ const CreateProduct = ({ setShow, selectedProduct, modalType }) => {
             <Input type="textarea" name="productDescription" value={productInput.productDescription} onChange={handleChange} />
           </FormGroup>
         </Col>
+      </Row>
+      <Row>
+        <h2>Translations</h2>
+        <Table>
+          <thead>
+            <tr>
+              <th>Language</th>
+              <th>Name</th>
+              <th>Product Name</th>
+              <th>Product Description</th>
+            </tr>
+          </thead>
 
-        <Col md={12} className="text-end">
+          <tbody>
+            {translation?.map((item) => (
+              <tr key={item.translationId}>
+                <td>{item.lang}</td>
+
+                <td>{item.name}</td>
+
+                <td>
+                  <FormGroup>
+                    <Input
+                      value={productInput.translations?.[item.lang]?.name || ''}
+                      onChange={(e) => handleTranslationChange(item.lang, 'name', e.target.value)}
+                    />
+                  </FormGroup>
+                </td>
+
+                <td>
+                  <FormGroup>
+                    <Input
+                      type="textarea"
+                      value={productInput.translations?.[item.lang]?.productDescription || ''}
+                      onChange={(e) => handleTranslationChange(item.lang, 'productDescription', e.target.value)}
+                    />
+                  </FormGroup>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <Col md={12} className="text-end mb-2">
           <Button color="primary" type="submit" disabled={loading}>
             {loading && <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />}
             {modalType === 'create' ? 'Create Product' : 'Update Product'}
