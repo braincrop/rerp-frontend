@@ -49,7 +49,7 @@ export const PostAssignTranslation = async (data) => {
 export const UpdateTranlsation= async (data) => {
   const { id, updatedData } = data
   try {
-    const response = await axiosLocal.put(`translations/${id}`, {
+    const response = await axiosInstance.put(`translations/${id}`, {
       ...updatedData,
     })
     return response.data
