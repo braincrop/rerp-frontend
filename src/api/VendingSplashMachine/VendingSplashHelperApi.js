@@ -1,5 +1,5 @@
 'use client'
-import { axiosInstance,axiosLocal } from '../axiosConfig'
+import { axiosInstance } from '../axiosConfig'
 
 export const AllVendiSplashMachine = async () => {
   try {
