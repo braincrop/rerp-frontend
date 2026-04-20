@@ -84,12 +84,12 @@ const SignIn = () => {
         <Row className="justify-content-center">
             {showLoader && <FullScreenLoader />}
           <Col md={6} lg={5}>
-            <div className="border-0 custom-bg">
+            <div className="border-0" style={{backgroundColor:theme.primaryColor}}>
               <div className="p-5">
                 <div className="text-center">
                   <div className="mx-auto mb-4 text-center auth-logo">
                     <a className="logo-light">
-                      <img src={theme?.logoUrl || LightLogo} height={92} alt="logo light" width={100} />
+                      <img src={theme?.logoUrl || LightLogo} height={92} alt="logo light" width={200} />
                     </a>
                   </div>
                   <h4 className="fw-bold text-dark mb-2">Welcome Back!</h4>

@@ -1,43 +1,39 @@
-"use client";
-import { createContext, useContext, useEffect, useState } from "react";
-import {tenantConfig} from "../utils/tenantConfig";
+'use client'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { tenantConfig } from '../utils/tenantConfig'
 
 const clientId = process.env.NEXT_PUBLIC_CLIENT_ID
 
-const url =`https://sprucesol.com/${clientId}/branding.json`
+const url = `https://sprucesol.com/${clientId}/branding.json`
 
-const ThemeContext = createContext();
+const ThemeContext = createContext()
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState("");
+  const [theme, setTheme] = useState('')
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        const response = await fetch(url);
+        const response = await fetch(url)
         if (!response.ok) {
-          throw new Error("Failed to fetch theme");
+          throw new Error('Failed to fetch theme')
         }
-        const data = await response.json();
-        setTheme(data);
+        const data = await response.json()
+        setTheme(data)
       } catch (error) {
-        console.error("Error fetching theme:", error);
+        console.error('Error fetching theme:', error)
       }
     }
-    fetchTheme();
-  }, []);
+    fetchTheme()
+  }, [])
 
- useEffect(() => {
-  if (theme?.secondaryColor) {
-    document.documentElement.style.setProperty("--taplox-secondary-bg",theme.secondaryColor);
-    document.body.style.backgroundColor = theme.backgroundColor;
-  }
-}, [theme]);
+  useEffect(() => {
+    if (theme?.secondaryColor) {
+      document.documentElement.style.setProperty('--custom-text-color', theme.textColor)
+      document.body.style.backgroundColor = theme.backgroundColor
+    }
+  }, [theme])
 
-  return (
-    <ThemeContext.Provider value={{ theme:theme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
-};
+  return <ThemeContext.Provider value={{ theme: theme }}>{children}</ThemeContext.Provider>
+}
 
-export const useTheme = () => useContext(ThemeContext);
+export const useTheme = () => useContext(ThemeContext)
